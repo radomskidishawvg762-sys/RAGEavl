@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "RAGEval Studio 流程架构 / Process Architecture",
+    "locale": "zh-CN",
+    "output": "rageval-process-architecture.html",
+    "quality_profile": "showcase",
+    "viewBox": [1320, 670],
+    "views": [
+      {
+        "id": "main-path",
+        "label": "主链路 / Main Path",
+        "focus": ["frontend", "api", "service", "runner", "engines", "diagnosis", "repo", "db"],
+        "note": "从请求到落库：POST /api/evaluations → 后台执行 → 指标 → 诊断 → Repository → PostgreSQL。"
+      },
+      {
+        "id": "externals",
+        "label": "外部依赖 / External",
+        "focus": ["rag", "judge", "engines", "runner"],
+        "note": "被测 RAG 系统提供 answer/contexts；Judge LLM 为 RAGAS 指标打分。"
+      },
+      {
+        "id": "data-boundary",
+        "label": "数据边界 / Data Boundary",
+        "focus": ["repo", "db", "report"],
+        "note": "Repository 是唯一数据访问边界；Report 只读聚合持久化数据。"
+      }
+    ]
+  },
+  "components": [
+    { "id": "frontend", "type": "frontend", "label": "前端 React SPA", "sublabel": "浏览器 · 只渲染", "pos": [40, 120], "size": [130, 60] },
+    { "id": "api", "type": "backend", "label": "API 层 / FastAPI", "sublabel": "REST /api · 202 异步", "pos": [290, 120], "size": [130, 60] },
+    { "id": "service", "type": "backend", "label": "服务层 / Services", "sublabel": "业务编排 · 状态机", "pos": [550, 120], "size": [140, 60] },
+    { "id": "runner", "type": "backend", "label": "LocalAsyncRunner", "sublabel": "asyncio · 逐条隔离", "pos": [830, 120], "size": [140, 60] },
+    { "id": "rag", "type": "external", "label": "RAG 系统（被测）", "sublabel": "answer + contexts", "pos": [40, 340], "size": [130, 60] },
+    { "id": "engines", "type": "backend", "label": "指标引擎 / Engines", "sublabel": "Integrity + RAGAS", "pos": [290, 340], "size": [140, 64] },
+    { "id": "diagnosis", "type": "backend", "label": "诊断引擎 / Diagnosis", "sublabel": "Failure→Rule→Evidence", "pos": [590, 340], "size": [150, 64] },
+    { "id": "repo", "type": "backend", "label": "仓储层 / Repository", "sublabel": "事务 · 条件更新", "pos": [910, 340], "size": [130, 60], "tag": "P-8" },
+    { "id": "judge", "type": "external", "label": "Judge LLM", "sublabel": "OpenAI 兼容网关", "pos": [40, 570], "size": [130, 60] },
+    { "id": "report", "type": "backend", "label": "报告 / Report", "sublabel": "Run 级聚合 · 只读", "pos": [590, 570], "size": [150, 60] },
+    { "id": "db", "type": "database", "label": "PostgreSQL 17", "sublabel": "10 张业务表", "pos": [1150, 570], "size": [130, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "RAGEval Studio 应用容器 / App Container", "wraps": ["api", "service", "runner", "engines", "diagnosis", "repo", "report"] },
+    { "kind": "region", "label": "Supabase Cloud / 仅数据库托管", "wraps": ["db"] }
+  ],
+  "connections": [
+    { "id": "fe-to-api", "from": "frontend", "to": "api", "label": "HTTP /api", "variant": "emphasis" },
+    { "id": "api-to-service", "from": "api", "to": "service", "label": "编排 / call" },
+    { "id": "service-to-runner", "from": "service", "to": "runner", "label": "后台执行 / async" },
+    { "id": "rag-to-engines", "from": "rag", "to": "engines", "label": "answer/contexts", "variant": "dashed" },
+    { "id": "runner-to-engines", "from": "runner", "to": "engines", "label": "逐条评估 / evaluate", "fromSide": "bottom", "toSide": "top" },
+    { "id": "judge-to-engines", "from": "judge", "to": "engines", "label": "LLM-as-a-Judge", "variant": "dashed" },
+    { "id": "engines-to-diagnosis", "from": "engines", "to": "diagnosis", "label": "Failure 判定" },
+    { "id": "diagnosis-to-repo", "from": "diagnosis", "to": "repo", "label": "持久化 / persist" },
+    { "id": "repo-to-db", "from": "repo", "to": "db", "label": "SQLAlchemy" },
+    { "id": "report-to-repo", "from": "report", "to": "repo", "label": "只读聚合 / read-only", "variant": "dashed" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "请求路径 / Request Path",
+      "items": [
+        "POST /api/evaluations → 202 + run_id；数据集行锁保证同数据集并发仅一个 Run 胜出",
+        "三层 YAML Effective Config + Run 级覆盖固化进 Run 快照（8 复现字段）"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "执行与诊断 / Execution & Diagnosis",
+      "items": [
+        "LocalAsyncRunner 单进程 asyncio，逐条错误隔离（FR-22）",
+        "Metric → Failure → Rule → Evidence Contract → Diagnosis → Recommendation；分数只触发，归因靠证据"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "状态与数据边界 / State & Data",
+      "items": [
+        "启动/取消/完成均为数据库条件更新；cancelled 终态绝不被覆盖",
+        "Repository 唯一数据访问边界（P-8）；Report 只读聚合，不重执行 Engine/Judge"
+      ]
+    }
+  ]
+}

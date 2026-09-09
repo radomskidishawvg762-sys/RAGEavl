@@ -1,0 +1,115 @@
+{
+  "run_id": "043cc370-0850-4cd2-bc07-108ca90afebd",
+  "dataset_version": "v1 (trimmed: dedup + 800-char contexts)",
+  "metric": "faithfulness",
+  "judge": {
+    "provider": "openai",
+    "model": "deepseek-v4-flash",
+    "base_url": "https://opencode.ai/zen/go/v1",
+    "timeout": 300
+  },
+  "summary": {
+    "total_records": 10,
+    "evaluated": 6,
+    "errors": 4,
+    "status": "completed_with_errors",
+    "average_faithfulness": 0.7237,
+    "error_code": "SYS_METRIC_ERROR (RAGAS TimeoutError on remaining long-context records)"
+  },
+  "per_record": [
+    {
+      "question": "butcher shop phone number",
+      "model": "mistral-7B-instruct",
+      "faithfulness": 1.0,
+      "labels": [{"label_type": "Evident Baseless Info", "text": "...specific location named \"bear\"..."}],
+      "verdict": "FALSE_NEGATIVE",
+      "note": "Faithfulness scored 1.0 although the answer contains a human-labelled evident baseless span."
+    },
+    {
+      "question": "what is the difference between single cream and double cream",
+      "model": "mistral-7B-instruct",
+      "faithfulness": 0.8,
+      "labels": [{"label_type": "Evident Conflict"}],
+      "verdict": "ALIGNED",
+      "note": "Lower-than-1.0 score consistent with a conflict span."
+    },
+    {
+      "question": "how to soak off gel polish",
+      "model": "mistral-7B-instruct",
+      "faithfulness": 0.625,
+      "labels": [{"label_type": "Evident Baseless Info"}],
+      "verdict": "ALIGNED",
+      "note": "Moderately low score consistent with a baseless step (warm water / moisturizer) not in context."
+    },
+    {
+      "question": "in word, how do i remove a row",
+      "model": "mistral-7B-instruct",
+      "faithfulness": 0.4286,
+      "labels": [{"label_type": "Evident Baseless Info"}],
+      "verdict": "ALIGNED",
+      "note": "Low score consistent with baseless keyboard-shortcut claim."
+    },
+    {
+      "question": "food rich in potassium magnesium and calcium",
+      "model": "mistral-7B-instruct",
+      "faithfulness": 0.6,
+      "labels": [{"label_type": "Subtle Baseless Info"}, {"label_type": "Subtle Baseless Info"}],
+      "verdict": "ALIGNED",
+      "note": "Low score consistent with two subtle unsupported spans."
+    },
+    {
+      "question": "pros and cons entering workforce or going to graduate school",
+      "model": "gpt-4-0613",
+      "faithfulness": 0.8889,
+      "labels": [
+        {"label_type": "Evident Baseless Info"},
+        {"label_type": "Evident Baseless Info"},
+        {"label_type": "Evident Baseless Info"}
+      ],
+      "verdict": "PARTIALLY_ALIGNED",
+      "note": "Score relatively high (0.89) despite three evident baseless spans; possible miss or over-claiming."
+    },
+    {
+      "question": "tips how to conserve water",
+      "model": "mistral-7B-instruct",
+      "faithfulness": null,
+      "labels": [{"label_type": "Subtle Baseless Info"}],
+      "verdict": "TIMEOUT"
+    },
+    {
+      "question": "safely clean your computer screen",
+      "model": "llama-2-7b-chat",
+      "faithfulness": null,
+      "labels": [{"label_type": "Evident Baseless Info"}],
+      "verdict": "TIMEOUT"
+    },
+    {
+      "question": "how do automotive technicians get paid",
+      "model": "llama-2-13b-chat",
+      "faithfulness": null,
+      "labels": [{"label_type": "Evident Baseless Info"}],
+      "verdict": "TIMEOUT"
+    },
+    {
+      "question": "how to plough a field",
+      "model": "mistral-7B-instruct",
+      "faithfulness": null,
+      "labels": [
+        {"label_type": "Evident Baseless Info"},
+        {"label_type": "Evident Baseless Info"},
+        {"label_type": "Evident Baseless Info"},
+        {"label_type": "Evident Baseless Info"},
+        {"label_type": "Evident Baseless Info"}
+      ],
+      "verdict": "TIMEOUT"
+    }
+  ],
+  "observations": [
+    "5 of 6 scored records are directionally consistent with human labels (lower score when labels present).",
+    "1 clear false negative: 'butcher shop phone number' scored 1.0 despite an evident baseless span.",
+    "1 partial: 'pros and cons grad school' scored 0.89 despite 3 evident baseless spans.",
+    "4 records still timeout under 300s - deepseek-v4-flash reasoning latency on long multi-passage contexts.",
+    "Reference answers were curated from source passages by the assistant (pending user review); not official corpus labels.",
+    "This is a smoke-level result (n=6), not a statistically significant benchmark."
+  ]
+}

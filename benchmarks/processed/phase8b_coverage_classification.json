@@ -1,0 +1,245 @@
+{
+  "phase": "8B",
+  "n_undetermined_report_items": 25,
+  "n_failure_report_items": 7,
+  "n_classified_items": 32,
+  "bucket_counts": {
+    "undetermined_scope_gap": 13,
+    "undetermined_true_insufficient": 10,
+    "not_evaluated_error": 2,
+    "failure_with_diagnosis": 7
+  },
+  "items": [
+    {
+      "record_id": "eb2cbc18-26d5-4f3a-b535-669f1599e906",
+      "question": "butcher shop phone number",
+      "metric": "entity_consistency",
+      "bucket": "undetermined_scope_gap",
+      "reason": "ans:entity not in alias table (no knowledge graph in MVP)"
+    },
+    {
+      "record_id": "eb2cbc18-26d5-4f3a-b535-669f1599e906",
+      "question": "butcher shop phone number",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_true_insufficient",
+      "reason": "ambiguous (no side detail)"
+    },
+    {
+      "record_id": "4366b658-3890-4623-be0f-de25ab972408",
+      "question": "in word, how do i remove a row",
+      "metric": "entity_consistency",
+      "bucket": "undetermined_scope_gap",
+      "reason": "ans:entity not in alias table (no knowledge graph in MVP)"
+    },
+    {
+      "record_id": "444b37a6-57d7-45b7-a742-147eefa8cb8f",
+      "question": "pros and cons entering workforce or going to graduate school",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_true_insufficient",
+      "reason": "ambiguous (no side detail)"
+    },
+    {
+      "record_id": "ba73065a-ac26-4fe3-87ae-715a176a7de1",
+      "question": "food rich in potassium magnesium and calcium",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_scope_gap",
+      "reason": "ans:unit outside MVP scope: f"
+    },
+    {
+      "record_id": "5f9ded87-2ec1-48a1-8d15-e7463237c1da",
+      "question": "how do automotive technicians get paid",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_scope_gap",
+      "reason": "ans:unit outside MVP scope: p"
+    },
+    {
+      "record_id": "d8a6f1dc-e1c9-48c4-885e-f846ca7fd3b3",
+      "question": "meaning of each types of topology network",
+      "metric": "faithfulness",
+      "bucket": "not_evaluated_error",
+      "reason": "SYS_METRIC_ERROR"
+    },
+    {
+      "record_id": "d28d2774-ae77-4403-a960-1463bb0722af",
+      "question": "benefits of ice for neck",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_true_insufficient",
+      "reason": "ambiguous (no side detail)"
+    },
+    {
+      "record_id": "66a3c10c-4f92-4bf7-9037-091b4bd23926",
+      "question": "what does a snake ring symbolize",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_true_insufficient",
+      "reason": "ambiguous (no side detail)"
+    },
+    {
+      "record_id": "4f55bfd1-b8e6-4193-8864-7d71390e7287",
+      "question": "inca clothes",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_true_insufficient",
+      "reason": "ambiguous (no side detail)"
+    },
+    {
+      "record_id": "90afbb3f-ca58-41c0-833a-49f3a8eb8606",
+      "question": "What is the purpose of reabsorption in the nephron",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_true_insufficient",
+      "reason": "ambiguous (no side detail)"
+    },
+    {
+      "record_id": "d9099e4c-f29a-4cee-b812-5b4cfe7bcc8a",
+      "question": "how to make pasta for pizzoccheri",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_scope_gap",
+      "reason": "ans:unit outside MVP scope: m"
+    },
+    {
+      "record_id": "813517c0-b860-4cc1-a92d-0ac88044ed7d",
+      "question": "smell in a house how to get rid of",
+      "metric": "entity_consistency",
+      "bucket": "undetermined_scope_gap",
+      "reason": "ref:entity not in alias table (no knowledge graph in MVP)"
+    },
+    {
+      "record_id": "b8bb1912-777e-4690-b75d-3c3312f6dd06",
+      "question": "what foods should i eat for eye health",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_scope_gap",
+      "reason": "ans:unit outside MVP scope: f"
+    },
+    {
+      "record_id": "893ee88e-afd0-4f91-b152-411d5325456a",
+      "question": "how to set up jailbroken apple tv 2",
+      "metric": "entity_consistency",
+      "bucket": "undetermined_scope_gap",
+      "reason": "ans:entity not in alias table (no knowledge graph in MVP)"
+    },
+    {
+      "record_id": "6378f352-26b2-4ff9-a78b-41c479e7fbdd",
+      "question": "how to plan a surprise wedding",
+      "metric": "entity_consistency",
+      "bucket": "undetermined_scope_gap",
+      "reason": "ref:entity not in alias table (no knowledge graph in MVP); ans:entity not in alias table (no knowledge graph in MVP)"
+    },
+    {
+      "record_id": "c86798a6-6652-4968-807c-7dd5702a63ee",
+      "question": "how to upgrade firmware of hp printer",
+      "metric": "entity_consistency",
+      "bucket": "undetermined_scope_gap",
+      "reason": "ref:entity not in alias table (no knowledge graph in MVP)"
+    },
+    {
+      "record_id": "5e45ec4f-ecdf-47ed-84c1-ca163638a823",
+      "question": "what is the difference in AF-C and AF-A",
+      "metric": "entity_consistency",
+      "bucket": "undetermined_scope_gap",
+      "reason": "ref:entity not in alias table (no knowledge graph in MVP)"
+    },
+    {
+      "record_id": "0ab68db5-c965-4c89-9eca-1538844f1a39",
+      "question": "how to bbq corn on the cob?",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_scope_gap",
+      "reason": "ans:unit outside MVP scope: t"
+    },
+    {
+      "record_id": "e0925b45-3033-4db6-b5eb-f5551c4bde15",
+      "question": "how to do everything in golf",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_true_insufficient",
+      "reason": "ambiguous (no side detail)"
+    },
+    {
+      "record_id": "5f2dc560-6dcc-4a27-bf0a-04a952a93338",
+      "question": "carry on cast still alive",
+      "metric": "entity_consistency",
+      "bucket": "undetermined_scope_gap",
+      "reason": "ref:entity not in alias table (no knowledge graph in MVP); ans:entity not in alias table (no knowledge graph in MVP)"
+    },
+    {
+      "record_id": "5f2dc560-6dcc-4a27-bf0a-04a952a93338",
+      "question": "carry on cast still alive",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_true_insufficient",
+      "reason": "ambiguous (no side detail)"
+    },
+    {
+      "record_id": "58193a1b-33d3-43c1-bb9a-6bb08db8fbc0",
+      "question": "what is professional job skills",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_true_insufficient",
+      "reason": "ambiguous (no side detail)"
+    },
+    {
+      "record_id": "1d44193d-7f7b-4f35-ab09-269de9fd7508",
+      "question": "what would hydrocortisone capsules be used for",
+      "metric": "faithfulness",
+      "bucket": "not_evaluated_error",
+      "reason": "SYS_METRIC_ERROR"
+    },
+    {
+      "record_id": "1d44193d-7f7b-4f35-ab09-269de9fd7508",
+      "question": "what would hydrocortisone capsules be used for",
+      "metric": "numerical_consistency",
+      "bucket": "undetermined_true_insufficient",
+      "reason": "ambiguous (no side detail)"
+    },
+    {
+      "record_id": "4366b658-3890-4623-be0f-de25ab972408",
+      "question": "in word, how do i remove a row",
+      "metric": "numerical_consistency",
+      "failure_type": "integrity.numerical_mismatch",
+      "bucket": "failure_with_diagnosis",
+      "reason": "Numerical Mismatch (abs_diff=2006.0, reference='1')"
+    },
+    {
+      "record_id": "2997f8eb-2167-4559-bc75-bd59023809aa",
+      "question": "what is the difference between single cream and double cream",
+      "metric": "numerical_consistency",
+      "failure_type": "integrity.unit_mismatch",
+      "bucket": "failure_with_diagnosis",
+      "reason": "Unit Mismatch (reference='1')"
+    },
+    {
+      "record_id": "9d2ce23f-5463-4206-a2c6-c8cfff57ea81",
+      "question": "how to plough a field",
+      "metric": "numerical_consistency",
+      "failure_type": "integrity.numerical_mismatch",
+      "bucket": "failure_with_diagnosis",
+      "reason": "Numerical Mismatch (abs_diff=2.0, reference='1')"
+    },
+    {
+      "record_id": "f7fba5e3-30cf-4b0c-a1ff-4a740bedb5d1",
+      "question": "how to grow petunia indoor",
+      "metric": "numerical_consistency",
+      "failure_type": "integrity.numerical_mismatch",
+      "bucket": "failure_with_diagnosis",
+      "reason": "Numerical Mismatch (abs_diff=64.0, reference='1')"
+    },
+    {
+      "record_id": "893ee88e-afd0-4f91-b152-411d5325456a",
+      "question": "how to set up jailbroken apple tv 2",
+      "metric": "numerical_consistency",
+      "failure_type": "integrity.numerical_mismatch",
+      "bucket": "failure_with_diagnosis",
+      "reason": "Numerical Mismatch (abs_diff=1.0, reference='1')"
+    },
+    {
+      "record_id": "779952da-b4ab-4810-b19e-5eee2febc5f4",
+      "question": "how to slow and tender cook a chuck roast in the oven",
+      "metric": "numerical_consistency",
+      "failure_type": "integrity.numerical_mismatch",
+      "bucket": "failure_with_diagnosis",
+      "reason": "Numerical Mismatch (abs_diff=349.0, reference='1')"
+    },
+    {
+      "record_id": "ef7b0cfd-6971-46d3-984f-b24a83d71958",
+      "question": "munchkin song lyrics merry old land of oz",
+      "metric": "numerical_consistency",
+      "failure_type": "integrity.numerical_mismatch",
+      "bucket": "failure_with_diagnosis",
+      "reason": "Numerical Mismatch (abs_diff=1.0, reference='1')"
+    }
+  ]
+}

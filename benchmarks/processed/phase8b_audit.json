@@ -1,0 +1,1606 @@
+{
+  "phase": "8B",
+  "note": "read-only audit; no code changes",
+  "n_records": 50,
+  "summary": {
+    "failure_with_diagnosis": {
+      "count": 7,
+      "metrics_seen": [
+        "entity_consistency",
+        "faithfulness",
+        "numerical_consistency",
+        "temporal_consistency"
+      ]
+    },
+    "undetermined_insufficient": {
+      "count": 19,
+      "metrics_seen": [
+        "entity_consistency",
+        "faithfulness",
+        "numerical_consistency",
+        "temporal_consistency"
+      ]
+    },
+    "undetermined_untriggered": {
+      "count": 23,
+      "metrics_seen": [
+        "entity_consistency",
+        "faithfulness",
+        "numerical_consistency",
+        "temporal_consistency"
+      ]
+    },
+    "undetermined_no_rule": {
+      "count": 0,
+      "metrics_seen": []
+    },
+    "not_evaluated_error": {
+      "count": 1,
+      "metrics_seen": [
+        "entity_consistency",
+        "faithfulness",
+        "numerical_consistency",
+        "temporal_consistency"
+      ]
+    },
+    "scored_no_judgment": {
+      "count": 0,
+      "metrics_seen": []
+    }
+  },
+  "ambiguity_reason_histogram": {
+    "ans": 6,
+    "ambiguous": 10,
+    "ref": 5
+  },
+  "buckets": {
+    "failure_with_diagnosis": [
+      {
+        "question": "what is the difference between single cream and double cream",
+        "is_failure": true,
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.8,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_none_or_unknown",
+            "score": null,
+            "status": "not_run",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "in word, how do i remove a row",
+        "is_failure": true,
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ans:entity not in alias table (no knowledge graph in MVP)"
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.8,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 0.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to plough a field",
+        "is_failure": true,
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.272727272727273,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 0.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to grow petunia indoor",
+        "is_failure": true,
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.857142857142857,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 0.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to set up jailbroken apple tv 2",
+        "is_failure": true,
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ans:entity not in alias table (no knowledge graph in MVP)"
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.555555555555556,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 0.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to slow and tender cook a chuck roast in the oven",
+        "is_failure": true,
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 0.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "munchkin song lyrics merry old land of oz",
+        "is_failure": true,
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.4,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 0.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      }
+    ],
+    "undetermined_insufficient": [
+      {
+        "question": "butcher shop phone number",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ans:entity not in alias table (no knowledge graph in MVP)"
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ambiguous"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "entity_consistency",
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "food rich in potassium magnesium and calcium",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.6,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ans:unit outside MVP scope: f"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "pros and cons entering workforce or going to graduate school",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.8,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ambiguous"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "how do automotive technicians get paid",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.625,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ans:unit outside MVP scope: p"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "inca clothes",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.846153846153846,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ambiguous"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "what does a snake ring symbolize",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.5,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ambiguous"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "benefits of ice for neck",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ambiguous"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "What is the purpose of reabsorption in the nephron",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.4,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ambiguous"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "how to make pasta for pizzoccheri",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ans:unit outside MVP scope: m"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "what foods should i eat for eye health",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.75,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ans:unit outside MVP scope: f"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "smell in a house how to get rid of",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ref:entity not in alias table (no knowledge graph in MVP)"
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.769230769230769,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "entity_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "how to plan a surprise wedding",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ref:entity not in alias table (no knowledge graph in MVP); ans:entity not in alias table (no knowledge graph in MVP)"
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.5,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "entity_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "how to do everything in golf",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.538461538461538,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ambiguous"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "how to bbq corn on the cob?",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ans:unit outside MVP scope: t"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "how to upgrade firmware of hp printer",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ref:entity not in alias table (no knowledge graph in MVP)"
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.555555555555556,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "entity_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "what is the difference in AF-C and AF-A",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ref:entity not in alias table (no knowledge graph in MVP)"
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.666666666666667,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "entity_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "what would hydrocortisone capsules be used for",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "error",
+            "score": null,
+            "status": "error",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ambiguous"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "carry on cast still alive",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ref:entity not in alias table (no knowledge graph in MVP); ans:entity not in alias table (no knowledge graph in MVP)"
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.5,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ambiguous"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "entity_consistency",
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      },
+      {
+        "question": "what is professional job skills",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.6,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "undetermined_ambiguous",
+            "score": null,
+            "status": "undetermined",
+            "ambiguity": "ambiguous"
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "ambiguous_metrics": [
+          "numerical_consistency"
+        ],
+        "missing_reference_metrics": []
+      }
+    ],
+    "undetermined_untriggered": [
+      {
+        "question": "tips how to conserve water",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.888888888888889,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "safely clean your computer screen",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.6875,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to soak off gel polish",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.5,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to make an egg bake in the oven",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.692307692307692,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to make oven sweet potato fries crispy",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to start a paw paw tree from seed",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to make french fries baked",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.875,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to cook in oven a prime beef roast",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.785714285714286,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to freeze peaches easy",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.642857142857143,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to cook a boston butt pork roast in the oven",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.727272727272727,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to improve hair growth",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.625,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to fix soft close toilet lid",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.875,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to grill a porterhouse",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.4,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to explain quartiles",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.666666666666667,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to cook thin pork tenderloin in oven with foil",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.625,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "what happens after colon cancer diagnosis",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.285714285714286,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to freeze hash browns",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.833333333333333,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to reclaim deleted google messages",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.75,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how do I find out how much sod i need",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.571428571428571,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to sell a timeshare yourself",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.428571428571429,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how tocook a rump roast",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.75,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "how to fold a quilt",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.692307692307692,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      },
+      {
+        "question": "benefits of a water pick",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "scored",
+            "score": 0.857142857142857,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        }
+      }
+    ],
+    "undetermined_no_rule": [],
+    "not_evaluated_error": [
+      {
+        "question": "meaning of each types of topology network",
+        "per_metric": {
+          "entity_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "faithfulness": {
+            "outcome": "error",
+            "score": null,
+            "status": "error",
+            "ambiguity": null
+          },
+          "numerical_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          },
+          "temporal_consistency": {
+            "outcome": "scored",
+            "score": 1.0,
+            "status": "completed",
+            "ambiguity": null
+          }
+        },
+        "error_metrics": [
+          "faithfulness"
+        ]
+      }
+    ],
+    "scored_no_judgment": []
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "run_id": "e6b07079-1413-4b28-bdc7-b0ba2e6a1fb9",
+  "dataset_version": "v5",
+  "metric": "faithfulness",
+  "judge": {
+    "provider": "openai",
+    "model": "deepseek-v4-flash",
+    "base_url": "https://opencode.ai/zen/go/v1",
+    "timeout": 180
+  },
+  "summary": {
+    "total_records": 10,
+    "evaluated": 2,
+    "errors": 8,
+    "status": "completed_with_errors",
+    "error_code": "SYS_METRIC_ERROR (RAGAS TimeoutError on long-context multi-call judgment)"
+  },
+  "results": [
+    {
+      "question": "butcher shop phone number",
+      "source_id": "14292",
+      "model": "mistral-7B-instruct",
+      "faithfulness": 1.0,
+      "human_labels": [
+        {"label_type": "Evident Baseless Info", "text": "none of them are for a specific location named \"bear\""}
+      ],
+      "observation": "SCORED 1.0 DESPITE a human-labelled baseless span; faithfulness missed the non-numeric hallucination."
+    },
+    {
+      "question": "food rich in potassium magnesium and calcium",
+      "source_id": "14298",
+      "model": "mistral-7B-instruct",
+      "faithfulness": 0.625,
+      "human_labels": [
+        {"label_type": "Subtle Baseless Info"},
+        {"label_type": "Subtle Baseless Info"}
+      ],
+      "observation": "Score direction consistent with presence of subtle unsupported spans."
+    }
+  ],
+  "failed_records": [
+    "butcher shop phone number (mistral variant, TimeoutError)",
+    "tips how to conserve water",
+    "safely clean your computer screen",
+    "what is the difference between single cream and double cream",
+    "how to soak off gel polish",
+    "in word, how do i remove a row",
+    "pros and cons entering workforce or going to graduate school",
+    "how do automotive technicians get paid",
+    "how to plough a field"
+  ],
+  "limitations": [
+    "Only 2 of 10 records produced a score; 8 failed with RAGAS TimeoutError (deepseek-v4-flash reasoning latency on long contexts).",
+    "faithfulness=1.0 on a record whose RAGTruth labels mark an evident baseless span - a false negative worth investigating.",
+    "Reference answers were curated from source passages by the assistant (pending user review); they are not part of the official corpus.",
+    "This is a first smoke result, not a statistically meaningful benchmark."
+  ]
+}

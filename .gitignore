@@ -1,0 +1,45 @@
+# ============ 密钥与环境配置（严禁提交） ============
+# Supabase Cloud 迁移后，DATABASE_URL 含数据库凭据，等同 Secret
+.env
+.env.local
+.env.test
+.env.demo
+.env.*.local
+!.env.example
+
+# ============ Python ============
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage.xml
+htmlcov/
+.coverage
+
+# ============ Node / 前端 ============
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# ============ 数据与导出（MVP 本地挂载，含业务数据） ============
+exports/
+*.dump
+*.sql.gz
+
+# ============ 本地模型权重（不提交到 Git） ============
+models/
+
+# ============ IDE / 系统 ============
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# ============ 日志 ============
+*.log
+logs/

@@ -1,0 +1,28 @@
+{
+  "experiment": "level3_faithfulness_bear_attribution",
+  "judge": {
+    "provider": "openai",
+    "model": "glm-5.3-flash",
+    "base_url": "https://opencode.ai/zen/go/v1",
+    "timeout": 300
+  },
+  "record": {
+    "question": "butcher shop phone number",
+    "contexts": [
+      "Butcher Shop - Hayward 826 B Street, Hayward CA 94541 Phone Number: (510) 889-8690",
+      "Butcher Shop - Lakefield 212 Main Street, Lakefield MN 56150 Phone Number: (507) 662-6281",
+      "The Local Butcher Shop phone number: (510) 845-6328. Boones Butcher Shop phone number: (502) 348-3668. Ye Ole Butcher Shop phone number: (972) 423-1848. J Ms Butcher Shop phone number: (865) 483-9228."
+    ]
+  },
+  "variant_a_bear_present": {
+    "answer": "Based on the given passages, there are several different phone numbers associated with butcher shops. However, none of them are for a specific location named \"bear\" or have any indication of being related to bears. Therefore, it is unable to determine if there is a butcher shop phone number specifically for \"bear\".",
+    "faithfulness": 0.75,
+    "status": "completed"
+  },
+  "variant_b_bear_removed": {
+    "answer": "Based on the given passages, there are several different phone numbers associated with butcher shops. The passages list phone numbers for the butcher shops mentioned above.",
+    "faithfulness": 1.0,
+    "status": "completed"
+  },
+  "conclusion": "If A==B==1.0 -> systematic miss of introduced-new-info spans (judge+metric limitation). If A<B or A<1.0 -> the judge can detect the baseless span when it is present."
+}

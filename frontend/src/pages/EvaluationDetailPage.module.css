@@ -1,0 +1,358 @@
+.linkBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-medium);
+  background: transparent;
+}
+.linkBtn:hover {
+  background: var(--color-bg-selected);
+  color: var(--color-brand);
+  border-color: color-mix(in srgb, var(--color-brand) 40%, transparent);
+}
+
+.runHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.runMain {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+.running {
+  color: var(--color-brand);
+  font-size: var(--fs-sm);
+}
+.runMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+}
+.runMeta code {
+  color: var(--color-text-subtle);
+}
+
+.metricEmpty {
+  color: var(--color-text-subtle);
+  font-size: var(--fs-sm);
+  font-style: italic;
+  padding: var(--sp-4);
+}
+
+.metricTable,
+.failureTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-md);
+}
+
+.failureDataTable,
+.evidenceTable {
+  display: block;
+  min-width: 760px;
+  overflow-x: auto;
+}
+.metricTable th,
+.failureTable th {
+  text-align: left;
+  color: var(--color-text-subtle);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--color-border-muted);
+}
+.metricTable td,
+.failureTable td {
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--color-border-muted);
+  color: var(--color-text);
+  vertical-align: middle;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.count {
+  font-size: var(--fs-sm);
+  color: var(--color-text-subtle);
+}
+
+.sampleList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sampleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-inset);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  font-size: var(--fs-md);
+}
+.sampleRow:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-brand);
+}
+.sampleType {
+  font-weight: var(--fw-medium);
+}
+.sampleQ {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text-muted);
+}
+.sampleArrow {
+  flex-shrink: 0;
+  color: var(--color-brand);
+  font-size: var(--fs-sm);
+  white-space: nowrap;
+}
+
+.undeterminedList {
+  list-style: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: 0;
+}
+.undeterminedItem,
+.unlexecItem {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: baseline;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-inset);
+  color: var(--color-text);
+  font-size: var(--fs-md);
+}
+.dim {
+  color: var(--color-text-muted);
+  font-size: var(--fs-sm);
+}
+
+.repro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.reproRow {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: baseline;
+}
+.reproKey {
+  width: 200px;
+  flex-shrink: 0;
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+}
+.reproVal {
+  color: var(--color-text);
+  font-size: var(--fs-md);
+}
+
+.progress {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-sm);
+  color: var(--color-info);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- UX Polish: workbench tabs ---- */
+
+.failureDataTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-md);
+}
+.failureDataTable th {
+  text-align: left;
+  color: var(--color-text-subtle);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--color-border-muted);
+}
+.failureDataTable td {
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--color-border-muted);
+}
+.failureDataTable tbody tr {
+  cursor: pointer;
+}
+.failureDataTable tbody tr:hover {
+  background: var(--color-bg-hover);
+}
+
+.evidenceTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+}
+.evidenceTable th {
+  text-align: left;
+  color: var(--color-text-subtle);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--color-border-muted);
+}
+.evidenceTable td {
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--color-border-muted);
+  vertical-align: top;
+}
+
+.evType {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  background: var(--color-bg-inset);
+  border: 1px solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+.evLocator {
+  font-size: var(--fs-xs);
+}
+.evContent {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-muted);
+  font-size: var(--fs-sm);
+}
+.openBtn {
+  padding: 3px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--fs-sm);
+}
+.openBtn:hover {
+  background: var(--color-bg-selected);
+  color: var(--color-brand);
+}
+
+.diagCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--sp-3);
+}
+.diagCard {
+  text-align: left;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-inset);
+  padding: var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  cursor: pointer;
+  color: var(--color-text);
+}
+.diagCard:hover {
+  border-color: color-mix(in srgb, var(--color-brand) 40%, transparent);
+  background: var(--color-bg-hover);
+}
+.diagHead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.diagType {
+  font-size: var(--fs-sm);
+}
+.diagCause {
+  font-size: var(--fs-md);
+  color: var(--color-text);
+}
+.diagMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--fs-xs);
+  color: var(--color-text-subtle);
+}
+
+.execGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+@media (max-width: 768px) {
+  /* 4-across KPI cards truncate values at phone width — stack 2x2 instead */
+  .execGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.execItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--color-bg-inset);
+  border: 1px solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+}
+.execLabel {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-subtle);
+}
+.execVal {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+}
+.execNote {
+  grid-column: 1 / -1;
+  font-size: var(--fs-sm);
+  color: var(--color-text-subtle);
+}
+
+/* Phase 9: weakest dimension highlight (Overall Score must not mask局部问题) */
+.weakest {
+  color: var(--color-error);
+  font-weight: var(--fw-semibold);
+}
+
+.weakestTag {
+  display: block;
+  margin-top: 2px;
+  color: var(--color-warning);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+}

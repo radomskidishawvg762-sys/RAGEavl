@@ -1,0 +1,10 @@
+# Domain layer 2/3. Only RECOMMENDS metrics — never thresholds (PRD Q3).
+domain: general
+recommended_metrics:
+  - context_recall
+  - context_precision
+  - faithfulness
+  - answer_relevancy
+  - entity_consistency
+  - temporal_consistency
+  - numerical_consistency

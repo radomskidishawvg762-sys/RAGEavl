@@ -1,0 +1,615 @@
+{
+  "experiment": "level4_miracl_retrieval_diagnosis",
+  "method": "deterministic",
+  "n_queries": 20,
+  "gold_hit_expected": "undetermined (no failure attributable)",
+  "all_missing_expected": "retrieval.missing_evidence",
+  "top_k_saturated_expected": "retrieval.top_k_issue",
+  "counts": {
+    "gold_hit_undetermined": 20,
+    "all_missing_missing_evidence": 20,
+    "top_k_issue": 20
+  },
+  "rows": [
+    {
+      "qid": "1009493#0",
+      "query": "中国俄罗斯族有多少人？",
+      "gold_count": 2,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1022851#0",
+      "query": "联合国安理会常任理事国有哪些？",
+      "gold_count": 5,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1026255#0",
+      "query": "印度人口有多少？",
+      "gold_count": 5,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1042661#0",
+      "query": "埃及有哪些民族？",
+      "gold_count": 3,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1057816#0",
+      "query": "祭天仪式有哪些？",
+      "gold_count": 3,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1059425#0",
+      "query": "西藏总人口多少？",
+      "gold_count": 4,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "10598#0",
+      "query": "美国有哪些流行音乐派别？",
+      "gold_count": 4,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1065971#0",
+      "query": "北宋时的开国皇帝是谁？",
+      "gold_count": 3,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1077527#0",
+      "query": "卵生动物有哪些？",
+      "gold_count": 3,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1086423#0",
+      "query": "有哪些有关卧底的电影？",
+      "gold_count": 2,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1097987#0",
+      "query": "四川地形有什么特征？",
+      "gold_count": 2,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1099470#0",
+      "query": "动物有哪些繁衍活动？",
+      "gold_count": 3,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "112539#0",
+      "query": "中国盛产哪些茶叶？",
+      "gold_count": 3,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1171948#0",
+      "query": "美国总统富兰克林有哪些成就？",
+      "gold_count": 5,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1178850#0",
+      "query": "中国有哪些证券交易所？",
+      "gold_count": 3,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "121445#0",
+      "query": "台湾有哪些少数民族？",
+      "gold_count": 3,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "121624#0",
+      "query": "台湾有哪些宗教？",
+      "gold_count": 8,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1238216#0",
+      "query": "中国最高人民法院的地址是哪里？",
+      "gold_count": 10,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1261599#0",
+      "query": "马来西亚位于哪一大洲？",
+      "gold_count": 4,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    },
+    {
+      "qid": "1266978#0",
+      "query": "英格兰属于哪一气候类型？",
+      "gold_count": 3,
+      "scenarios": {
+        "gold_hit": {
+          "status": "undetermined",
+          "code": null,
+          "reason": "all 2 gold evidence items present in retrieved contexts; low score not attributable to a retrieval root cause without retrieval metadata",
+          "missing_evidence": [
+            "retrieval_metadata"
+          ],
+          "contract": ""
+        },
+        "all_missing": {
+          "status": "diagnosed",
+          "code": "retrieval.missing_evidence",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.missing_evidence.v1"
+        },
+        "top_k_saturated": {
+          "status": "diagnosed",
+          "code": "retrieval.top_k_issue",
+          "reason": null,
+          "missing_evidence": [],
+          "contract": "retrieval.top_k_issue.v1"
+        }
+      }
+    }
+  ]
+}

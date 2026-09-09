@@ -1,0 +1,14 @@
+line-length = 100
+target-version = "py312"
+
+[lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = [
+    "E501",
+    "B008",  # FastAPI idiom: Depends()/Query() in parameter defaults
+]
+
+[lint.per-file-ignores]
+# Alembic's generated template style (Sequence/Union typing) — migrations are
+# frozen artifacts; never reformat them.
+"alembic/versions/*" = ["I001", "UP007", "UP035"]

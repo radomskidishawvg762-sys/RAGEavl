@@ -1,0 +1,49 @@
+{
+  "title": "RAGTruth 50-record faithfulness gold-alignment study",
+  "run": "b8759669-4352-432f-849c-f5cfcb3db570",
+  "judge": {"provider": "openai", "model": "glm-5.3-flash", "base_url": "https://opencode.ai/zen/go/v1", "timeout": 300},
+  "dataset": "ragtruth_golden_qa_50 (dedup + 800-char contexts, assistant-curated references pending review)",
+  "coverage": {
+    "total_records": 50,
+    "scored": 33,
+    "timeout_errors": 17,
+    "scored_rate": 0.66,
+    "coverage_note": "GLM-5.3-flash improved scored rate vs deepseek-v4-flash (0.60 vs 0.66 on 10/50 sample set); 17 still timeout on long multi-passage records."
+  },
+  "score_distribution": {
+    "mean_faithfulness": 0.6494,
+    "median_faithfulness": 0.7,
+    "records_below_0.5": 7,
+    "records_at_or_above_0.8": 6,
+    "score_range": [0.0, 1.0]
+  },
+  "gold_alignment": {
+    "spearman_label_count_vs_score": -0.1434,
+    "label_count_trend": {
+      "1_label": {"n": 25, "mean": 0.6386},
+      "2_labels": {"n": 4, "mean": 0.8606},
+      "4_labels": {"n": 3, "mean": 0.4744},
+      "5_labels": {"n": 1, "mean": 0.6}
+    },
+    "label_type_means": {
+      "has_Evident": {"n": "subset", "mean": 0.6486},
+      "only_Subtle": {"n": "subset", "mean": 0.6506},
+      "has_Conflict": {"mean": 0.7249}
+    },
+    "verdict": "WEAK_ALIGNMENT",
+    "conclusion": "Faithfulness shows only weak negative correlation (-0.14) with RAGTruth hallucination-label count and no clear gradient across Evident/Subtle types. A single faithfulness score is NOT a reliable detector of the hallucination spans labelled by RAGTruth. This is an empirical finding that motivates multi-signal evaluation (integrity + evidence + multiple metrics) rather than trusting one score."
+  },
+  "known_limitations": [
+    "RAGTruth QA split is fully labelled; binary precision/recall is not meaningful here.",
+    "Reference answers are assistant-curated drafts, not official corpus labels.",
+    "Contexts were deduplicated and truncated to 800 chars (metadata.context_trimmed=true) to bound latency.",
+    "17 records could not be scored due to RAGAS TimeoutError even under GLM-5.3-flash + 300s.",
+    "n=33 scored samples; this is an engineering smoke study, not a statistical benchmark.",
+    "RAGTruth hallucination spans are frequently 'introduced new info' type, which faithfulness claim-verification may not reliably surface."
+  ],
+  "assets": {
+    "golden_dataset": "benchmarks/processed/ragtruth_golden_qa_50.json",
+    "raw_scores": "run50_scores.json (temp)",
+    "this_file": "benchmarks/processed/ragtruth_faithfulness_50_gold_align.json"
+  }
+}

@@ -1,0 +1,21 @@
+# Profile layer 3/3. threshold: null = no PASS/FAIL judgment (PRD Q3, Appendix B).
+profile:
+  name: default
+  version: v1
+metrics:
+  context_recall: { enabled: true, threshold: null, weight: 1.0 }
+  context_precision: { enabled: true, threshold: null, weight: 1.0 }
+  faithfulness: { enabled: true, threshold: null, weight: 1.0 }
+  answer_relevancy: { enabled: true, threshold: null, weight: 1.0 }
+  entity_consistency: { enabled: true, threshold: null, weight: 1.0 }
+  temporal_consistency: { enabled: true, threshold: null, weight: 1.0 }
+  numerical_consistency: { enabled: true, threshold: null, weight: 1.0 }
+severity_mapping:
+  numerical_mismatch: CRITICAL
+  temporal_mismatch: ERROR
+  entity_mismatch: ERROR
+  unit_mismatch: ERROR
+  unsupported_claim: ERROR
+diagnosis:
+  enabled: true
+quality_gate: null   # P1

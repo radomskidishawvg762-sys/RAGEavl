@@ -1,0 +1,32 @@
+{
+  "experiment": "ragtruth_full_evaluation_chain_demo",
+  "run_id": "8588ecfb-4506-45c9-a0e0-38afaa25a19c",
+  "dataset": "ragtruth_golden_qa_50 (v2, real answer+contexts from RAGTruth)",
+  "judge": "glm-5.3-flash via opencode.ai/zen/go/v1 (timeout 300)",
+  "enabled_metrics": ["faithfulness", "entity_consistency", "temporal_consistency", "numerical_consistency"],
+  "summary": {
+    "status": "completed",
+    "total": 50,
+    "evaluated": 50,
+    "errors": 0,
+    "overall_score": 0.8764
+  },
+  "metric_scores": {
+    "faithfulness": {"score": 0.677, "valid": 48, "error": 2},
+    "entity_consistency": {"score": 1.0, "valid": 42},
+    "temporal_consistency": {"score": 1.0, "valid": 50},
+    "numerical_consistency": {"score": 0.8235, "valid": 34}
+  },
+  "failures": {
+    "count": 7,
+    "types": {"integrity.numerical_mismatch": 6, "integrity.unit_mismatch": 1},
+    "note": "all failures are deterministic integrity mismatches with abs_diff evidence"
+  },
+  "undetermined": {"count": 25, "reason": "comparison_type=ambiguous: cannot reliably judge (no forced diagnosis)"},
+  "reproducibility": {
+    "judge_model": "glm-5.3-flash",
+    "metric_version": "ragas-0.4.3,integrity-normalization-v1",
+    "dataset_version": "v2",
+    "config_version": "63afda5753d775ef33ffb09dd166dc73ff27ed8a476f22b063fd6569e9121700"
+  }
+}

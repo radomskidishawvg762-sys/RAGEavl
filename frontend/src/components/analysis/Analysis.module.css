@@ -1,0 +1,217 @@
+/* Failure -> Diagnosis -> Evidence -> Recommendation visual hierarchy. */
+
+.diagnosis {
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-text-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-3);
+  min-width: 0;
+}
+
+.diagnosisHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+
+.diagnosisTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.failureType {
+  font-weight: var(--fw-semibold);
+  font-family: var(--font-mono);
+  font-size: var(--fs-md);
+  color: var(--color-text);
+}
+
+.confidence {
+  font-size: var(--fs-sm);
+  color: var(--color-text-subtle);
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px var(--sp-4);
+  margin: 0;
+}
+
+.field {
+  display: contents;
+}
+.field dt {
+  color: var(--color-text-subtle);
+  font-size: var(--fs-sm);
+  padding-top: 2px;
+}
+.field dd {
+  margin: 0;
+  font-size: var(--fs-md);
+  color: var(--color-text);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.rootCause {
+  color: var(--color-text);
+}
+
+.undeterminedReason {
+  color: var(--color-undetermined);
+}
+
+.missingChip {
+  display: inline-block;
+  background: var(--color-bg-inset);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+  margin-right: 4px;
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+}
+
+.diagnosisChildren {
+  margin-top: var(--sp-3);
+  border-top: 1px solid var(--color-border-muted);
+  padding-top: var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+/* ---- Evidence ---- */
+
+.evidence {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.contract {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  color: var(--color-text-subtle);
+}
+.contract code {
+  background: var(--color-bg-inset);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+}
+.contractLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.contractLabel :global(.en) {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.evidenceEmpty {
+  color: var(--color-text-subtle);
+  font-size: var(--fs-sm);
+  font-style: italic;
+  padding: var(--sp-2);
+}
+
+.evidenceList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.evidenceRow {
+  border: 1px solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-inset);
+  overflow: hidden;
+}
+
+.evidenceHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 5px var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.evidenceType {
+  color: var(--color-undetermined);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  background: color-mix(in srgb, var(--color-undetermined) 14%, transparent);
+  border-radius: var(--radius-full);
+  padding: 1px 8px;
+}
+
+.evidenceSource {
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+}
+
+.evidenceLocator {
+  font-size: var(--fs-xs);
+  color: var(--color-text-subtle);
+}
+
+.evidenceContent {
+  margin: 0;
+  padding: var(--sp-2);
+  border-top: 1px solid var(--color-border-muted);
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 240px;
+  overflow: auto;
+}
+
+@media (max-width: 560px) {
+  .diagnosis {
+    padding: var(--sp-3);
+  }
+
+  .fields {
+    grid-template-columns: 1fr;
+    gap: var(--sp-1);
+  }
+
+  .field {
+    display: grid;
+    gap: 2px;
+  }
+
+  .evidenceHeader {
+    align-items: flex-start;
+  }
+}
+
+.truncated {
+  max-height: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toggle {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--color-brand);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+  padding: 0;
+}

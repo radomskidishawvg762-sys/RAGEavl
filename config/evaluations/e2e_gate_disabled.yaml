@@ -1,0 +1,33 @@
+# E2E acceptance harness profile (T-19) — same metrics as e2e.yaml but with the
+# quality gate DISABLED, to exercise QUALITY_GATE_DISABLED on a real run.
+profile:
+  name: e2e_gate_disabled
+  version: v1
+metrics:
+  context_recall: { enabled: true, threshold: null, weight: 1.0 }
+  context_precision: { enabled: true, threshold: null, weight: 1.0 }
+  faithfulness: { enabled: true, threshold: null, weight: 1.0 }
+  answer_relevancy: { enabled: true, threshold: null, weight: 1.0 }
+  entity_consistency: { enabled: true, threshold: 0.9, weight: 1.0 }
+  temporal_consistency: { enabled: true, threshold: 0.9, weight: 1.0 }
+  numerical_consistency: { enabled: true, threshold: 0.9, weight: 1.0 }
+alias_table:
+  中国平安: 中国平安
+  平安: 中国平安
+  Ping An: 中国平安
+  中国人寿: 中国人寿
+  China Life: 中国人寿
+severity_mapping:
+  numerical_mismatch: CRITICAL
+  temporal_mismatch: ERROR
+  entity_mismatch: ERROR
+  unit_mismatch: ERROR
+  unsupported_claim: ERROR
+diagnosis:
+  enabled: true
+quality_gate:
+  enabled: false
+  required_metrics:
+    - numerical_consistency
+    - entity_consistency
+    - temporal_consistency

@@ -1,0 +1,210 @@
+{
+  "source_file": "ragtruth_existing_qa_10.json",
+  "summary": {
+    "records": 10,
+    "verdict_counts": {
+      "ungrounded_numeric_claims": 4,
+      "all_numeric_claims_grounded": 3,
+      "no_numeric_claims_deterministic_path_unresolved": 3
+    },
+    "records_with_human_labels": 2,
+    "ungrounded_numeric_records": 4,
+    "limitation": "RAGTruth hallucination spans are mostly non-numeric; the deterministic numeric-claim path resolves grounding only for reliably parsed numbers and stays unresolved otherwise. LLM-based faithfulness (Judge) is required to assess non-numeric unsupported spans."
+  },
+  "records": [
+    {
+      "source_sample_id": "11856",
+      "model": "gpt-4-0613",
+      "question": "butcher shop phone number",
+      "answer_numeric_claims": [
+        510.0,
+        889.0,
+        8690.0,
+        507.0,
+        662.0,
+        6281.0,
+        845.0,
+        6328.0,
+        502.0,
+        348.0,
+        3668.0,
+        972.0,
+        423.0,
+        1848.0,
+        865.0,
+        483.0,
+        9228.0
+      ],
+      "grounded_numeric_claims": 14,
+      "ungrounded_numeric_claims": [
+        6328.0,
+        3668.0,
+        1848.0
+      ],
+      "deterministic_verdict": "ungrounded_numeric_claims",
+      "ragtruth_human_labels": []
+    },
+    {
+      "source_sample_id": "11857",
+      "model": "gpt-3.5-turbo-0613",
+      "question": "butcher shop phone number",
+      "answer_numeric_claims": [
+        510.0,
+        889.0,
+        8690.0
+      ],
+      "grounded_numeric_claims": 3,
+      "ungrounded_numeric_claims": [],
+      "deterministic_verdict": "all_numeric_claims_grounded",
+      "ragtruth_human_labels": []
+    },
+    {
+      "source_sample_id": "11858",
+      "model": "mistral-7B-instruct",
+      "question": "butcher shop phone number",
+      "answer_numeric_claims": [],
+      "grounded_numeric_claims": 0,
+      "ungrounded_numeric_claims": [],
+      "deterministic_verdict": "no_numeric_claims_deterministic_path_unresolved",
+      "ragtruth_human_labels": [
+        {
+          "label_type": "Evident Baseless Info",
+          "text": "However, none of them are for a specific location named \"bear\" or have any indication of being related to bears.",
+          "implicit_true": false
+        }
+      ]
+    },
+    {
+      "source_sample_id": "11859",
+      "model": "llama-2-7b-chat",
+      "question": "butcher shop phone number",
+      "answer_numeric_claims": [
+        510.0,
+        889.0,
+        8690.0
+      ],
+      "grounded_numeric_claims": 3,
+      "ungrounded_numeric_claims": [],
+      "deterministic_verdict": "all_numeric_claims_grounded",
+      "ragtruth_human_labels": []
+    },
+    {
+      "source_sample_id": "11860",
+      "model": "llama-2-13b-chat",
+      "question": "butcher shop phone number",
+      "answer_numeric_claims": [
+        1.0,
+        510.0,
+        889.0,
+        8690.0
+      ],
+      "grounded_numeric_claims": 4,
+      "ungrounded_numeric_claims": [],
+      "deterministic_verdict": "all_numeric_claims_grounded",
+      "ragtruth_human_labels": []
+    },
+    {
+      "source_sample_id": "11861",
+      "model": "llama-2-70b-chat",
+      "question": "butcher shop phone number",
+      "answer_numeric_claims": [],
+      "grounded_numeric_claims": 0,
+      "ungrounded_numeric_claims": [],
+      "deterministic_verdict": "no_numeric_claims_deterministic_path_unresolved",
+      "ragtruth_human_labels": []
+    },
+    {
+      "source_sample_id": "11862",
+      "model": "gpt-4-0613",
+      "question": "tips how to conserve water",
+      "answer_numeric_claims": [
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        20.0,
+        6.0,
+        7.0,
+        8.0,
+        9.0
+      ],
+      "grounded_numeric_claims": 3,
+      "ungrounded_numeric_claims": [
+        4.0,
+        5.0,
+        20.0,
+        6.0,
+        7.0,
+        8.0,
+        9.0
+      ],
+      "deterministic_verdict": "ungrounded_numeric_claims",
+      "ragtruth_human_labels": []
+    },
+    {
+      "source_sample_id": "11863",
+      "model": "gpt-3.5-turbo-0613",
+      "question": "tips how to conserve water",
+      "answer_numeric_claims": [],
+      "grounded_numeric_claims": 0,
+      "ungrounded_numeric_claims": [],
+      "deterministic_verdict": "no_numeric_claims_deterministic_path_unresolved",
+      "ragtruth_human_labels": []
+    },
+    {
+      "source_sample_id": "11864",
+      "model": "mistral-7B-instruct",
+      "question": "tips how to conserve water",
+      "answer_numeric_claims": [
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0,
+        8.0
+      ],
+      "grounded_numeric_claims": 3,
+      "ungrounded_numeric_claims": [
+        4.0,
+        5.0,
+        6.0,
+        7.0,
+        8.0
+      ],
+      "deterministic_verdict": "ungrounded_numeric_claims",
+      "ragtruth_human_labels": [
+        {
+          "label_type": "Subtle Baseless Info",
+          "text": "Conserving water is essential for maintaining water resources and reducing the overall water usage.",
+          "implicit_true": true
+        }
+      ]
+    },
+    {
+      "source_sample_id": "11865",
+      "model": "llama-2-7b-chat",
+      "question": "tips how to conserve water",
+      "answer_numeric_claims": [
+        1.0,
+        2.0,
+        3.0,
+        5.0,
+        4.0,
+        6.0,
+        7.0
+      ],
+      "grounded_numeric_claims": 3,
+      "ungrounded_numeric_claims": [
+        5.0,
+        4.0,
+        6.0,
+        7.0
+      ],
+      "deterministic_verdict": "ungrounded_numeric_claims",
+      "ragtruth_human_labels": []
+    }
+  ]
+}

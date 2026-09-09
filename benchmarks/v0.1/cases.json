@@ -1,0 +1,285 @@
+{
+  "benchmark_version": "benchmark-v0.1",
+  "cases": [
+    {"case_id": "B1-num-001", "category": "B1_normal", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "公司营收是多少？", "reference_answer": "营收为1亿元", "reference_contexts": ["营收为1亿元"], "answer": "营收为10000万元", "contexts": ["营收为1亿元"]},
+     "expected": {"comparison_type": "match", "score": 1.0, "diagnosis_status": "not_failed"}},
+
+    {"case_id": "B1-num-002", "category": "B1_normal", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "公司营收是多少？", "reference_answer": "营收为1亿元", "reference_contexts": ["营收为1亿元"], "answer": "营收为100000000元", "contexts": ["营收为1亿元"]},
+     "expected": {"comparison_type": "match", "score": 1.0, "diagnosis_status": "not_failed"}},
+
+    {"case_id": "B1-num-003", "category": "B1_normal", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "公司营收是多少？", "reference_answer": "营收为十亿元", "reference_contexts": ["营收为十亿元"], "answer": "营收为10亿元", "contexts": ["营收为十亿元"]},
+     "expected": {"comparison_type": "match", "score": 1.0, "diagnosis_status": "not_failed"}},
+
+    {"case_id": "B1-tem-001", "category": "B1_normal", "kind": "integrity",
+     "metric": "temporal_consistency",
+     "input": {"question": "报告期是什么？", "reference_answer": "报告期为2024年", "reference_contexts": ["报告期为2024年"], "answer": "报告期为2024年度", "contexts": ["报告期为2024年"]},
+     "expected": {"comparison_type": "match", "score": 1.0, "diagnosis_status": "not_failed"}},
+
+    {"case_id": "B1-tem-002", "category": "B1_normal", "kind": "integrity",
+     "metric": "temporal_consistency",
+     "input": {"question": "报告期是什么？", "reference_answer": "报告期为2024Q1", "reference_contexts": ["报告期为2024Q1"], "answer": "报告期为Q1 2024", "contexts": ["报告期为2024Q1"]},
+     "expected": {"comparison_type": "match", "score": 1.0, "diagnosis_status": "not_failed"}},
+
+    {"case_id": "B1-tem-003", "category": "B1_normal", "kind": "integrity",
+     "metric": "temporal_consistency",
+     "input": {"question": "财年是什么？", "reference_answer": "财年为FY2024", "reference_contexts": ["财年为FY2024"], "answer": "财年为2024年", "contexts": ["财年为FY2024"]},
+     "expected": {"comparison_type": "match", "score": 1.0, "diagnosis_status": "not_failed"}},
+
+    {"case_id": "B1-ent-001", "category": "B1_normal", "kind": "integrity",
+     "metric": "entity_consistency",
+     "input": {"question": "哪个主体？", "reference_answer": "中国平安", "reference_contexts": ["中国平安"], "answer": "平安", "contexts": ["中国平安"],
+               "alias_table": {"中国平安": "中国平安", "平安": "中国平安", "Ping An": "中国平安", "中国人寿": "中国人寿", "China Life": "中国人寿"}},
+     "expected": {"comparison_type": "match", "score": 1.0, "diagnosis_status": "not_failed"}},
+
+    {"case_id": "B1-ent-002", "category": "B1_normal", "kind": "integrity",
+     "metric": "entity_consistency",
+     "input": {"question": "哪个主体？", "reference_answer": "中国平安", "reference_contexts": ["中国平安"], "answer": "Ping An", "contexts": ["中国平安"],
+               "alias_table": {"中国平安": "中国平安", "平安": "中国平安", "Ping An": "中国平安", "中国人寿": "中国人寿", "China Life": "中国人寿"}},
+     "expected": {"comparison_type": "match", "score": 1.0, "diagnosis_status": "not_failed"}},
+
+    {"case_id": "B2-ret-001", "category": "B2_retrieval_failure", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "公司营收是多少？", "reference_answer": "营收为1亿元", "reference_contexts": ["营收为1亿元"], "answer": "营收为1亿元", "contexts": ["关于市场竞争的无关分析"]},
+     "expected": {"comparison_type": "match", "score": 1.0, "diagnosis_status": "not_failed"}},
+
+    {"case_id": "B2-ret-002", "category": "B2_retrieval_failure", "kind": "integrity",
+     "metric": "temporal_consistency",
+     "input": {"question": "报告期是什么？", "reference_answer": "报告期为2024年", "reference_contexts": ["报告期为2024年"], "answer": "报告期为2024年", "contexts": ["行业趋势的无关段落"]},
+     "expected": {"comparison_type": "match", "score": 1.0, "diagnosis_status": "not_failed"}},
+
+    {"case_id": "B3-gen-001", "category": "B3_generation_failure", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "公司营收是多少？", "reference_answer": "营收为1亿元", "reference_contexts": ["营收为1亿元"], "answer": "营收为12000万元", "contexts": ["营收为1亿元"]},
+     "expected": {"comparison_type": "value_mismatch", "score": 0.0, "diagnosis_status": "diagnosed",
+                  "failure_type": "integrity.numerical_mismatch", "severity": "CRITICAL",
+                  "evidence_contract": "integrity.numerical_mismatch.v1", "confidence": "high",
+                  "evidence_types": ["answer_claim", "reference_evidence"]}},
+
+    {"case_id": "B3-gen-002", "category": "B3_generation_failure", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "公司营收是多少？", "reference_answer": "营收为1亿元", "reference_contexts": ["营收为1亿元"], "answer": "公司经营良好", "contexts": ["营收为1亿元"]},
+     "expected": {"comparison_type": "ambiguous", "score": null, "diagnosis_status": "undetermined"}},
+
+    {"case_id": "B4-num-001", "category": "B4_integrity", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "公司营收是多少？", "reference_answer": "营收为1亿元", "reference_contexts": ["营收为1亿元"], "answer": "营收为12000万元", "contexts": ["营收为1亿元"]},
+     "expected": {"comparison_type": "value_mismatch", "score": 0.0, "diagnosis_status": "diagnosed",
+                  "failure_type": "integrity.numerical_mismatch", "severity": "CRITICAL",
+                  "evidence_contract": "integrity.numerical_mismatch.v1", "confidence": "high",
+                  "evidence_types": ["answer_claim", "reference_evidence"]}},
+
+    {"case_id": "B4-num-002", "category": "B4_integrity", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "公司营收是多少？", "reference_answer": "营收为100万元", "reference_contexts": ["营收为100万元"], "answer": "营收为1亿元", "contexts": ["营收为100万元"]},
+     "expected": {"comparison_type": "value_mismatch", "score": 0.0, "diagnosis_status": "diagnosed",
+                  "failure_type": "integrity.numerical_mismatch", "severity": "CRITICAL",
+                  "evidence_contract": "integrity.numerical_mismatch.v1", "confidence": "high",
+                  "evidence_types": ["answer_claim", "reference_evidence"]}},
+
+    {"case_id": "B4-num-003", "category": "B4_integrity", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "公司营收是多少？", "reference_answer": "营收为1亿元", "reference_contexts": ["营收为1亿元"], "answer": "营收为1万元", "contexts": ["营收为1亿元"]},
+     "expected": {"comparison_type": "scale_mismatch", "score": 0.0, "diagnosis_status": "diagnosed",
+                  "failure_type": "integrity.numerical_mismatch", "severity": "CRITICAL",
+                  "evidence_contract": "integrity.numerical_mismatch.v1", "confidence": "high",
+                  "evidence_types": ["answer_claim", "reference_evidence"]}},
+
+    {"case_id": "B4-num-004", "category": "B4_integrity", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "增幅是多少？", "reference_answer": "增幅为5%", "reference_contexts": ["增幅为5%"], "answer": "增幅为5元", "contexts": ["增幅为5%"]},
+     "expected": {"comparison_type": "unit_mismatch", "score": null, "diagnosis_status": "diagnosed",
+                  "failure_type": "integrity.unit_mismatch", "severity": "ERROR",
+                  "evidence_contract": "integrity.unit_mismatch.v1", "confidence": "high",
+                  "evidence_types": ["answer_claim", "reference_evidence"]}},
+
+    {"case_id": "B4-tem-001", "category": "B4_integrity", "kind": "integrity",
+     "metric": "temporal_consistency",
+     "input": {"question": "报告期是什么？", "reference_answer": "报告期为2024年", "reference_contexts": ["报告期为2024年"], "answer": "报告期为2023年", "contexts": ["报告期为2024年"]},
+     "expected": {"comparison_type": "temporal_mismatch", "score": 0.0, "diagnosis_status": "diagnosed",
+                  "failure_type": "integrity.temporal_mismatch", "severity": "ERROR",
+                  "evidence_contract": "integrity.temporal_mismatch.v1", "confidence": "high",
+                  "evidence_types": ["answer_claim", "reference_evidence"]}},
+
+    {"case_id": "B4-ent-001", "category": "B4_integrity", "kind": "integrity",
+     "metric": "entity_consistency",
+     "input": {"question": "哪个主体？", "reference_answer": "中国平安", "reference_contexts": ["中国平安"], "answer": "中国人寿", "contexts": ["中国平安"],
+               "alias_table": {"中国平安": "中国平安", "平安": "中国平安", "Ping An": "中国平安", "中国人寿": "中国人寿", "China Life": "中国人寿"}},
+     "expected": {"comparison_type": "entity_mismatch", "score": 0.0, "diagnosis_status": "diagnosed",
+                  "failure_type": "integrity.entity_mismatch", "severity": "ERROR",
+                  "evidence_contract": "integrity.entity_mismatch.v1", "confidence": "high",
+                  "evidence_types": ["answer_claim", "reference_evidence"]}},
+
+    {"case_id": "B5-num-001", "category": "B5_ambiguous", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "载重是多少？", "reference_answer": "载重为100吨", "reference_contexts": ["载重为100吨"], "answer": "载重为100吨", "contexts": ["载重为100吨"]},
+     "expected": {"comparison_type": "ambiguous", "score": null, "diagnosis_status": "undetermined"}},
+
+    {"case_id": "B5-num-002", "category": "B5_ambiguous", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "金额是多少？", "reference_answer": "金额为100美元", "reference_contexts": ["金额为100美元"], "answer": "金额为100元", "contexts": ["金额为100美元"]},
+     "expected": {"comparison_type": "ambiguous", "score": null, "diagnosis_status": "undetermined"}},
+
+    {"case_id": "B5-num-003", "category": "B5_ambiguous", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "规模是多少？", "reference_answer": "规模为一亿亿", "reference_contexts": ["规模为一亿亿"], "answer": "规模为一亿亿", "contexts": ["规模为一亿亿"]},
+     "expected": {"comparison_type": "ambiguous", "score": null, "diagnosis_status": "undetermined"}},
+
+    {"case_id": "B5-num-004", "category": "B5_ambiguous", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "营收是多少？", "reference_answer": "财报未披露数字信息", "reference_contexts": ["财报未披露数字信息"], "answer": "财报未披露数字信息", "contexts": ["财报未披露数字信息"]},
+     "expected": {"comparison_type": "match", "score": 1.0, "diagnosis_status": "not_failed"}},
+
+    {"case_id": "B5-num-005", "category": "B5_ambiguous", "kind": "integrity",
+     "metric": "numerical_consistency",
+     "input": {"question": "载重与营收？", "reference_answer": "载重为100吨", "reference_contexts": ["载重为100吨"], "answer": "营收为1亿元", "contexts": ["载重为100吨"]},
+     "expected": {"comparison_type": "ambiguous", "score": null, "diagnosis_status": "undetermined"}},
+
+    {"case_id": "B5-tem-001", "category": "B5_ambiguous", "kind": "integrity",
+     "metric": "temporal_consistency",
+     "input": {"question": "报告期是什么？", "reference_answer": "报告期为去年", "reference_contexts": ["报告期为去年"], "answer": "报告期为去年", "contexts": ["报告期为去年"]},
+     "expected": {"comparison_type": "ambiguous", "score": null, "diagnosis_status": "undetermined"}},
+
+    {"case_id": "B5-tem-002", "category": "B5_ambiguous", "kind": "integrity",
+     "metric": "temporal_consistency",
+     "input": {"question": "报告期是什么？", "reference_answer": "报告期为2024Q1", "reference_contexts": ["报告期为2024Q1"], "answer": "报告期为2024年", "contexts": ["报告期为2024Q1"]},
+     "expected": {"comparison_type": "ambiguous", "score": null, "diagnosis_status": "undetermined"}},
+
+    {"case_id": "B5-tem-003", "category": "B5_ambiguous", "kind": "integrity",
+     "metric": "temporal_consistency",
+     "input": {"question": "报告期是什么？", "reference_answer": "报告期为2024Q1", "reference_contexts": ["报告期为2024Q1"], "answer": "报告期为2024-03-01", "contexts": ["报告期为2024Q1"]},
+     "expected": {"comparison_type": "ambiguous", "score": null, "diagnosis_status": "undetermined"}},
+
+    {"case_id": "B5-ent-001", "category": "B5_ambiguous", "kind": "integrity",
+     "metric": "entity_consistency",
+     "input": {"question": "哪个主体？", "reference_answer": "nova", "reference_contexts": ["nova"], "answer": "nova", "contexts": ["nova"],
+               "alias_table": {"Nova": "甲公司", "nova": "乙公司"}},
+     "expected": {"comparison_type": "ambiguous", "score": null, "diagnosis_status": "undetermined"}},
+
+    {"case_id": "CMP-001", "category": "B_compare", "kind": "analysis",
+     "input": {
+       "baseline": {"overall": 0.85, "metrics": [
+         {"name": "context_recall", "category": "retrieval", "score": 0.80},
+         {"name": "faithfulness", "category": "generation", "score": 0.90}]},
+       "candidate": {"overall": 0.86, "metrics": [
+         {"name": "context_recall", "category": "retrieval", "score": 0.88},
+         {"name": "faithfulness", "category": "generation", "score": 0.84}]}},
+     "expected": {
+       "comparability": "DIRECT",
+       "metrics": {
+         "context_recall": {"delta": 0.08, "relative_delta": 0.10, "comparable": true},
+         "faithfulness": {"delta": -0.06, "comparable": true}},
+       "regression": {"context_recall": "IMPROVEMENT", "faithfulness": "REGRESSION"},
+       "trade_off": true,
+       "overall": {"delta": 0.01, "comparable": true}}},
+
+    {"case_id": "REG-001", "category": "B_regression", "kind": "analysis",
+     "input": {
+       "baseline": {"metrics": [{"name": "faithfulness", "category": "generation", "score": 0.80}]},
+       "candidate": {"metrics": [{"name": "faithfulness", "category": "generation", "score": 0.90}]}},
+     "expected": {"comparability": "DIRECT",
+                  "metrics": {"faithfulness": {"delta": 0.10, "comparable": true}},
+                  "regression": {"faithfulness": "IMPROVEMENT"}, "trade_off": false}},
+
+    {"case_id": "REG-002", "category": "B_regression", "kind": "analysis",
+     "input": {
+       "baseline": {"metrics": [{"name": "faithfulness", "category": "generation", "score": 0.90}]},
+       "candidate": {"metrics": [{"name": "faithfulness", "category": "generation", "score": 0.80}]}},
+     "expected": {"comparability": "DIRECT",
+                  "metrics": {"faithfulness": {"delta": -0.10, "comparable": true}},
+                  "regression": {"faithfulness": "REGRESSION"}, "trade_off": false}},
+
+    {"case_id": "REG-003", "category": "B_regression", "kind": "analysis",
+     "input": {
+       "baseline": {"metrics": [{"name": "faithfulness", "category": "generation", "score": 0.90}]},
+       "candidate": {"metrics": [{"name": "faithfulness", "category": "generation", "score": 0.905}]}},
+     "expected": {"comparability": "DIRECT",
+                  "metrics": {"faithfulness": {"delta": 0.005, "comparable": true}},
+                  "regression": {"faithfulness": "STABLE"}, "trade_off": false}},
+
+    {"case_id": "REG-004", "category": "B_regression", "kind": "analysis",
+     "input": {
+       "baseline": {"metrics": [{"name": "answer_latency", "category": "generation", "score": 5.0}]},
+       "candidate": {"metrics": [{"name": "answer_latency", "category": "generation", "score": 6.0}]}},
+     "expected": {"comparability": "DIRECT",
+                  "metrics": {"answer_latency": {"delta": 1.0, "comparable": true}},
+                  "regression": {"answer_latency": "REGRESSION"}, "trade_off": false}},
+
+    {"case_id": "REG-005", "category": "B_regression", "kind": "analysis",
+     "input": {
+       "baseline": {"metrics": [{"name": "answer_latency", "category": "generation", "score": 6.0}]},
+       "candidate": {"metrics": [{"name": "answer_latency", "category": "generation", "score": 5.0}]}},
+     "expected": {"comparability": "DIRECT",
+                  "metrics": {"answer_latency": {"delta": -1.0, "comparable": true}},
+                  "regression": {"answer_latency": "IMPROVEMENT"}, "trade_off": false}},
+
+    {"case_id": "REG-006", "category": "B_regression", "kind": "analysis",
+     "input": {
+       "baseline": {"metrics": [{"name": "faithfulness", "category": "generation", "score": 0.80}]},
+       "candidate": {"metrics": [{"name": "faithfulness", "category": "generation", "score": null,
+                                  "error": {"code": "SYS_METRIC_ERROR", "message": "boom"}}]}},
+     "expected": {"comparability": "DIRECT",
+                  "metrics": {"faithfulness": {"comparable": false}},
+                  "regression": {"faithfulness": "NOT_COMPARABLE"}, "trade_off": false}},
+
+    {"case_id": "REG-007", "category": "B_regression", "kind": "analysis",
+     "input": {
+       "baseline": {"metrics": [{"name": "faithfulness", "category": "generation", "score": 0.80}]},
+       "candidate": {"metrics": [{"name": "faithfulness", "category": "generation", "score": null,
+                                  "comparison_basis": {"comparison_type": "ambiguous", "method": "deterministic"}}]}},
+     "expected": {"comparability": "DIRECT",
+                  "metrics": {"faithfulness": {"comparable": false}},
+                  "regression": {"faithfulness": "UNDETERMINED"}, "trade_off": false}},
+
+    {"case_id": "GATE-001", "category": "B_gate", "kind": "gate",
+     "input": {"quality_gate": {"enabled": true, "required_metrics": ["faithfulness", "context_recall"]},
+               "enabled_metrics": ["faithfulness", "context_recall"],
+               "overall": 0.88,
+               "metrics": [
+                 {"name": "faithfulness", "category": "generation", "score": 0.90, "threshold": 0.80},
+                 {"name": "context_recall", "category": "retrieval", "score": 0.85, "threshold": 0.80}]},
+     "expected": {"status": "PASS", "reasons": []}},
+
+    {"case_id": "GATE-002", "category": "B_gate", "kind": "gate",
+     "input": {"quality_gate": {"enabled": true, "required_metrics": ["faithfulness", "context_recall"]},
+               "enabled_metrics": ["faithfulness", "context_recall"],
+               "metrics": [
+                 {"name": "faithfulness", "category": "generation", "score": 0.90, "threshold": 0.80},
+                 {"name": "context_recall", "category": "retrieval", "score": 0.70, "threshold": 0.80}]},
+     "expected": {"status": "FAIL", "reasons": ["QUALITY_THRESHOLD_FAILED"]}},
+
+    {"case_id": "GATE-003", "category": "B_gate", "kind": "gate",
+     "input": {"quality_gate": {"enabled": true, "required_metrics": ["faithfulness"]},
+               "enabled_metrics": ["faithfulness"],
+               "metrics": [
+                 {"name": "faithfulness", "category": "generation", "score": null, "threshold": 0.80,
+                  "error": {"code": "BIZ_JUDGE_NOT_CONFIGURED", "reason": "judge_not_configured"}}]},
+     "expected": {"status": "FAIL", "reasons": ["REQUIRED_METRIC_NOT_EVALUABLE"]}},
+
+    {"case_id": "GATE-004", "category": "B_gate", "kind": "gate",
+     "input": {"quality_gate": {"enabled": false, "required_metrics": ["faithfulness"]},
+               "enabled_metrics": ["faithfulness"],
+               "metrics": [
+                 {"name": "faithfulness", "category": "generation", "score": 0.90, "threshold": 0.80}]},
+     "expected": {"status": "NOT_EVALUABLE", "reasons": ["QUALITY_GATE_DISABLED"]}},
+
+    {"case_id": "GATE-005", "category": "B_gate", "kind": "gate",
+     "input": {"quality_gate": null,
+               "enabled_metrics": ["faithfulness"],
+               "metrics": [
+                 {"name": "faithfulness", "category": "generation", "score": 0.90, "threshold": 0.80}]},
+     "expected": {"status": "NOT_EVALUABLE", "reasons": ["QUALITY_GATE_NOT_CONFIGURED"]}},
+
+    {"case_id": "GATE-006", "category": "B_gate", "kind": "gate",
+     "input": {"quality_gate": {"enabled": true, "required_metrics": ["faithfulness", "context_recall"]},
+               "enabled_metrics": ["faithfulness"],
+               "metrics": [
+                 {"name": "faithfulness", "category": "generation", "score": 0.90, "threshold": 0.80}]},
+     "expected": {"status": "NOT_EVALUABLE", "reasons": ["QUALITY_GATE_CONFIG_INVALID"]}}
+  ]
+}

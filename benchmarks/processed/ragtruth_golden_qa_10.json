@@ -1,0 +1,497 @@
+{
+  "name": "ragtruth_golden_qa_v1",
+  "domain": "general",
+  "records": [
+    {
+      "question": "butcher shop phone number",
+      "answer": "Based on the given passages, there are several different phone numbers associated with butcher shops. However, none of them are for a specific location named \"bear\" or have any indication of being related to bears. Therefore, it is unable to determine if there is a butcher shop phone number specifically for \"bear\".",
+      "contexts": [
+        "passage 1:Butcher Shop - Hayward 826 B Street, Hayward CA 94541 Phone Number: (510) 889-8690",
+        "passage 2:Butcher Shop - Lakefield 212 Main Street, Lakefield MN 56150 Phone Number: (507) 662-6281",
+        "passage 3:Some More Phone Numbers Related To The Butcher Shop The Local Butcher Shop phone number : (510) 845-6328 Boones Butcher Shop phone number : (502) 348-3668 Ye Ole Butcher Shop phone number : (972) 423-1848 J Ms Butcher Shop phone number : (865) 483-9228"
+      ],
+      "reference_answer": "Butcher shops and their phone numbers: Butcher Shop - Hayward, 826 B Street, Hayward CA 94541, (510) 889-8690; Butcher Shop - Lakefield, 212 Main Street, Lakefield MN 56150, (507) 662-6281; The Local Butcher Shop (510) 845-6328; Boones Butcher Shop (502) 348-3668; Ye Ole Butcher Shop (972) 423-1848; J Ms Butcher Shop (865) 483-9228.",
+      "reference_contexts": [
+        "passage 1:Butcher Shop - Hayward 826 B Street, Hayward CA 94541 Phone Number: (510) 889-8690",
+        "passage 2:Butcher Shop - Lakefield 212 Main Street, Lakefield MN 56150 Phone Number: (507) 662-6281",
+        "passage 3:Some More Phone Numbers Related To The Butcher Shop The Local Butcher Shop phone number : (510) 845-6328 Boones Butcher Shop phone number : (502) 348-3668 Ye Ole Butcher Shop phone number : (972) 423-1848 J Ms Butcher Shop phone number : (865) 483-9228"
+      ],
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_id": "14292",
+        "source_sample_id": "11858",
+        "model": "mistral-7B-instruct",
+        "temperature": 0.7,
+        "quality": "good",
+        "hallucination_labels": [
+          {
+            "start": 102,
+            "end": 214,
+            "text": "However, none of them are for a specific location named \"bear\" or have any indication of being related to bears.",
+            "meta": "HIGH INTRO OF NEW INFO\nNo mention of this in the passages and original answer. ",
+            "label_type": "Evident Baseless Info",
+            "implicit_true": false,
+            "due_to_null": false
+          }
+        ],
+        "reference_source": "curated_from_source_passages_by_assistant",
+        "reference_verification": "pending_user_review",
+        "evaluation_stage": "existing_generated_result_with_curated_reference",
+        "answer": "Based on the given passages, there are several different phone numbers associated with butcher shops. However, none of them are for a specific location named \"bear\" or have any indication of being related to bears. Therefore, it is unable to determine if there is a butcher shop phone number specifically for \"bear\".",
+        "contexts": [
+          "passage 1:Butcher Shop - Hayward 826 B Street, Hayward CA 94541 Phone Number: (510) 889-8690",
+          "passage 2:Butcher Shop - Lakefield 212 Main Street, Lakefield MN 56150 Phone Number: (507) 662-6281",
+          "passage 3:Some More Phone Numbers Related To The Butcher Shop The Local Butcher Shop phone number : (510) 845-6328 Boones Butcher Shop phone number : (502) 348-3668 Ye Ole Butcher Shop phone number : (972) 423-1848 J Ms Butcher Shop phone number : (865) 483-9228"
+        ]
+      }
+    },
+    {
+      "question": "tips how to conserve water",
+      "answer": "Conserving water is essential for maintaining water resources and reducing the overall water usage. Here are some tips on how to conserve water based on the given passages:\n\n1. Take shorter showers and replace your showerhead with an ultra-low-flow version. Some units are available that allow you to cut off the flow without adjusting the water temperature knobs.\n2. When taking a bath, fill the tub only 1/3 full instead of using the entire tub.\n3. Use a shower bucket instead of letting the water pour down the drain while you wait for your shower water to heat up. You can use the water for flushing the toilet or watering your plants.\n4. Turn off the tap while brushing your teeth and when washing your hands.\n5. Water your lawns in the early morning or later evening in 20 minute intervals. Use a broom instead of a hose to remove debris from your driveway or sidewalk.\n6. Bathe your pets outdoors in areas that need water.\n7. Install a shut-off nozzle on your water hose; a garden hose left running can waste up to 20 litres per minute.\n8. Direct downspouts towards shrubs and trees in your garden.",
+      "contexts": [
+        "passage 1:1 Take shorter showers. 2  Replace you showerhead with an ultra-low-flow version. 3  Some units are available that allow you to cut off the flow without adjusting the water temperature knobs. 4  Use the minimum amount of water needed for a bath by closing the drain first and filling the tub only 1/3 full.",
+        "passage 2:Here are 20 water-saving tips to get you going…. 1. Shower Bucket. Instead of letting the water pour down the drain, stick a bucket under the faucet while you wait for your shower water to heat up. You can use the water for flushing the toilet or watering your plants. 2. Turn off the tap while brushing your teeth. Water comes out of the average faucet at 2.5 gallons per minute. Don’t let all that water go down the drain while you brush! Turn off the faucet after you wet your brush, and leave it off until it’s time to rinse. 3. Turn off the tap while washing your hands.",
+        "passage 3:Water lawns in the early morning or later evening in 20 minute intervals. Use a broom instead of your hose to remove debris from your driveway or sidewalk. Bathe your pets outdoors in areas that need water. Install a shut-off nozzle on your water hose; a garden hose left running can waste up to 20 litres per minute. Direct downspouts towards shrubs and trees in your garden."
+      ],
+      "reference_answer": "Water-saving tips: take shorter showers; replace the showerhead with an ultra-low-flow version; use the minimum water needed for a bath by filling the tub only 1/3 full; collect the water that runs while waiting for the shower to heat up (shower bucket) and use it to flush the toilet or water plants; turn off the tap while brushing teeth and washing hands; water lawns in the early morning or later evening in 20-minute intervals; use a broom instead of a hose to clean driveways and sidewalks; bathe pets outdoors; install a shut-off nozzle on the hose; direct downspouts towards shrubs and trees.",
+      "reference_contexts": [
+        "passage 1:1 Take shorter showers. 2  Replace you showerhead with an ultra-low-flow version. 3  Some units are available that allow you to cut off the flow without adjusting the water temperature knobs. 4  Use the minimum amount of water needed for a bath by closing the drain first and filling the tub only 1/3 full.",
+        "passage 2:Here are 20 water-saving tips to get you going…. 1. Shower Bucket. Instead of letting the water pour down the drain, stick a bucket under the faucet while you wait for your shower water to heat up. You can use the water for flushing the toilet or watering your plants. 2. Turn off the tap while brushing your teeth. Water comes out of the average faucet at 2.5 gallons per minute. Don’t let all that water go down the drain while you brush! Turn off the faucet after you wet your brush, and leave it off until it’s time to rinse. 3. Turn off the tap while washing your hands.",
+        "passage 3:Water lawns in the early morning or later evening in 20 minute intervals. Use a broom instead of your hose to remove debris from your driveway or sidewalk. Bathe your pets outdoors in areas that need water. Install a shut-off nozzle on your water hose; a garden hose left running can waste up to 20 litres per minute. Direct downspouts towards shrubs and trees in your garden."
+      ],
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_id": "14293",
+        "source_sample_id": "11864",
+        "model": "mistral-7B-instruct",
+        "temperature": 0.85,
+        "quality": "good",
+        "hallucination_labels": [
+          {
+            "start": 0,
+            "end": 99,
+            "text": "Conserving water is essential for maintaining water resources and reducing the overall water usage.",
+            "meta": "LOW INTRO OF NEW INFO\nNo explicit mention of this but fits within the context for the given topic. ",
+            "label_type": "Subtle Baseless Info",
+            "implicit_true": true,
+            "due_to_null": false
+          }
+        ],
+        "reference_source": "curated_from_source_passages_by_assistant",
+        "reference_verification": "pending_user_review",
+        "evaluation_stage": "existing_generated_result_with_curated_reference",
+        "answer": "Conserving water is essential for maintaining water resources and reducing the overall water usage. Here are some tips on how to conserve water based on the given passages:\n\n1. Take shorter showers and replace your showerhead with an ultra-low-flow version. Some units are available that allow you to cut off the flow without adjusting the water temperature knobs.\n2. When taking a bath, fill the tub only 1/3 full instead of using the entire tub.\n3. Use a shower bucket instead of letting the water pour down the drain while you wait for your shower water to heat up. You can use the water for flushing the toilet or watering your plants.\n4. Turn off the tap while brushing your teeth and when washing your hands.\n5. Water your lawns in the early morning or later evening in 20 minute intervals. Use a broom instead of a hose to remove debris from your driveway or sidewalk.\n6. Bathe your pets outdoors in areas that need water.\n7. Install a shut-off nozzle on your water hose; a garden hose left running can waste up to 20 litres per minute.\n8. Direct downspouts towards shrubs and trees in your garden.",
+        "contexts": [
+          "passage 1:1 Take shorter showers. 2  Replace you showerhead with an ultra-low-flow version. 3  Some units are available that allow you to cut off the flow without adjusting the water temperature knobs. 4  Use the minimum amount of water needed for a bath by closing the drain first and filling the tub only 1/3 full.",
+          "passage 2:Here are 20 water-saving tips to get you going…. 1. Shower Bucket. Instead of letting the water pour down the drain, stick a bucket under the faucet while you wait for your shower water to heat up. You can use the water for flushing the toilet or watering your plants. 2. Turn off the tap while brushing your teeth. Water comes out of the average faucet at 2.5 gallons per minute. Don’t let all that water go down the drain while you brush! Turn off the faucet after you wet your brush, and leave it off until it’s time to rinse. 3. Turn off the tap while washing your hands.",
+          "passage 3:Water lawns in the early morning or later evening in 20 minute intervals. Use a broom instead of your hose to remove debris from your driveway or sidewalk. Bathe your pets outdoors in areas that need water. Install a shut-off nozzle on your water hose; a garden hose left running can waste up to 20 litres per minute. Direct downspouts towards shrubs and trees in your garden."
+        ]
+      }
+    },
+    {
+      "question": "safely clean your computer screen",
+      "answer": "Based on the provided passages, here is how to safely clean your computer screen:\n\n1. Use a dry and clean microfiber cloth to gently wipe the screen. This is the preferred method recommended in passage 1.\n2. For cleaning the edges of the LCD screen, use a clean cotton ball or swab, as suggested in passage 3.\n3. Always clean your screen powered off, as stated in passages 1 and 3. Do not touch the screen while it is on, as this can damage the lifespan of the screen.\n4. Avoid using window or abrasive cleaners on your TV screen, as they can cause yellowing and damage, per passage 3.\n5. If a spot does not come off after cleaning, do not rub harder, as this can damage the pixels and ruin the screen, according to passage 3.\n\nUnable to answer based on given passages. The passages do not provide specific instructions for cleaning the screen with liquid or other solutions.",
+      "contexts": [
+        "passage 1:Remember, the less you touch your screen the better. Lightly wipe the screen with a dry and clean microfiber cloth. Microfiber is a miracle of modern technology; put it to good use. No paper towels, no kitchen towels, no household rags; only microfiber should touch your screen.ow to Safely Clean Your Screen. Now that we’ve made you terrified of Windex and rags (as, on behalf of your beautiful widescreen monitor, you should be), it’s time to get down to the business of properly cleaning your screens.",
+        "passage 2:Instructions. Add 1 part isopropyl alcohol and 1 part distilled water to an empty spray bottle. Close the bottle and shake it to combine the ingredients. Turn off the laptop. It&#039;s easier to see the dust and smudges when the screen is dark. Spray a lint-free cloth with the homemade cleaning solution or LCD cleaner.Wipe the laptop screen thoroughly with the cloth to remove any dust or fingerprints. Clean in one direction to prevent streaks.lose the bottle and shake it to combine the ingredients. Turn off the laptop. It&#039;s easier to see the dust and smudges when the screen is dark. Spray a lint-free cloth with the homemade cleaning solution or LCD cleaner.",
+        "passage 3:1 The microfiber clothes are washable, soft and safe to use on your screens. 2  To clean the edges of your LCD screen use a clean cotton ball or swab. 3  ALWAYS clean your screen powered off! ( 4 I know I said this above, but it is important enough to reiterate.). DO NOT touch your LCD screen, because it will shorten the lifespan of your screen. 2  NEVER use a window or abrasive cleaner on your TV screen as it can cause the screen to yellow and also damage it. 3  If a spot does not come off, do NOT rub harder, because you can kill some of your pixels and ruin your screen."
+      ],
+      "reference_answer": "To safely clean a computer screen: lightly wipe the screen with a dry, clean microfiber cloth (never paper or kitchen towels); always clean the screen powered off; for heavier cleaning, mix 1 part isopropyl alcohol with 1 part distilled water in a spray bottle, spray a lint-free cloth (not the screen) and wipe in one direction; clean the edges of an LCD screen with a clean cotton ball or swab; never use window or abrasive cleaners and do not rub hard (it can damage pixels).",
+      "reference_contexts": [
+        "passage 1:Remember, the less you touch your screen the better. Lightly wipe the screen with a dry and clean microfiber cloth. Microfiber is a miracle of modern technology; put it to good use. No paper towels, no kitchen towels, no household rags; only microfiber should touch your screen.ow to Safely Clean Your Screen. Now that we’ve made you terrified of Windex and rags (as, on behalf of your beautiful widescreen monitor, you should be), it’s time to get down to the business of properly cleaning your screens.",
+        "passage 2:Instructions. Add 1 part isopropyl alcohol and 1 part distilled water to an empty spray bottle. Close the bottle and shake it to combine the ingredients. Turn off the laptop. It&#039;s easier to see the dust and smudges when the screen is dark. Spray a lint-free cloth with the homemade cleaning solution or LCD cleaner.Wipe the laptop screen thoroughly with the cloth to remove any dust or fingerprints. Clean in one direction to prevent streaks.lose the bottle and shake it to combine the ingredients. Turn off the laptop. It&#039;s easier to see the dust and smudges when the screen is dark. Spray a lint-free cloth with the homemade cleaning solution or LCD cleaner.",
+        "passage 3:1 The microfiber clothes are washable, soft and safe to use on your screens. 2  To clean the edges of your LCD screen use a clean cotton ball or swab. 3  ALWAYS clean your screen powered off! ( 4 I know I said this above, but it is important enough to reiterate.). DO NOT touch your LCD screen, because it will shorten the lifespan of your screen. 2  NEVER use a window or abrasive cleaner on your TV screen as it can cause the screen to yellow and also damage it. 3  If a spot does not come off, do NOT rub harder, because you can kill some of your pixels and ruin your screen."
+      ],
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_id": "14294",
+        "source_sample_id": "11871",
+        "model": "llama-2-7b-chat",
+        "temperature": 0.925,
+        "quality": "good",
+        "hallucination_labels": [
+          {
+            "start": 844,
+            "end": 874,
+            "text": "with liquid or other solutions",
+            "meta": "This particular condition was never in the original question. ",
+            "label_type": "Evident Baseless Info",
+            "implicit_true": false,
+            "due_to_null": false
+          }
+        ],
+        "reference_source": "curated_from_source_passages_by_assistant",
+        "reference_verification": "pending_user_review",
+        "evaluation_stage": "existing_generated_result_with_curated_reference",
+        "answer": "Based on the provided passages, here is how to safely clean your computer screen:\n\n1. Use a dry and clean microfiber cloth to gently wipe the screen. This is the preferred method recommended in passage 1.\n2. For cleaning the edges of the LCD screen, use a clean cotton ball or swab, as suggested in passage 3.\n3. Always clean your screen powered off, as stated in passages 1 and 3. Do not touch the screen while it is on, as this can damage the lifespan of the screen.\n4. Avoid using window or abrasive cleaners on your TV screen, as they can cause yellowing and damage, per passage 3.\n5. If a spot does not come off after cleaning, do not rub harder, as this can damage the pixels and ruin the screen, according to passage 3.\n\nUnable to answer based on given passages. The passages do not provide specific instructions for cleaning the screen with liquid or other solutions.",
+        "contexts": [
+          "passage 1:Remember, the less you touch your screen the better. Lightly wipe the screen with a dry and clean microfiber cloth. Microfiber is a miracle of modern technology; put it to good use. No paper towels, no kitchen towels, no household rags; only microfiber should touch your screen.ow to Safely Clean Your Screen. Now that we’ve made you terrified of Windex and rags (as, on behalf of your beautiful widescreen monitor, you should be), it’s time to get down to the business of properly cleaning your screens.",
+          "passage 2:Instructions. Add 1 part isopropyl alcohol and 1 part distilled water to an empty spray bottle. Close the bottle and shake it to combine the ingredients. Turn off the laptop. It&#039;s easier to see the dust and smudges when the screen is dark. Spray a lint-free cloth with the homemade cleaning solution or LCD cleaner.Wipe the laptop screen thoroughly with the cloth to remove any dust or fingerprints. Clean in one direction to prevent streaks.lose the bottle and shake it to combine the ingredients. Turn off the laptop. It&#039;s easier to see the dust and smudges when the screen is dark. Spray a lint-free cloth with the homemade cleaning solution or LCD cleaner.",
+          "passage 3:1 The microfiber clothes are washable, soft and safe to use on your screens. 2  To clean the edges of your LCD screen use a clean cotton ball or swab. 3  ALWAYS clean your screen powered off! ( 4 I know I said this above, but it is important enough to reiterate.). DO NOT touch your LCD screen, because it will shorten the lifespan of your screen. 2  NEVER use a window or abrasive cleaner on your TV screen as it can cause the screen to yellow and also damage it. 3  If a spot does not come off, do NOT rub harder, because you can kill some of your pixels and ruin your screen."
+        ]
+      }
+    },
+    {
+      "question": "what is the difference between single cream and double cream",
+      "answer": "Based on the given passages, we can say that the primary difference between single cream and double cream in Britain is the butterfat content. Single cream has between 10% and 12%, which creates a thin liquid similar to half and half. On the other hand, double cream contains 48% butterfat and is therefore thicker. Additionally, the fat content makes double cream suitable for whipping whereas single cream cannot be easily whipped. Single cream also has a higher binding ability due to its higher fat content. Therefore, for cooking purposes, if you want a thinner consistency and do not need whipping capabilities, single cream would be more suitable. However, if you need a thicker consistency and require whipping capabilities, double cream would be a better option.",
+      "contexts": [
+        "passage 1:In Britain, single cream refers to a milk product that has between 10 percent and 12 percent butterfat.This relatively low level of butterfat creates a thin liquid similar to the U.S. product called half and half. In contrast, double cream in Britain refers to a cream product containing 48 percent butterfat.n Britain, single cream refers to a milk product that has between 10 percent and 12 percent butterfat.",
+        "passage 2:Whipping. Because of its high milk content, single cream is too thin to be whipped into soft or hard peaks. Double cream, however, is an excellent cream for whipping. It whips quickly into soft and then hard peaks. Some cooks find that double cream is so thick it strains their mixer.n Britain, single cream refers to a milk product that has between 10 percent and 12 percent butterfat.",
+        "passage 3:Report Abuse. Double cream has a higher fat content than single. You can use it in cooking but you will generally need rather less to get the same results. Because of the higher fat content it will bind with the flour ion the pasta to produce a thicker sauce.E: In cooking, what is the difference between double & single cream? For making my home-made macaroni m cheese-what should I use to coat the pasta-double cream or single cream? I used double before and it tasted really good, but dont know the difference between the two for cooking purposes."
+      ],
+      "reference_answer": "In Britain, single cream has between 10% and 12% butterfat and is a thin liquid similar to half and half; double cream contains 48% butterfat and is thicker. Single cream is too thin to whip; double cream whips quickly into soft and then hard peaks. In cooking, double cream binds with flour to produce a thicker sauce, so less is generally needed.",
+      "reference_contexts": [
+        "passage 1:In Britain, single cream refers to a milk product that has between 10 percent and 12 percent butterfat.This relatively low level of butterfat creates a thin liquid similar to the U.S. product called half and half. In contrast, double cream in Britain refers to a cream product containing 48 percent butterfat.n Britain, single cream refers to a milk product that has between 10 percent and 12 percent butterfat.",
+        "passage 2:Whipping. Because of its high milk content, single cream is too thin to be whipped into soft or hard peaks. Double cream, however, is an excellent cream for whipping. It whips quickly into soft and then hard peaks. Some cooks find that double cream is so thick it strains their mixer.n Britain, single cream refers to a milk product that has between 10 percent and 12 percent butterfat.",
+        "passage 3:Report Abuse. Double cream has a higher fat content than single. You can use it in cooking but you will generally need rather less to get the same results. Because of the higher fat content it will bind with the flour ion the pasta to produce a thicker sauce.E: In cooking, what is the difference between double & single cream? For making my home-made macaroni m cheese-what should I use to coat the pasta-double cream or single cream? I used double before and it tasted really good, but dont know the difference between the two for cooking purposes."
+      ],
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_id": "14295",
+        "source_sample_id": "11876",
+        "model": "mistral-7B-instruct",
+        "temperature": 1.0,
+        "quality": "good",
+        "hallucination_labels": [
+          {
+            "start": 434,
+            "end": 511,
+            "text": "Single cream also has a higher binding ability due to its higher fat content.",
+            "meta": "EVIDENT CONFLICT\nOriginal: Double cream has a higher fat content ... it will bind with the flour to produce a thicker sauce\nAIGC: Single cream also has a higher binding quality",
+            "label_type": "Evident Conflict",
+            "implicit_true": false,
+            "due_to_null": false
+          }
+        ],
+        "reference_source": "curated_from_source_passages_by_assistant",
+        "reference_verification": "pending_user_review",
+        "evaluation_stage": "existing_generated_result_with_curated_reference",
+        "answer": "Based on the given passages, we can say that the primary difference between single cream and double cream in Britain is the butterfat content. Single cream has between 10% and 12%, which creates a thin liquid similar to half and half. On the other hand, double cream contains 48% butterfat and is therefore thicker. Additionally, the fat content makes double cream suitable for whipping whereas single cream cannot be easily whipped. Single cream also has a higher binding ability due to its higher fat content. Therefore, for cooking purposes, if you want a thinner consistency and do not need whipping capabilities, single cream would be more suitable. However, if you need a thicker consistency and require whipping capabilities, double cream would be a better option.",
+        "contexts": [
+          "passage 1:In Britain, single cream refers to a milk product that has between 10 percent and 12 percent butterfat.This relatively low level of butterfat creates a thin liquid similar to the U.S. product called half and half. In contrast, double cream in Britain refers to a cream product containing 48 percent butterfat.n Britain, single cream refers to a milk product that has between 10 percent and 12 percent butterfat.",
+          "passage 2:Whipping. Because of its high milk content, single cream is too thin to be whipped into soft or hard peaks. Double cream, however, is an excellent cream for whipping. It whips quickly into soft and then hard peaks. Some cooks find that double cream is so thick it strains their mixer.n Britain, single cream refers to a milk product that has between 10 percent and 12 percent butterfat.",
+          "passage 3:Report Abuse. Double cream has a higher fat content than single. You can use it in cooking but you will generally need rather less to get the same results. Because of the higher fat content it will bind with the flour ion the pasta to produce a thicker sauce.E: In cooking, what is the difference between double & single cream? For making my home-made macaroni m cheese-what should I use to coat the pasta-double cream or single cream? I used double before and it tasted really good, but dont know the difference between the two for cooking purposes."
+        ]
+      }
+    },
+    {
+      "question": "how to soak off gel polish",
+      "answer": "To soak off gel polish, you can follow these steps:\n\n1. Gather materials: a bottle of acetone remover, cotton balls, aluminum foil, and an orange stick or cuticle pusher.\n2. Place a cotton ball soaked with acetone remover onto one of your fingernails.\n3. Wrap the finger with the cotton ball in foil and squeeze it tightly to keep it in contact with the nail.\n4. Remove the foil from the finger and push the polish off the nail using the orange stick or cuticle pusher.\n5. Repeat this step for each of your nails.\n6. Allow the remaining polish to soak off naturally by leaving the nails in warm water and wrapping them with moisturizer.\n7. Once all the polish has been removed, wash and dry your hands thoroughly.\n\nNote: It's important to follow these instructions carefully and avoid cutting the nails too short. If any polish remains on the nails after soaking, it may damage the skin beneath the nail.",
+      "contexts": [
+        "passage 1:Gelish Soak Off Gel Nail Polish is a unique formula that lasts up to 21 days on natural nails and the application out performs other Soak Off Gel Polishes.Excellent coverage with quick and accurate cure times, and a easy removal process. Special designed color pigments create the ultimate in Soak Off Gel Polish.elish Soak Off Gel Nail Polish is a unique formula that lasts up to 21 days on natural nails and the application out performs other Soak Off Gel Polishes.",
+        "passage 2:1 This helps break through the top coat to allow the remover to penetrate the layers of polish below. 2  Soak a cotton ball with the acetone remover and place it on one of the fingernails. 3  Wrap the finger with the cotton ball in foil, and squeeze it nice and tight so that the cotton ball stays in contact with the nail. Remove the foil from one finger. ( 2 You should be able to visibly see the polish coming loose from the edges of the nail.) Push the polish off of the nail using your orange stick or cuticle pusher. 3  Don’t use anything too sharp or you could remove the top layer of your nail. 4  Repeat this step for each nail.",
+        "passage 3:Gelish. Gelish® Soak-Off Gel Polish applies like polish and cures in a LED lamp in 30 seconds, or 2 minutes in traditional UV lamps.elish stays on nails for up to 3 weeks with no chipping or peeling, and soaks completely off in only 10 - 15 minutes. Gelish® Soak-Off Gel-Polish Application & Removal Gelish® Gel-Polish Application & Removal."
+      ],
+      "reference_answer": "To soak off gel polish: soak a cotton ball with acetone remover and place it on the fingernail; wrap the finger with the cotton ball in foil, squeezing it tight so it stays in contact; remove the foil and push the polish off using an orange stick or cuticle pusher; do not use anything too sharp; repeat for each nail. Gelish soak-off gel cures in an LED lamp in 30 seconds or 2 minutes in a UV lamp and soaks off in 10-15 minutes.",
+      "reference_contexts": [
+        "passage 1:Gelish Soak Off Gel Nail Polish is a unique formula that lasts up to 21 days on natural nails and the application out performs other Soak Off Gel Polishes.Excellent coverage with quick and accurate cure times, and a easy removal process. Special designed color pigments create the ultimate in Soak Off Gel Polish.elish Soak Off Gel Nail Polish is a unique formula that lasts up to 21 days on natural nails and the application out performs other Soak Off Gel Polishes.",
+        "passage 2:1 This helps break through the top coat to allow the remover to penetrate the layers of polish below. 2  Soak a cotton ball with the acetone remover and place it on one of the fingernails. 3  Wrap the finger with the cotton ball in foil, and squeeze it nice and tight so that the cotton ball stays in contact with the nail. Remove the foil from one finger. ( 2 You should be able to visibly see the polish coming loose from the edges of the nail.) Push the polish off of the nail using your orange stick or cuticle pusher. 3  Don’t use anything too sharp or you could remove the top layer of your nail. 4  Repeat this step for each nail.",
+        "passage 3:Gelish. Gelish® Soak-Off Gel Polish applies like polish and cures in a LED lamp in 30 seconds, or 2 minutes in traditional UV lamps.elish stays on nails for up to 3 weeks with no chipping or peeling, and soaks completely off in only 10 - 15 minutes. Gelish® Soak-Off Gel-Polish Application & Removal Gelish® Gel-Polish Application & Removal."
+      ],
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_id": "14296",
+        "source_sample_id": "11882",
+        "model": "mistral-7B-instruct",
+        "temperature": 0.925,
+        "quality": "good",
+        "hallucination_labels": [
+          {
+            "start": 514,
+            "end": 713,
+            "text": "6. Allow the remaining polish to soak off naturally by leaving the nails in warm water and wrapping them with moisturizer.\n7. Once all the polish has been removed, wash and dry your hands thoroughly.",
+            "meta": "HIGH INTRO OF NEW INFO\nIt includes additional steps not mentioned in the original source, such as 'Allow the remaining... them with moisturizer' and 'Once all the... your hands thoroughly.'",
+            "label_type": "Evident Baseless Info",
+            "implicit_true": false,
+            "due_to_null": false
+          }
+        ],
+        "reference_source": "curated_from_source_passages_by_assistant",
+        "reference_verification": "pending_user_review",
+        "evaluation_stage": "existing_generated_result_with_curated_reference",
+        "answer": "To soak off gel polish, you can follow these steps:\n\n1. Gather materials: a bottle of acetone remover, cotton balls, aluminum foil, and an orange stick or cuticle pusher.\n2. Place a cotton ball soaked with acetone remover onto one of your fingernails.\n3. Wrap the finger with the cotton ball in foil and squeeze it tightly to keep it in contact with the nail.\n4. Remove the foil from the finger and push the polish off the nail using the orange stick or cuticle pusher.\n5. Repeat this step for each of your nails.\n6. Allow the remaining polish to soak off naturally by leaving the nails in warm water and wrapping them with moisturizer.\n7. Once all the polish has been removed, wash and dry your hands thoroughly.\n\nNote: It's important to follow these instructions carefully and avoid cutting the nails too short. If any polish remains on the nails after soaking, it may damage the skin beneath the nail.",
+        "contexts": [
+          "passage 1:Gelish Soak Off Gel Nail Polish is a unique formula that lasts up to 21 days on natural nails and the application out performs other Soak Off Gel Polishes.Excellent coverage with quick and accurate cure times, and a easy removal process. Special designed color pigments create the ultimate in Soak Off Gel Polish.elish Soak Off Gel Nail Polish is a unique formula that lasts up to 21 days on natural nails and the application out performs other Soak Off Gel Polishes.",
+          "passage 2:1 This helps break through the top coat to allow the remover to penetrate the layers of polish below. 2  Soak a cotton ball with the acetone remover and place it on one of the fingernails. 3  Wrap the finger with the cotton ball in foil, and squeeze it nice and tight so that the cotton ball stays in contact with the nail. Remove the foil from one finger. ( 2 You should be able to visibly see the polish coming loose from the edges of the nail.) Push the polish off of the nail using your orange stick or cuticle pusher. 3  Don’t use anything too sharp or you could remove the top layer of your nail. 4  Repeat this step for each nail.",
+          "passage 3:Gelish. Gelish® Soak-Off Gel Polish applies like polish and cures in a LED lamp in 30 seconds, or 2 minutes in traditional UV lamps.elish stays on nails for up to 3 weeks with no chipping or peeling, and soaks completely off in only 10 - 15 minutes. Gelish® Soak-Off Gel-Polish Application & Removal Gelish® Gel-Polish Application & Removal."
+        ]
+      }
+    },
+    {
+      "question": "in word, how do i remove a row",
+      "answer": "To remove a row from a table in Microsoft Word 2007, you can either use the keyboard shortcut \"Ctrl+Shift+Right Arrow\" to shift all the cells one row to the right, effectively deleting the row, or right-click in a cell inside the row you want to delete and choose \"Delete Cells\". In the Delete Cells dialog box, select \"Delete entire row\" and then click \"OK\" or hit Enter.",
+      "contexts": [
+        "passage 1:Add or delete a table column or row. To add or delete columns and rows, right-click a row or column, and then click the command you want. You can also quickly add a row by clicking in the lower-right cell of the table and pressing the Tab key.Here are more detailed instructions.dd a column to the left or right. Right-click in a cell to the left or to the right of where you want to add a column. On the shortcut menu, point to Insert, and then click Insert Columns to the Left or Insert Columns to the Right.",
+        "passage 2:Delete a row from a table in Microsoft Word 2007. Just as you can insert new rows and columns in pre-existing tables in Word 2007, you can delete rows and columns, whether they contain any data or not. This tutorial explains how to delete a row from a table in your Microsoft Word documents.You can either delete the content of a row, but keep the structural row inside the table, or delete the row and its content: this tutorial will show you how to both delete the content of rows, and how to delete rows themselves.elete a row from a table in Word 2007. If you want to remove both the row and its content, you can use the keyboard shortcut described above: select the row, and hit. .",
+        "passage 3:Delete a row from a table in Word 2007. If you want to remove both the row and its content, you can use the keyboard shortcut described above: select the row, and hit. .But we will also show you another way to remove a row from a table, easier to remember: Right-click in a cell inside the row you would like to delete.From the context menu that opens, choose Delete Cells, and the Delete Cells dialog box will open. By default, Shift cells left is selected, so you first need to choose the  Delete entire row  option-then hit. (or click OK).elete a row from a table in Word 2007. If you want to remove both the row and its content, you can use the keyboard shortcut described above: select the row, and hit. ."
+      ],
+      "reference_answer": "To remove a row in Microsoft Word: right-click in a cell inside the row you want to delete, choose Delete Cells from the context menu, select the 'Delete entire row' option and hit OK. You can delete the row content while keeping the structural row, or delete the row and its content together.",
+      "reference_contexts": [
+        "passage 2:Delete a row from a table in Microsoft Word 2007. Just as you can insert new rows and columns in pre-existing tables in Word 2007, you can delete rows and columns, whether they contain any data or not. This tutorial explains how to delete a row from a table in your Microsoft Word documents.You can either delete the content of a row, but keep the structural row inside the table, or delete the row and its content: this tutorial will show you how to both delete the content of rows, and how to delete rows themselves.elete a row from a table in Word 2007. If you want to remove both the row and its content, you can use the keyboard shortcut described above: select the row, and hit. .",
+        "passage 3:Delete a row from a table in Word 2007. If you want to remove both the row and its content, you can use the keyboard shortcut described above: select the row, and hit. .But we will also show you another way to remove a row from a table, easier to remember: Right-click in a cell inside the row you would like to delete.From the context menu that opens, choose Delete Cells, and the Delete Cells dialog box will open. By default, Shift cells left is selected, so you first need to choose the  Delete entire row  option-then hit. (or click OK).elete a row from a table in Word 2007. If you want to remove both the row and its content, you can use the keyboard shortcut described above: select the row, and hit. ."
+      ],
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_id": "14297",
+        "source_sample_id": "11888",
+        "model": "mistral-7B-instruct",
+        "temperature": 0.85,
+        "quality": "good",
+        "hallucination_labels": [
+          {
+            "start": 68,
+            "end": 118,
+            "text": "use the keyboard shortcut \"Ctrl+Shift+Right Arrow\"",
+            "meta": "HIGH INTRO OF NEW INFO\nIt contains the keyboard shortcut 'Ctrl+Shift+Right Arrow' to delete a row, which is not mentioned in the original source.",
+            "label_type": "Evident Baseless Info",
+            "implicit_true": false,
+            "due_to_null": false
+          }
+        ],
+        "reference_source": "curated_from_source_passages_by_assistant",
+        "reference_verification": "pending_user_review",
+        "evaluation_stage": "existing_generated_result_with_curated_reference",
+        "answer": "To remove a row from a table in Microsoft Word 2007, you can either use the keyboard shortcut \"Ctrl+Shift+Right Arrow\" to shift all the cells one row to the right, effectively deleting the row, or right-click in a cell inside the row you want to delete and choose \"Delete Cells\". In the Delete Cells dialog box, select \"Delete entire row\" and then click \"OK\" or hit Enter.",
+        "contexts": [
+          "passage 1:Add or delete a table column or row. To add or delete columns and rows, right-click a row or column, and then click the command you want. You can also quickly add a row by clicking in the lower-right cell of the table and pressing the Tab key.Here are more detailed instructions.dd a column to the left or right. Right-click in a cell to the left or to the right of where you want to add a column. On the shortcut menu, point to Insert, and then click Insert Columns to the Left or Insert Columns to the Right.",
+          "passage 2:Delete a row from a table in Microsoft Word 2007. Just as you can insert new rows and columns in pre-existing tables in Word 2007, you can delete rows and columns, whether they contain any data or not. This tutorial explains how to delete a row from a table in your Microsoft Word documents.You can either delete the content of a row, but keep the structural row inside the table, or delete the row and its content: this tutorial will show you how to both delete the content of rows, and how to delete rows themselves.elete a row from a table in Word 2007. If you want to remove both the row and its content, you can use the keyboard shortcut described above: select the row, and hit. .",
+          "passage 3:Delete a row from a table in Word 2007. If you want to remove both the row and its content, you can use the keyboard shortcut described above: select the row, and hit. .But we will also show you another way to remove a row from a table, easier to remember: Right-click in a cell inside the row you would like to delete.From the context menu that opens, choose Delete Cells, and the Delete Cells dialog box will open. By default, Shift cells left is selected, so you first need to choose the  Delete entire row  option-then hit. (or click OK).elete a row from a table in Word 2007. If you want to remove both the row and its content, you can use the keyboard shortcut described above: select the row, and hit. ."
+        ]
+      }
+    },
+    {
+      "question": "food rich in potassium magnesium and calcium",
+      "answer": "Based on the given passages, it is possible to find foods that are rich in potassium, calcium, and magnesium. These include fruits such as bananas, apricots, prunes, dates, cantaloupe, watermelon, and strawberries, which are all good sources of potassium. Dark leafy vegetables such as kale, turnip greens, broccoli, Brussels sprouts, and cabbage are also rich sources of both potassium and calcium. Additionally, canned fish such as salmon, sardines, and mackerel are good sources of calcium and omega-3 fatty acids. Green leafy vegetables, legumes, nuts, seeds, and whole grains are good sources of magnesium.",
+      "contexts": [
+        "passage 1:Foods Containing Potassium. Fruits rich in potassium include bananas, apricots, prunes, dates, cantaloupe, watermelon and strawberries. Foods such as salmon, beans, turkey and fish also contain potassium as do peas, greens, spinach and tomatoes.If you are consuming three of these items a day, you are probably getting enough potassium.o do dark leafy vegetables. Kale, turnip greens, broccoli, brussel sprouts and cabbage are rich sources of calcium. Canned fish (with bones), such as salmon, sardines and mackerel are also good choices. Fruits rich in potassium include bananas, apricots, prunes, dates, cantaloupe, watermelon and strawberries.",
+        "passage 2:Foods Rich In Calcium. Foods such as milk, cheese and yogurt contain calcium. So do dark leafy vegetables. Kale, turnip greens, broccoli, brussel sprouts and cabbage are rich sources of calcium. Canned fish (with bones), such as salmon, sardines and mackerel are also good choices.Fruits rich in potassium include bananas, apricots, prunes, dates, cantaloupe, watermelon and strawberries.Foods such as salmon, beans, turkey and fish also contain potassium as do peas, greens, spinach and tomatoes. If you are consuming three of these items a day, you are probably getting enough potassium.o do dark leafy vegetables. Kale, turnip greens, broccoli, brussel sprouts and cabbage are rich sources of calcium. Canned fish (with bones), such as salmon, sardines and mackerel are also good choices. Fruits rich in potassium include bananas, apricots, prunes, dates, cantaloupe, watermelon and strawberries.",
+        "passage 3:Food. Magnesium is widely distributed in plant and animal foods and in beverages. Green leafy vegetables, such as spinach, legumes, nuts, seeds, and whole grains, are good sources [ 1, 3 ]. In general, foods containing dietary fiber provide magnesium.Magnesium is also added to some breakfast cereals and other fortified foods.Some types of food processing, such as refining grains in ways that remove the nutrient-rich germ and bran, lower magnesium content substantially [ 1 ]. Selected food sources of magnesium are listed in Table 2.n general, foods containing dietary fiber provide magnesium. Magnesium is also added to some breakfast cereals and other fortified foods. Some types of food processing, such as refining grains in ways that remove the nutrient-rich germ and bran, lower magnesium content substantially [ 1 ]."
+      ],
+      "reference_answer": "Foods rich in potassium include bananas, apricots, prunes, dates, cantaloupe, watermelon, strawberries, salmon, beans, turkey, fish, peas, greens, spinach and tomatoes. Foods rich in calcium include milk, cheese, yogurt, dark leafy vegetables (kale, turnip greens, broccoli, brussels sprouts, cabbage) and canned fish with bones such as salmon, sardines and mackerel. Magnesium is widely distributed in green leafy vegetables such as spinach, legumes, nuts, seeds and whole grains.",
+      "reference_contexts": [
+        "passage 1:Foods Containing Potassium. Fruits rich in potassium include bananas, apricots, prunes, dates, cantaloupe, watermelon and strawberries. Foods such as salmon, beans, turkey and fish also contain potassium as do peas, greens, spinach and tomatoes.If you are consuming three of these items a day, you are probably getting enough potassium.o do dark leafy vegetables. Kale, turnip greens, broccoli, brussel sprouts and cabbage are rich sources of calcium. Canned fish (with bones), such as salmon, sardines and mackerel are also good choices. Fruits rich in potassium include bananas, apricots, prunes, dates, cantaloupe, watermelon and strawberries.",
+        "passage 2:Foods Rich In Calcium. Foods such as milk, cheese and yogurt contain calcium. So do dark leafy vegetables. Kale, turnip greens, broccoli, brussel sprouts and cabbage are rich sources of calcium. Canned fish (with bones), such as salmon, sardines and mackerel are also good choices.Fruits rich in potassium include bananas, apricots, prunes, dates, cantaloupe, watermelon and strawberries.Foods such as salmon, beans, turkey and fish also contain potassium as do peas, greens, spinach and tomatoes. If you are consuming three of these items a day, you are probably getting enough potassium.o do dark leafy vegetables. Kale, turnip greens, broccoli, brussel sprouts and cabbage are rich sources of calcium. Canned fish (with bones), such as salmon, sardines and mackerel are also good choices. Fruits rich in potassium include bananas, apricots, prunes, dates, cantaloupe, watermelon and strawberries.",
+        "passage 3:Food. Magnesium is widely distributed in plant and animal foods and in beverages. Green leafy vegetables, such as spinach, legumes, nuts, seeds, and whole grains, are good sources [ 1, 3 ]. In general, foods containing dietary fiber provide magnesium.Magnesium is also added to some breakfast cereals and other fortified foods.Some types of food processing, such as refining grains in ways that remove the nutrient-rich germ and bran, lower magnesium content substantially [ 1 ]. Selected food sources of magnesium are listed in Table 2.n general, foods containing dietary fiber provide magnesium. Magnesium is also added to some breakfast cereals and other fortified foods. Some types of food processing, such as refining grains in ways that remove the nutrient-rich germ and bran, lower magnesium content substantially [ 1 ]."
+      ],
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_id": "14298",
+        "source_sample_id": "11894",
+        "model": "mistral-7B-instruct",
+        "temperature": 0.775,
+        "quality": "good",
+        "hallucination_labels": [
+          {
+            "start": 286,
+            "end": 399,
+            "text": "kale, turnip greens, broccoli, Brussels sprouts, and cabbage are also rich sources of both potassium and calcium.",
+            "meta": "LOW INTRO OF NEW INFO\nIt is true that dark leafy vegetables such as kale... and cabbage are also rich sources of potassium but it is not mentioned in the original source.",
+            "label_type": "Subtle Baseless Info",
+            "implicit_true": true,
+            "due_to_null": false
+          },
+          {
+            "start": 414,
+            "end": 517,
+            "text": "canned fish such as salmon, sardines, and mackerel are good sources of calcium and omega-3 fatty acids.",
+            "meta": "LOW INTRO OF NEW INFO\nIt is true that canned fish such as salmon, sardines, and mackerel are good sources of calcium and omega-3 fatty acids but it is not mentioned in the original source.",
+            "label_type": "Subtle Baseless Info",
+            "implicit_true": true,
+            "due_to_null": false
+          }
+        ],
+        "reference_source": "curated_from_source_passages_by_assistant",
+        "reference_verification": "pending_user_review",
+        "evaluation_stage": "existing_generated_result_with_curated_reference",
+        "answer": "Based on the given passages, it is possible to find foods that are rich in potassium, calcium, and magnesium. These include fruits such as bananas, apricots, prunes, dates, cantaloupe, watermelon, and strawberries, which are all good sources of potassium. Dark leafy vegetables such as kale, turnip greens, broccoli, Brussels sprouts, and cabbage are also rich sources of both potassium and calcium. Additionally, canned fish such as salmon, sardines, and mackerel are good sources of calcium and omega-3 fatty acids. Green leafy vegetables, legumes, nuts, seeds, and whole grains are good sources of magnesium.",
+        "contexts": [
+          "passage 1:Foods Containing Potassium. Fruits rich in potassium include bananas, apricots, prunes, dates, cantaloupe, watermelon and strawberries. Foods such as salmon, beans, turkey and fish also contain potassium as do peas, greens, spinach and tomatoes.If you are consuming three of these items a day, you are probably getting enough potassium.o do dark leafy vegetables. Kale, turnip greens, broccoli, brussel sprouts and cabbage are rich sources of calcium. Canned fish (with bones), such as salmon, sardines and mackerel are also good choices. Fruits rich in potassium include bananas, apricots, prunes, dates, cantaloupe, watermelon and strawberries.",
+          "passage 2:Foods Rich In Calcium. Foods such as milk, cheese and yogurt contain calcium. So do dark leafy vegetables. Kale, turnip greens, broccoli, brussel sprouts and cabbage are rich sources of calcium. Canned fish (with bones), such as salmon, sardines and mackerel are also good choices.Fruits rich in potassium include bananas, apricots, prunes, dates, cantaloupe, watermelon and strawberries.Foods such as salmon, beans, turkey and fish also contain potassium as do peas, greens, spinach and tomatoes. If you are consuming three of these items a day, you are probably getting enough potassium.o do dark leafy vegetables. Kale, turnip greens, broccoli, brussel sprouts and cabbage are rich sources of calcium. Canned fish (with bones), such as salmon, sardines and mackerel are also good choices. Fruits rich in potassium include bananas, apricots, prunes, dates, cantaloupe, watermelon and strawberries.",
+          "passage 3:Food. Magnesium is widely distributed in plant and animal foods and in beverages. Green leafy vegetables, such as spinach, legumes, nuts, seeds, and whole grains, are good sources [ 1, 3 ]. In general, foods containing dietary fiber provide magnesium.Magnesium is also added to some breakfast cereals and other fortified foods.Some types of food processing, such as refining grains in ways that remove the nutrient-rich germ and bran, lower magnesium content substantially [ 1 ]. Selected food sources of magnesium are listed in Table 2.n general, foods containing dietary fiber provide magnesium. Magnesium is also added to some breakfast cereals and other fortified foods. Some types of food processing, such as refining grains in ways that remove the nutrient-rich germ and bran, lower magnesium content substantially [ 1 ]."
+        ]
+      }
+    },
+    {
+      "question": "pros and cons entering workforce or going to graduate school",
+      "answer": "Pros of entering the workforce include earning an income right away and gaining practical experience. Cons include potentially earning less than those with graduate degrees. Pros of going to graduate school include furthering education in a specific field and potentially earning a higher income upon graduation. Cons include the expense and time commitment required for grad school. Some students manage to balance both by working part-time or volunteering while in grad school.",
+      "contexts": [
+        "passage 1:A lot of college grads opt to delay their entry into the workforce however, and instead enroll in graduate school. Grad school isn't the right choice for everybody, but for many it's a good option to consider when deciding whether to further your education or enter the workforce.n the other hand, the graduates who are able to find work end up making a lot more than their undergraduate counterparts; the median annual salary plus bonus for a person fresh out of grad school with an MBA is $105,000. Time. Graduate school takes a lot of time, time that many people might not have.",
+        "passage 2:Some ambitious students will choose to work and pursue grad school at the same time. This may sound like a lot to handle, but students who take this approach often reap double the rewards. Rather than taking on a paid position, some students elect to volunteer part-time, working around their study schedule.y jcuadmissions November 20, 2014 American college in Rome American university in Rome study abroad in Italy. Undergraduate students hear a lot of conflicting advice when it comes to plotting their course following graduation.",
+        "passage 3:There are pros and cons to each decision. Graduate school is expensive and time consuming, yet it allows you to further your education in a specific field. It is a tough decision that I will have to make next December, and some students will have to make as soon as this summer.urthermore, it will give you an opportunity to expand your education, and it will give you more knowledge about your field of study. When you come out of graduate school you will be more educated than a student who went straight into the career world. I also recommend holding a part time job while in graduate school."
+      ],
+      "reference_answer": "The passages discuss the choice between entering the workforce and going to graduate school. Graduate school is expensive and time consuming but allows further education in a specific field; graduates who find work can earn more (median annual salary plus bonus for a fresh MBA is $105,000). Some students work and pursue grad school at the same time, or volunteer part-time around their study schedule.",
+      "reference_contexts": [
+        "passage 1:A lot of college grads opt to delay their entry into the workforce however, and instead enroll in graduate school. Grad school isn't the right choice for everybody, but for many it's a good option to consider when deciding whether to further your education or enter the workforce.n the other hand, the graduates who are able to find work end up making a lot more than their undergraduate counterparts; the median annual salary plus bonus for a person fresh out of grad school with an MBA is $105,000. Time. Graduate school takes a lot of time, time that many people might not have.",
+        "passage 2:Some ambitious students will choose to work and pursue grad school at the same time. This may sound like a lot to handle, but students who take this approach often reap double the rewards. Rather than taking on a paid position, some students elect to volunteer part-time, working around their study schedule.y jcuadmissions November 20, 2014 American college in Rome American university in Rome study abroad in Italy. Undergraduate students hear a lot of conflicting advice when it comes to plotting their course following graduation.",
+        "passage 3:There are pros and cons to each decision. Graduate school is expensive and time consuming, yet it allows you to further your education in a specific field. It is a tough decision that I will have to make next December, and some students will have to make as soon as this summer.urthermore, it will give you an opportunity to expand your education, and it will give you more knowledge about your field of study. When you come out of graduate school you will be more educated than a student who went straight into the career world. I also recommend holding a part time job while in graduate school."
+      ],
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_id": "14299",
+        "source_sample_id": "11898",
+        "model": "gpt-4-0613",
+        "temperature": 0.7,
+        "quality": "good",
+        "hallucination_labels": [
+          {
+            "start": 102,
+            "end": 173,
+            "text": "Cons include potentially earning less than those with graduate degrees.",
+            "meta": "HIGH INTRO OF NEW INFO\nPassages have no mention of this earning less than those with graduate degrees. ",
+            "label_type": "Evident Baseless Info",
+            "implicit_true": false,
+            "due_to_null": false
+          },
+          {
+            "start": 272,
+            "end": 311,
+            "text": "earning a higher income upon graduation",
+            "meta": "HIGH INTRO OF NEW INFO\nPassages have no mention of this detail. ",
+            "label_type": "Evident Baseless Info",
+            "implicit_true": false,
+            "due_to_null": false
+          },
+          {
+            "start": 72,
+            "end": 100,
+            "text": "gaining practical experience",
+            "meta": "HIGH INTRO OF NEW INFO\nPassages have no mention of this tip. \n",
+            "label_type": "Evident Baseless Info",
+            "implicit_true": false,
+            "due_to_null": false
+          }
+        ],
+        "reference_source": "curated_from_source_passages_by_assistant",
+        "reference_verification": "pending_user_review",
+        "evaluation_stage": "existing_generated_result_with_curated_reference",
+        "answer": "Pros of entering the workforce include earning an income right away and gaining practical experience. Cons include potentially earning less than those with graduate degrees. Pros of going to graduate school include furthering education in a specific field and potentially earning a higher income upon graduation. Cons include the expense and time commitment required for grad school. Some students manage to balance both by working part-time or volunteering while in grad school.",
+        "contexts": [
+          "passage 1:A lot of college grads opt to delay their entry into the workforce however, and instead enroll in graduate school. Grad school isn't the right choice for everybody, but for many it's a good option to consider when deciding whether to further your education or enter the workforce.n the other hand, the graduates who are able to find work end up making a lot more than their undergraduate counterparts; the median annual salary plus bonus for a person fresh out of grad school with an MBA is $105,000. Time. Graduate school takes a lot of time, time that many people might not have.",
+          "passage 2:Some ambitious students will choose to work and pursue grad school at the same time. This may sound like a lot to handle, but students who take this approach often reap double the rewards. Rather than taking on a paid position, some students elect to volunteer part-time, working around their study schedule.y jcuadmissions November 20, 2014 American college in Rome American university in Rome study abroad in Italy. Undergraduate students hear a lot of conflicting advice when it comes to plotting their course following graduation.",
+          "passage 3:There are pros and cons to each decision. Graduate school is expensive and time consuming, yet it allows you to further your education in a specific field. It is a tough decision that I will have to make next December, and some students will have to make as soon as this summer.urthermore, it will give you an opportunity to expand your education, and it will give you more knowledge about your field of study. When you come out of graduate school you will be more educated than a student who went straight into the career world. I also recommend holding a part time job while in graduate school."
+        ]
+      }
+    },
+    {
+      "question": "how do automotive technicians get paid",
+      "answer": "Based on the provided passages, automotive technicians can get paid in different ways, including hourly and commission-based pay. The specific amount of pay varies by location, with the highest average pay in Alaska ($23.70 per hour or $49,400 per year) and the lowest average pay in Mississippi ($18.60 per hour or $38,900 per year). Additionally, some automotive technicians may earn more working in related industries such as aerospace products and parts manufacturing, which pays an average of $32 per hour or $66,300 per year. However, the passages do not provide specific information on how automotive technicians get paid or their typical salaries. Therefore, I am unable to answer the question based on the given passages.",
+      "contexts": [
+        "passage 1:In short, whether mechanics and technicians are entitled to overtime wages depends on (a) where they work (auto dealer or repair shop), (b) how they are paid (commission or not), (c) how much they make (regular hourly rate and commissions), and (d) the state in which they work.d 1554, finding that certain automotive mechanics and technicians paid on a flat-rate or flag-rate are entitled to overtime under the FLSA.",
+        "passage 2:Automotive technicians in Alaska have the highest average pay in regard to geography, at about $23.70 per hour or $49,400 per year. Techs in Connecticut, Maryland, Massachusetts and Washington D.C. average $20.50 to $21.50 per hour.otential. A small number of automotive technicians work in aerospace products and parts manufacturing, which is the highest-paying opportunity for these workers, indicates the BLS. Automotive techs in this industry earn about $32 per hour or $66,300 per year on average.",
+        "passage 3:104 months ago. The amount of pay from company to company does not vary too much, but you do have a wide variety of compensation methods. There are various combinations of hourly and commission pay rates, which depending on what type of work you specialize in can vary your bottom line considerably.04 months ago. The amount of pay from company to company does not vary too much, but you do have a wide variety of compensation methods. There are various combinations of hourly and commission pay rates, which depending on what type of work you specialize in can vary your bottom line considerably."
+      ],
+      "reference_answer": "Automotive technicians can be paid hourly, by commission, or on a flat-rate/flag-rate basis; whether they are entitled to overtime depends on where they work, how they are paid, how much they make and the state. Alaska has the highest average pay at about $23.70 per hour or $49,400 per year; automotive technicians in aerospace products and parts manufacturing earn about $32 per hour or $66,300 per year on average.",
+      "reference_contexts": [
+        "passage 1:In short, whether mechanics and technicians are entitled to overtime wages depends on (a) where they work (auto dealer or repair shop), (b) how they are paid (commission or not), (c) how much they make (regular hourly rate and commissions), and (d) the state in which they work.d 1554, finding that certain automotive mechanics and technicians paid on a flat-rate or flag-rate are entitled to overtime under the FLSA.",
+        "passage 2:Automotive technicians in Alaska have the highest average pay in regard to geography, at about $23.70 per hour or $49,400 per year. Techs in Connecticut, Maryland, Massachusetts and Washington D.C. average $20.50 to $21.50 per hour.otential. A small number of automotive technicians work in aerospace products and parts manufacturing, which is the highest-paying opportunity for these workers, indicates the BLS. Automotive techs in this industry earn about $32 per hour or $66,300 per year on average."
+      ],
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_id": "14300",
+        "source_sample_id": "11908",
+        "model": "llama-2-13b-chat",
+        "temperature": 0.85,
+        "quality": "good",
+        "hallucination_labels": [
+          {
+            "start": 258,
+            "end": 333,
+            "text": "the lowest average pay in Mississippi ($18.60 per hour or $38,900 per year)",
+            "meta": "HIGH INTRO OF NEW INFO\nIt includes information about the lowest average pay of automotive technicians in Mississippi ($18.60 per hour or $38,900 per year), which is not mentioned in the original source.",
+            "label_type": "Evident Baseless Info",
+            "implicit_true": false,
+            "due_to_null": false
+          }
+        ],
+        "reference_source": "curated_from_source_passages_by_assistant",
+        "reference_verification": "pending_user_review",
+        "evaluation_stage": "existing_generated_result_with_curated_reference",
+        "answer": "Based on the provided passages, automotive technicians can get paid in different ways, including hourly and commission-based pay. The specific amount of pay varies by location, with the highest average pay in Alaska ($23.70 per hour or $49,400 per year) and the lowest average pay in Mississippi ($18.60 per hour or $38,900 per year). Additionally, some automotive technicians may earn more working in related industries such as aerospace products and parts manufacturing, which pays an average of $32 per hour or $66,300 per year. However, the passages do not provide specific information on how automotive technicians get paid or their typical salaries. Therefore, I am unable to answer the question based on the given passages.",
+        "contexts": [
+          "passage 1:In short, whether mechanics and technicians are entitled to overtime wages depends on (a) where they work (auto dealer or repair shop), (b) how they are paid (commission or not), (c) how much they make (regular hourly rate and commissions), and (d) the state in which they work.d 1554, finding that certain automotive mechanics and technicians paid on a flat-rate or flag-rate are entitled to overtime under the FLSA.",
+          "passage 2:Automotive technicians in Alaska have the highest average pay in regard to geography, at about $23.70 per hour or $49,400 per year. Techs in Connecticut, Maryland, Massachusetts and Washington D.C. average $20.50 to $21.50 per hour.otential. A small number of automotive technicians work in aerospace products and parts manufacturing, which is the highest-paying opportunity for these workers, indicates the BLS. Automotive techs in this industry earn about $32 per hour or $66,300 per year on average.",
+          "passage 3:104 months ago. The amount of pay from company to company does not vary too much, but you do have a wide variety of compensation methods. There are various combinations of hourly and commission pay rates, which depending on what type of work you specialize in can vary your bottom line considerably.04 months ago. The amount of pay from company to company does not vary too much, but you do have a wide variety of compensation methods. There are various combinations of hourly and commission pay rates, which depending on what type of work you specialize in can vary your bottom line considerably."
+        ]
+      }
+    },
+    {
+      "question": "how to plough a field",
+      "answer": "To plow a field with a small 3-point plow and a disk harrow, start by turning around in a wide circle and plow the field from the side edges towards the center until the first bottom completely overlaps the second bottom and forms a high hill in the middle. Once you reach the top of the hill, align the wheel of the plow in the ditch or furrow and plow over the ditch with the first bottom. Repeat this process until the entire field has been plowed. For a larger tractor and a 4-furrow plow, the process would be similar but with more furrows and potentially a larger amount of land being plowed. It's important to note that for new farmers, practicing good plowing techniques and understanding the equipment can take time and practice.",
+      "contexts": [
+        "passage 1:I have an MF 245, a small 3 point plow, a disk harrow, and a cultivator. I have a 30 acre farm in WV, and want to plow and plant a wildflower meadow. The field in mind used to grow crops many years ago, and other fields on my place mainly grew hay.urn around at the end and plow back up the field with the first bottom completely over lapping so that the middle hill is higher than the rest again as straight as you can.When you get to the top again line up the wheel in the ditch(furrow) so that the first bottom is covering up the furrow.",
+        "passage 2:Tractor field plowing. Find the center of the field in the front center and back, mark off the center with stakes or sticks if you want to just run them over.Eye up the last stake with the first two just to give yourself a straight line. Line up the tractor on the stakes and plow as straight as you can.ind the center of the field in the front center and back, mark off the center with stakes or sticks if you want to just run them over. Eye up the last stake with the first two just to give yourself a straight line.",
+        "passage 3:The answer to your question depends on the size and shape of your field, and the size of your plow. You have a myriad of answers, and some are thoughtful, some make no sense to other than the sender, per his acreage. google...Operation, Care, and Repair of Farm Machinery, by John Deere.'m new to farming (no family background in it, I'm just learning as I go) so I don't really know how one plows a field with a regular plow (not a reversible/rollover type). I bought a large tractor and a 4 furrow plow, now I just need to get out there."
+      ],
+      "reference_answer": "To plow a field: find the center of the field front and back and mark it off with stakes; line up the tractor on the stakes and plow as straight as possible; turn around at the end and plow back up the field with the first bottom completely overlapping so the middle is higher; at the top, line up the wheel in the furrow so the first bottom covers the furrow.",
+      "reference_contexts": [
+        "passage 1:I have an MF 245, a small 3 point plow, a disk harrow, and a cultivator. I have a 30 acre farm in WV, and want to plow and plant a wildflower meadow. The field in mind used to grow crops many years ago, and other fields on my place mainly grew hay.urn around at the end and plow back up the field with the first bottom completely over lapping so that the middle hill is higher than the rest again as straight as you can.When you get to the top again line up the wheel in the ditch(furrow) so that the first bottom is covering up the furrow.",
+        "passage 2:Tractor field plowing. Find the center of the field in the front center and back, mark off the center with stakes or sticks if you want to just run them over.Eye up the last stake with the first two just to give yourself a straight line. Line up the tractor on the stakes and plow as straight as you can.ind the center of the field in the front center and back, mark off the center with stakes or sticks if you want to just run them over. Eye up the last stake with the first two just to give yourself a straight line.",
+        "passage 3:The answer to your question depends on the size and shape of your field, and the size of your plow. You have a myriad of answers, and some are thoughtful, some make no sense to other than the sender, per his acreage. google...Operation, Care, and Repair of Farm Machinery, by John Deere.'m new to farming (no family background in it, I'm just learning as I go) so I don't really know how one plows a field with a regular plow (not a reversible/rollover type). I bought a large tractor and a 4 furrow plow, now I just need to get out there."
+      ],
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_id": "14301",
+        "source_sample_id": "11912",
+        "model": "mistral-7B-instruct",
+        "temperature": 1.0,
+        "quality": "good",
+        "hallucination_labels": [
+          {
+            "start": 61,
+            "end": 159,
+            "text": "start by turning around in a wide circle and plow the field from the side edges towards the center",
+            "meta": "HIGH INTRO OF NEW INFO\nAdditional step such as, 'start by turning around in a wide circle and plow the field from the side edges towards the center' is not mentioned in the original source.",
+            "label_type": "Evident Baseless Info",
+            "implicit_true": false,
+            "due_to_null": false
+          },
+          {
+            "start": 207,
+            "end": 220,
+            "text": "second bottom",
+            "meta": "HIGH INTRO OF NEW INFO\n'second bottom' is not mentioned in the original source.",
+            "label_type": "Evident Baseless Info",
+            "implicit_true": false,
+            "due_to_null": false
+          },
+          {
+            "start": 392,
+            "end": 450,
+            "text": "Repeat this process until the entire field has been plowed",
+            "meta": "HIGH INTRO OF NEW INFO\nAdditional step such as, 'Repeat this process until the entire field has been plowed' is not mentioned in the original source.",
+            "label_type": "Evident Baseless Info",
+            "implicit_true": false,
+            "due_to_null": false
+          },
+          {
+            "start": 494,
+            "end": 598,
+            "text": "the process would be similar but with more furrows and potentially a larger amount of land being plowed.",
+            "meta": "HIGH INTRO OF NEW INFO\nIt is not mentioned in the original source that 'the process would be similar but with more furrows and potentially a larger amount of land being plowed.'",
+            "label_type": "Evident Baseless Info",
+            "implicit_true": false,
+            "due_to_null": false
+          },
+          {
+            "start": 599,
+            "end": 738,
+            "text": "It's important to note that for new farmers, practicing good plowing techniques and understanding the equipment can take time and practice.",
+            "meta": "HIGH INTRO OF NEW INFO\nIt is not mentioned in the original source that 'practicing good plowing techniques and understanding the equipment can take time and practice.'",
+            "label_type": "Evident Baseless Info",
+            "implicit_true": false,
+            "due_to_null": false
+          }
+        ],
+        "reference_source": "curated_from_source_passages_by_assistant",
+        "reference_verification": "pending_user_review",
+        "evaluation_stage": "existing_generated_result_with_curated_reference",
+        "answer": "To plow a field with a small 3-point plow and a disk harrow, start by turning around in a wide circle and plow the field from the side edges towards the center until the first bottom completely overlaps the second bottom and forms a high hill in the middle. Once you reach the top of the hill, align the wheel of the plow in the ditch or furrow and plow over the ditch with the first bottom. Repeat this process until the entire field has been plowed. For a larger tractor and a 4-furrow plow, the process would be similar but with more furrows and potentially a larger amount of land being plowed. It's important to note that for new farmers, practicing good plowing techniques and understanding the equipment can take time and practice.",
+        "contexts": [
+          "passage 1:I have an MF 245, a small 3 point plow, a disk harrow, and a cultivator. I have a 30 acre farm in WV, and want to plow and plant a wildflower meadow. The field in mind used to grow crops many years ago, and other fields on my place mainly grew hay.urn around at the end and plow back up the field with the first bottom completely over lapping so that the middle hill is higher than the rest again as straight as you can.When you get to the top again line up the wheel in the ditch(furrow) so that the first bottom is covering up the furrow.",
+          "passage 2:Tractor field plowing. Find the center of the field in the front center and back, mark off the center with stakes or sticks if you want to just run them over.Eye up the last stake with the first two just to give yourself a straight line. Line up the tractor on the stakes and plow as straight as you can.ind the center of the field in the front center and back, mark off the center with stakes or sticks if you want to just run them over. Eye up the last stake with the first two just to give yourself a straight line.",
+          "passage 3:The answer to your question depends on the size and shape of your field, and the size of your plow. You have a myriad of answers, and some are thoughtful, some make no sense to other than the sender, per his acreage. google...Operation, Care, and Repair of Farm Machinery, by John Deere.'m new to farming (no family background in it, I'm just learning as I go) so I don't really know how one plows a field with a regular plow (not a reversible/rollover type). I bought a large tractor and a 4 furrow plow, now I just need to get out there."
+        ]
+      }
+    }
+  ]
+}

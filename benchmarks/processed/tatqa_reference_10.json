@@ -1,0 +1,168 @@
+{
+  "name": "tatqa_public_reference_v1",
+  "domain": "general",
+  "records": [
+    {
+      "question": "What is the company paid on a cost-plus type contract?",
+      "reference_answer": "our allowable incurred costs plus a profit which can be fixed or variable depending on the contract’s fee arrangement up to predetermined funding levels determined by the customer",
+      "reference_contexts": [
+        "On a fixed-price type contract, we agree to perform the contractual statement of work for a predetermined sales price. On a cost-plus type contract, we are paid our allowable incurred costs plus a profit which can be fixed or variable depending on the contract’s fee arrangement up to predetermined funding levels determined by the customer. On a time-and-material type contract, we are paid on the basis of direct labor hours expended at specified fixed-price hourly rates (that include wages, overhead, allowable general and administrative expenses and profit) and materials at cost. The table below presents total net sales disaggregated by contract type (in millions):"
+      ],
+      "metadata": {
+        "source_dataset": "tatqa",
+        "source_sample_id": "3ffd9053-a45d-491c-957a-1b2fa0af0570",
+        "source_question_id": "23801627-ff77-4597-8d24-1c99e2452082",
+        "answer_type": "span",
+        "scale": "",
+        "derivation": "",
+        "evaluation_stage": "reference_only"
+      }
+    },
+    {
+      "question": "What is the amount of total sales in 2019?",
+      "reference_answer": "$1,496.5",
+      "reference_contexts": [
+        "On a fixed-price type contract, we agree to perform the contractual statement of work for a predetermined sales price. On a cost-plus type contract, we are paid our allowable incurred costs plus a profit which can be fixed or variable depending on the contract’s fee arrangement up to predetermined funding levels determined by the customer. On a time-and-material type contract, we are paid on the basis of direct labor hours expended at specified fixed-price hourly rates (that include wages, overhead, allowable general and administrative expenses and profit) and materials at cost. The table below presents total net sales disaggregated by contract type (in millions):"
+      ],
+      "metadata": {
+        "source_dataset": "tatqa",
+        "source_sample_id": "3ffd9053-a45d-491c-957a-1b2fa0af0570",
+        "source_question_id": "4960801d-277d-4f79-8eca-c4d0200fa9d6",
+        "answer_type": "span",
+        "scale": "million",
+        "derivation": "",
+        "evaluation_stage": "reference_only"
+      }
+    },
+    {
+      "question": "What are the contract types?",
+      "reference_answer": "fixed-price type; cost-plus type; time-and-material type",
+      "reference_contexts": [
+        "Sales by Contract Type: Substantially all of our contracts are fixed-price type contracts. Sales included in Other contract types represent cost plus and time and material type contracts.",
+        "On a fixed-price type contract, we agree to perform the contractual statement of work for a predetermined sales price. On a cost-plus type contract, we are paid our allowable incurred costs plus a profit which can be fixed or variable depending on the contract’s fee arrangement up to predetermined funding levels determined by the customer. On a time-and-material type contract, we are paid on the basis of direct labor hours expended at specified fixed-price hourly rates (that include wages, overhead, allowable general and administrative expenses and profit) and materials at cost. The table below presents total net sales disaggregated by contract type (in millions):"
+      ],
+      "metadata": {
+        "source_dataset": "tatqa",
+        "source_sample_id": "3ffd9053-a45d-491c-957a-1b2fa0af0570",
+        "source_question_id": "593c4388-5209-4462-8b83-b429c8612c25",
+        "answer_type": "multi-span",
+        "scale": "",
+        "derivation": "",
+        "evaluation_stage": "reference_only"
+      }
+    },
+    {
+      "question": "In which year is the amount of total sales the largest?",
+      "reference_answer": "2019",
+      "reference_contexts": [
+        "On a fixed-price type contract, we agree to perform the contractual statement of work for a predetermined sales price. On a cost-plus type contract, we are paid our allowable incurred costs plus a profit which can be fixed or variable depending on the contract’s fee arrangement up to predetermined funding levels determined by the customer. On a time-and-material type contract, we are paid on the basis of direct labor hours expended at specified fixed-price hourly rates (that include wages, overhead, allowable general and administrative expenses and profit) and materials at cost. The table below presents total net sales disaggregated by contract type (in millions):"
+      ],
+      "metadata": {
+        "source_dataset": "tatqa",
+        "source_sample_id": "3ffd9053-a45d-491c-957a-1b2fa0af0570",
+        "source_question_id": "f4142349-eb72-49eb-9a76-f3ccb1010cbc",
+        "answer_type": "span",
+        "scale": "",
+        "derivation": "1,496.5>1,202.9>1,107.7",
+        "evaluation_stage": "reference_only"
+      }
+    },
+    {
+      "question": "What is the change in Other in 2019 from 2018?",
+      "reference_answer": "-12.6",
+      "reference_contexts": [
+        "On a fixed-price type contract, we agree to perform the contractual statement of work for a predetermined sales price. On a cost-plus type contract, we are paid our allowable incurred costs plus a profit which can be fixed or variable depending on the contract’s fee arrangement up to predetermined funding levels determined by the customer. On a time-and-material type contract, we are paid on the basis of direct labor hours expended at specified fixed-price hourly rates (that include wages, overhead, allowable general and administrative expenses and profit) and materials at cost. The table below presents total net sales disaggregated by contract type (in millions):"
+      ],
+      "metadata": {
+        "source_dataset": "tatqa",
+        "source_sample_id": "3ffd9053-a45d-491c-957a-1b2fa0af0570",
+        "source_question_id": "eb787966-fa02-401f-bfaf-ccabf3828b23",
+        "answer_type": "arithmetic",
+        "scale": "million",
+        "derivation": "44.1-56.7",
+        "evaluation_stage": "reference_only"
+      }
+    },
+    {
+      "question": "What is the percentage change in Other in 2019 from 2018?",
+      "reference_answer": "-22.22",
+      "reference_contexts": [
+        "On a fixed-price type contract, we agree to perform the contractual statement of work for a predetermined sales price. On a cost-plus type contract, we are paid our allowable incurred costs plus a profit which can be fixed or variable depending on the contract’s fee arrangement up to predetermined funding levels determined by the customer. On a time-and-material type contract, we are paid on the basis of direct labor hours expended at specified fixed-price hourly rates (that include wages, overhead, allowable general and administrative expenses and profit) and materials at cost. The table below presents total net sales disaggregated by contract type (in millions):"
+      ],
+      "metadata": {
+        "source_dataset": "tatqa",
+        "source_sample_id": "3ffd9053-a45d-491c-957a-1b2fa0af0570",
+        "source_question_id": "05b670d3-5b19-438c-873f-9bf6de29c69e",
+        "answer_type": "arithmetic",
+        "scale": "percent",
+        "derivation": "(44.1-56.7)/56.7",
+        "evaluation_stage": "reference_only"
+      }
+    },
+    {
+      "question": "How is industry end market information presented?",
+      "reference_answer": "consistently with our internal management reporting and may be revised periodically as management deems necessary.",
+      "reference_contexts": [
+        "Net sales by segment and industry end market(1) were as follows:",
+        "(1) Industry end market information is presented consistently with our internal management reporting and may be revised periodically as management deems necessary."
+      ],
+      "metadata": {
+        "source_dataset": "tatqa",
+        "source_sample_id": "53474060-2736-46cb-bd97-1eb42f0ff3c1",
+        "source_question_id": "86ae8d77-4dcd-4f82-baac-61c6a2551760",
+        "answer_type": "span",
+        "scale": "",
+        "derivation": "",
+        "evaluation_stage": "reference_only"
+      }
+    },
+    {
+      "question": "In which years was for the net sales by segment and industry end market calculated?",
+      "reference_answer": "2019; 2018; 2017",
+      "reference_contexts": [
+        "Net sales by segment and industry end market(1) were as follows:"
+      ],
+      "metadata": {
+        "source_dataset": "tatqa",
+        "source_sample_id": "53474060-2736-46cb-bd97-1eb42f0ff3c1",
+        "source_question_id": "b1018041-1c58-47f2-94db-fa8df0a631cb",
+        "answer_type": "multi-span",
+        "scale": "",
+        "derivation": "",
+        "evaluation_stage": "reference_only"
+      }
+    },
+    {
+      "question": "What are the types of Solutions segments in the table?",
+      "reference_answer": "Transportation Solutions; Industrial Solutions; Communications Solutions",
+      "reference_contexts": [
+        "Net sales by segment and industry end market(1) were as follows:"
+      ],
+      "metadata": {
+        "source_dataset": "tatqa",
+        "source_sample_id": "53474060-2736-46cb-bd97-1eb42f0ff3c1",
+        "source_question_id": "d841005e-c88b-4071-aa53-16bd8a892656",
+        "answer_type": "multi-span",
+        "scale": "",
+        "derivation": "",
+        "evaluation_stage": "reference_only"
+      }
+    },
+    {
+      "question": "In which year was the amount for Sensors the largest?",
+      "reference_answer": "2018",
+      "reference_contexts": [
+        " |  | Fiscal | \n | 2019 | 2018 | 2017\n |  | (in millions) | \nTransportation Solutions: |  |  | \nAutomotive | $ 5,686 | $ 6,092 | $  5,228\nCommercial transportation | 1,221 | 1,280 | 997\nSensors | 914 | 918 | 814\nTotal Transportation Solutions | 7,821 | 8,290 | 7,039\nIndustrial Solutions: |  |  | \nIndustrial equipment | 1,949 | 1,987 | 1,747\nAerospace, defense, oil, and gas | 1,306 | 1,157 | 1,075\nEnergy | 699 | 712 | 685\nTotal Industrial Solutions | 3,954 | 3,856 | 3,507\nCommunications Solutions: |  |  | \nData and devices | 993 | 1,068 | 963\nAppliances | 680 | 774 | 676\nTotal Communications Solutions | 1,673 | 1,842 | 1,639\nTotal | $ 13,448 | $ 13,988 | $ 12,185"
+      ],
+      "metadata": {
+        "source_dataset": "tatqa",
+        "source_sample_id": "53474060-2736-46cb-bd97-1eb42f0ff3c1",
+        "source_question_id": "870c1bda-0cd7-4bd0-bba6-8deb178e24ce",
+        "answer_type": "span",
+        "scale": "",
+        "derivation": "918>914>814",
+        "evaluation_stage": "reference_only"
+      }
+    }
+  ]
+}

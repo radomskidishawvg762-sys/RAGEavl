@@ -1,0 +1,58 @@
+[server] healthy at http://127.0.0.1:8000
+[setup] project=dbe96896-df07-4214-a951-1e2ba6d9f915 dataset=109ca103-bc06-4908-88e5-ad4e40f93c67 version=v1
+
+== E2E checks: 50/50 passed ==
+  [PASS] Judge gateway reachable + key accepted
+  [PASS] POST /api/evaluations -> 202 + run_id
+  [PASS] run reached terminal (completed)
+  [PASS] status completed/with_errors (embeddings errors isolated)
+  [PASS] datasets.is_locked == true after run
+  [PASS] re-run on locked dataset -> 409 BIZ_DATASET_LOCKED
+  [PASS] Compare RunA->RunB is DIRECT (same reproducibility meta)
+  [PASS] numerical delta = candidate - baseline (-0.2)
+  [PASS] temporal delta ~ 0 (same 5/6)
+  [PASS] entity delta = 1.0 - 5/6 (~ +0.1667)
+  [PASS] regression epsilon+source surfaced
+  [PASS] regression numerical REGRESSION
+  [PASS] regression temporal STABLE
+  [PASS] regression entity IMPROVEMENT
+  [PASS] faithfulness scored by real Judge (comparable)
+  [PASS] faithfulness delta == candidate - baseline (real scores)
+  [PASS] faithfulness verdict consistent with delta (IMPROVEMENT)
+  [PASS] context_recall scored by real Judge (comparable)
+  [PASS] context_recall delta == candidate - baseline (real scores)
+  [PASS] context_recall verdict consistent with delta (REGRESSION)
+  [PASS] answer_relevancy NOT comparable (embeddings not configured)
+  [PASS] context_precision NOT comparable (embeddings not configured)
+  [PASS] H1->H2 DIRECT
+  [PASS] H1->H2 context_recall delta +0.08, relative_delta 0.10 (= CMP-001)
+  [PASS] H1->H2 faithfulness delta -0.06
+  [PASS] H1->H2 recall IMPROVEMENT / faithfulness REGRESSION (= CMP-001)
+  [PASS] H1->H2 trade_off true (= CMP-001)
+  [PASS] lower_is_better delta +1.0 -> REGRESSION
+  [PASS] lower_is_better delta -1.0 -> IMPROVEMENT
+  [PASS] Run A gate FAIL (threshold 0.9, integrity aggregates < 0.9)
+  [PASS] gate PASS
+  [PASS] gate FAIL required_metric_not_evaluable
+  [PASS] gate NOT_EVALUABLE disabled
+  [PASS] gate NOT_EVALUABLE not_configured
+  [PASS] evaluation_results count == 6 records
+  [PASS] metric_results count == 6 records x 7 metrics (42)
+  [PASS] answer_relevancy embeddings-error rows stay null (6, never 0)
+  [PASS] numerical ambiguous record stays null (1)
+  [PASS] 3 integrity mismatches diagnosed (entity/numerical/temporal)
+  [PASS] undetermined diagnoses (errors/ambiguous) never fabricate a root cause
+  [PASS] recommendations linked to diagnosed diagnoses (>=1 per diagnosed)
+  [PASS] report.summary.overall_score == persisted overall_score
+  [PASS] report.summary.coverage == persisted coverage
+  [PASS] report failures == diagnosed diagnoses
+  [PASS] report undetermined == undetermined diagnoses
+  [PASS] report execution_errors present (embeddings not configured)
+  [PASS] 8 mandatory reproducibility fields persisted
+  [PASS] read-only services succeed with Engine/Judge/RAG construction forbidden
+  [PASS] read-only services wrote no metric_results
+  [PASS] in-process report matches API report (overall + failure count)
+
+run_a=3564fcd0-00ab-48b6-9402-2257c71e076c  dataset=109ca103-bc06-4908-88e5-ad4e40f93c67  project=dbe96896-df07-4214-a951-1e2ba6d9f915
+compare/regression harness: run_b=5361339f-a09d-47c3-b2ea-fee0935aed9d h1=30b4b74b-6fb1-4ee9-98a2-b85205bd7d90 h2=b555edcb-5e09-40a9-863e-7f05c06b1d39 h3=567c087f-65d7-43cc-8a90-3773df9b15c9 h4=c3d8e177-b8ff-436a-91d3-e26d8276ce3d
+gate harness: {'pass': 'd8d2aba6-9a55-436d-8387-ecea8e3c9abb', 'ne': 'bf905294-4097-464d-98e3-62386681ca82', 'disabled': '6c688dca-19fd-4ecd-b230-28726cc4a9f1', 'nc': 'b7e3f54d-66f2-4976-9fd6-9ad0a14bc516'}

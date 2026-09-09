@@ -1,0 +1,266 @@
+{
+  "name": "ragtruth_existing_results_v1",
+  "domain": "general",
+  "records": [
+    {
+      "question": "butcher shop phone number",
+      "answer": "The phone numbers for several butcher shops are mentioned in the passages. Butcher Shop in Hayward can be reached at (510) 889-8690. Butcher Shop in Lakefield can be contacted at (507) 662-6281. The Local Butcher Shop's number is (510) 845-6328, Boones Butcher Shop can be reached at (502) 348-3668, Ye Ole Butcher Shop's number is (972) 423-1848, and J Ms Butcher Shop's phone number is (865) 483-9228.",
+      "contexts": [
+        "passage 1:Butcher Shop - Hayward 826 B Street, Hayward CA 94541 Phone Number: (510) 889-8690",
+        "passage 2:Butcher Shop - Lakefield 212 Main Street, Lakefield MN 56150 Phone Number: (507) 662-6281",
+        "passage 3:Some More Phone Numbers Related To The Butcher Shop The Local Butcher Shop phone number : (510) 845-6328 Boones Butcher Shop phone number : (502) 348-3668 Ye Ole Butcher Shop phone number : (972) 423-1848 J Ms Butcher Shop phone number : (865) 483-9228"
+      ],
+      "reference_answer": null,
+      "reference_contexts": null,
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_sample_id": "11856",
+        "source_id": "14292",
+        "task_type": "QA",
+        "source": "MARCO",
+        "model": "gpt-4-0613",
+        "temperature": 0.7,
+        "quality": "good",
+        "hallucination_labels": [],
+        "evaluation_stage": "existing_generated_result",
+        "reference_status": "not_provided_by_source"
+      }
+    },
+    {
+      "question": "butcher shop phone number",
+      "answer": "Butcher Shop - Hayward phone number: (510) 889-8690",
+      "contexts": [
+        "passage 1:Butcher Shop - Hayward 826 B Street, Hayward CA 94541 Phone Number: (510) 889-8690",
+        "passage 2:Butcher Shop - Lakefield 212 Main Street, Lakefield MN 56150 Phone Number: (507) 662-6281",
+        "passage 3:Some More Phone Numbers Related To The Butcher Shop The Local Butcher Shop phone number : (510) 845-6328 Boones Butcher Shop phone number : (502) 348-3668 Ye Ole Butcher Shop phone number : (972) 423-1848 J Ms Butcher Shop phone number : (865) 483-9228"
+      ],
+      "reference_answer": null,
+      "reference_contexts": null,
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_sample_id": "11857",
+        "source_id": "14292",
+        "task_type": "QA",
+        "source": "MARCO",
+        "model": "gpt-3.5-turbo-0613",
+        "temperature": 0.7,
+        "quality": "good",
+        "hallucination_labels": [],
+        "evaluation_stage": "existing_generated_result",
+        "reference_status": "not_provided_by_source"
+      }
+    },
+    {
+      "question": "butcher shop phone number",
+      "answer": "Based on the given passages, there are several different phone numbers associated with butcher shops. However, none of them are for a specific location named \"bear\" or have any indication of being related to bears. Therefore, it is unable to determine if there is a butcher shop phone number specifically for \"bear\".",
+      "contexts": [
+        "passage 1:Butcher Shop - Hayward 826 B Street, Hayward CA 94541 Phone Number: (510) 889-8690",
+        "passage 2:Butcher Shop - Lakefield 212 Main Street, Lakefield MN 56150 Phone Number: (507) 662-6281",
+        "passage 3:Some More Phone Numbers Related To The Butcher Shop The Local Butcher Shop phone number : (510) 845-6328 Boones Butcher Shop phone number : (502) 348-3668 Ye Ole Butcher Shop phone number : (972) 423-1848 J Ms Butcher Shop phone number : (865) 483-9228"
+      ],
+      "reference_answer": null,
+      "reference_contexts": null,
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_sample_id": "11858",
+        "source_id": "14292",
+        "task_type": "QA",
+        "source": "MARCO",
+        "model": "mistral-7B-instruct",
+        "temperature": 0.7,
+        "quality": "good",
+        "hallucination_labels": [
+          {
+            "start": 102,
+            "end": 214,
+            "text": "However, none of them are for a specific location named \"bear\" or have any indication of being related to bears.",
+            "meta": "HIGH INTRO OF NEW INFO\nNo mention of this in the passages and original answer. ",
+            "label_type": "Evident Baseless Info",
+            "implicit_true": false,
+            "due_to_null": false
+          }
+        ],
+        "evaluation_stage": "existing_generated_result",
+        "reference_status": "not_provided_by_source"
+      }
+    },
+    {
+      "question": "butcher shop phone number",
+      "answer": "Based on the provided passages, the butcher shop phone number is:\n\n* Butcher Shop - Hayward: (510) 889-8690\n\nTherefore, the answer to the question is: (510) 889-8690.",
+      "contexts": [
+        "passage 1:Butcher Shop - Hayward 826 B Street, Hayward CA 94541 Phone Number: (510) 889-8690",
+        "passage 2:Butcher Shop - Lakefield 212 Main Street, Lakefield MN 56150 Phone Number: (507) 662-6281",
+        "passage 3:Some More Phone Numbers Related To The Butcher Shop The Local Butcher Shop phone number : (510) 845-6328 Boones Butcher Shop phone number : (502) 348-3668 Ye Ole Butcher Shop phone number : (972) 423-1848 J Ms Butcher Shop phone number : (865) 483-9228"
+      ],
+      "reference_answer": null,
+      "reference_contexts": null,
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_sample_id": "11859",
+        "source_id": "14292",
+        "task_type": "QA",
+        "source": "MARCO",
+        "model": "llama-2-7b-chat",
+        "temperature": 0.85,
+        "quality": "good",
+        "hallucination_labels": [],
+        "evaluation_stage": "existing_generated_result",
+        "reference_status": "not_provided_by_source"
+      }
+    },
+    {
+      "question": "butcher shop phone number",
+      "answer": "Based on the given passages, the butcher shop phone number is:\n\nPassage 1: (510) 889-8690\n\nTherefore, the answer to the question \"butcher shop phone number\" is (510) 889-8690.",
+      "contexts": [
+        "passage 1:Butcher Shop - Hayward 826 B Street, Hayward CA 94541 Phone Number: (510) 889-8690",
+        "passage 2:Butcher Shop - Lakefield 212 Main Street, Lakefield MN 56150 Phone Number: (507) 662-6281",
+        "passage 3:Some More Phone Numbers Related To The Butcher Shop The Local Butcher Shop phone number : (510) 845-6328 Boones Butcher Shop phone number : (502) 348-3668 Ye Ole Butcher Shop phone number : (972) 423-1848 J Ms Butcher Shop phone number : (865) 483-9228"
+      ],
+      "reference_answer": null,
+      "reference_contexts": null,
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_sample_id": "11860",
+        "source_id": "14292",
+        "task_type": "QA",
+        "source": "MARCO",
+        "model": "llama-2-13b-chat",
+        "temperature": 0.7,
+        "quality": "good",
+        "hallucination_labels": [],
+        "evaluation_stage": "existing_generated_result",
+        "reference_status": "not_provided_by_source"
+      }
+    },
+    {
+      "question": "butcher shop phone number",
+      "answer": "Based on the given passages, I am unable to provide a phone number for a butcher shop. The passages only provide phone numbers for specific butcher shops, and do not include a general phone number for a butcher shop. Therefore, I cannot provide an answer to the question.",
+      "contexts": [
+        "passage 1:Butcher Shop - Hayward 826 B Street, Hayward CA 94541 Phone Number: (510) 889-8690",
+        "passage 2:Butcher Shop - Lakefield 212 Main Street, Lakefield MN 56150 Phone Number: (507) 662-6281",
+        "passage 3:Some More Phone Numbers Related To The Butcher Shop The Local Butcher Shop phone number : (510) 845-6328 Boones Butcher Shop phone number : (502) 348-3668 Ye Ole Butcher Shop phone number : (972) 423-1848 J Ms Butcher Shop phone number : (865) 483-9228"
+      ],
+      "reference_answer": null,
+      "reference_contexts": null,
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_sample_id": "11861",
+        "source_id": "14292",
+        "task_type": "QA",
+        "source": "MARCO",
+        "model": "llama-2-70b-chat",
+        "temperature": 0.85,
+        "quality": "good",
+        "hallucination_labels": [],
+        "evaluation_stage": "existing_generated_result",
+        "reference_status": "not_provided_by_source"
+      }
+    },
+    {
+      "question": "tips how to conserve water",
+      "answer": "Here are some tips on how to conserve water: \n\n1. Take shorter showers and consider replacing your showerhead with an ultra-low-flow version. \n2. Use the minimum amount of water needed for a bath by filling the tub only 1/3 full. \n3. Use a bucket to collect the water that runs while waiting for your shower to heat up, this water can then be used for flushing the toilet or watering plants. \n4. Turn off the faucet while brushing your teeth or washing your hands. \n5. Water your lawns in the early morning or later evening in 20-minute intervals. \n6. Use a broom instead of your hose to remove debris from your driveway or sidewalk. \n7. Bathe your pets outdoors in areas that need water. \n8. Install a shut-off nozzle on your water hose to prevent wastage. \n9. Direct downspouts towards shrubs and trees in your garden.",
+      "contexts": [
+        "passage 1:1 Take shorter showers. 2  Replace you showerhead with an ultra-low-flow version. 3  Some units are available that allow you to cut off the flow without adjusting the water temperature knobs. 4  Use the minimum amount of water needed for a bath by closing the drain first and filling the tub only 1/3 full.",
+        "passage 2:Here are 20 water-saving tips to get you going…. 1. Shower Bucket. Instead of letting the water pour down the drain, stick a bucket under the faucet while you wait for your shower water to heat up. You can use the water for flushing the toilet or watering your plants. 2. Turn off the tap while brushing your teeth. Water comes out of the average faucet at 2.5 gallons per minute. Don’t let all that water go down the drain while you brush! Turn off the faucet after you wet your brush, and leave it off until it’s time to rinse. 3. Turn off the tap while washing your hands.",
+        "passage 3:Water lawns in the early morning or later evening in 20 minute intervals. Use a broom instead of your hose to remove debris from your driveway or sidewalk. Bathe your pets outdoors in areas that need water. Install a shut-off nozzle on your water hose; a garden hose left running can waste up to 20 litres per minute. Direct downspouts towards shrubs and trees in your garden."
+      ],
+      "reference_answer": null,
+      "reference_contexts": null,
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_sample_id": "11862",
+        "source_id": "14293",
+        "task_type": "QA",
+        "source": "MARCO",
+        "model": "gpt-4-0613",
+        "temperature": 0.7,
+        "quality": "good",
+        "hallucination_labels": [],
+        "evaluation_stage": "existing_generated_result",
+        "reference_status": "not_provided_by_source"
+      }
+    },
+    {
+      "question": "tips how to conserve water",
+      "answer": "To conserve water, you can take shorter showers, replace your showerhead with an ultra-low-flow version, use the minimum amount of water needed for a bath, and collect shower water in a bucket for other uses. Additionally, you should turn off the tap while brushing your teeth or washing your hands, water lawns in the early morning or late evening in intervals, use a broom instead of a hose to clean driveways and sidewalks, bathe pets outdoors in areas that need water, install a shut-off nozzle on your water hose, and direct downspouts towards shrubs and trees in your garden.",
+      "contexts": [
+        "passage 1:1 Take shorter showers. 2  Replace you showerhead with an ultra-low-flow version. 3  Some units are available that allow you to cut off the flow without adjusting the water temperature knobs. 4  Use the minimum amount of water needed for a bath by closing the drain first and filling the tub only 1/3 full.",
+        "passage 2:Here are 20 water-saving tips to get you going…. 1. Shower Bucket. Instead of letting the water pour down the drain, stick a bucket under the faucet while you wait for your shower water to heat up. You can use the water for flushing the toilet or watering your plants. 2. Turn off the tap while brushing your teeth. Water comes out of the average faucet at 2.5 gallons per minute. Don’t let all that water go down the drain while you brush! Turn off the faucet after you wet your brush, and leave it off until it’s time to rinse. 3. Turn off the tap while washing your hands.",
+        "passage 3:Water lawns in the early morning or later evening in 20 minute intervals. Use a broom instead of your hose to remove debris from your driveway or sidewalk. Bathe your pets outdoors in areas that need water. Install a shut-off nozzle on your water hose; a garden hose left running can waste up to 20 litres per minute. Direct downspouts towards shrubs and trees in your garden."
+      ],
+      "reference_answer": null,
+      "reference_contexts": null,
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_sample_id": "11863",
+        "source_id": "14293",
+        "task_type": "QA",
+        "source": "MARCO",
+        "model": "gpt-3.5-turbo-0613",
+        "temperature": 0.7,
+        "quality": "good",
+        "hallucination_labels": [],
+        "evaluation_stage": "existing_generated_result",
+        "reference_status": "not_provided_by_source"
+      }
+    },
+    {
+      "question": "tips how to conserve water",
+      "answer": "Conserving water is essential for maintaining water resources and reducing the overall water usage. Here are some tips on how to conserve water based on the given passages:\n\n1. Take shorter showers and replace your showerhead with an ultra-low-flow version. Some units are available that allow you to cut off the flow without adjusting the water temperature knobs.\n2. When taking a bath, fill the tub only 1/3 full instead of using the entire tub.\n3. Use a shower bucket instead of letting the water pour down the drain while you wait for your shower water to heat up. You can use the water for flushing the toilet or watering your plants.\n4. Turn off the tap while brushing your teeth and when washing your hands.\n5. Water your lawns in the early morning or later evening in 20 minute intervals. Use a broom instead of a hose to remove debris from your driveway or sidewalk.\n6. Bathe your pets outdoors in areas that need water.\n7. Install a shut-off nozzle on your water hose; a garden hose left running can waste up to 20 litres per minute.\n8. Direct downspouts towards shrubs and trees in your garden.",
+      "contexts": [
+        "passage 1:1 Take shorter showers. 2  Replace you showerhead with an ultra-low-flow version. 3  Some units are available that allow you to cut off the flow without adjusting the water temperature knobs. 4  Use the minimum amount of water needed for a bath by closing the drain first and filling the tub only 1/3 full.",
+        "passage 2:Here are 20 water-saving tips to get you going…. 1. Shower Bucket. Instead of letting the water pour down the drain, stick a bucket under the faucet while you wait for your shower water to heat up. You can use the water for flushing the toilet or watering your plants. 2. Turn off the tap while brushing your teeth. Water comes out of the average faucet at 2.5 gallons per minute. Don’t let all that water go down the drain while you brush! Turn off the faucet after you wet your brush, and leave it off until it’s time to rinse. 3. Turn off the tap while washing your hands.",
+        "passage 3:Water lawns in the early morning or later evening in 20 minute intervals. Use a broom instead of your hose to remove debris from your driveway or sidewalk. Bathe your pets outdoors in areas that need water. Install a shut-off nozzle on your water hose; a garden hose left running can waste up to 20 litres per minute. Direct downspouts towards shrubs and trees in your garden."
+      ],
+      "reference_answer": null,
+      "reference_contexts": null,
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_sample_id": "11864",
+        "source_id": "14293",
+        "task_type": "QA",
+        "source": "MARCO",
+        "model": "mistral-7B-instruct",
+        "temperature": 0.85,
+        "quality": "good",
+        "hallucination_labels": [
+          {
+            "start": 0,
+            "end": 99,
+            "text": "Conserving water is essential for maintaining water resources and reducing the overall water usage.",
+            "meta": "LOW INTRO OF NEW INFO\nNo explicit mention of this but fits within the context for the given topic. ",
+            "label_type": "Subtle Baseless Info",
+            "implicit_true": true,
+            "due_to_null": false
+          }
+        ],
+        "evaluation_stage": "existing_generated_result",
+        "reference_status": "not_provided_by_source"
+      }
+    },
+    {
+      "question": "tips how to conserve water",
+      "answer": "Here are some tips for conserving water based on the provided passages:\n\n1. Take shorter showers using an ultra-low-flow showerhead. (Passage 1)\n2. Use the minimum amount of water needed for a bath by filling the tub only 1/3 full and closing the drain before running water. (Passage 1)\n3. Turn off the tap while brushing your teeth to save 2.5 gallons per minute. (Passage 2)\n4. Turn off the tap while washing your hands to save water. (Passage 2)\n5. Water lawns in the early morning or evening using a broom instead of a hose to reduce water waste. (Passage 3)\n6. Install a shut-off nozzle on your water hose to prevent unnecessary water runoff. (Passage 3)\n7. Direct downspouts towards shrubs and trees in your garden to make the most of rainwater. (Passage 3)\n\nUnable to answer based on given passages. The passages do not provide specific information on how to conserve water in the kitchen or indoor spaces.",
+      "contexts": [
+        "passage 1:1 Take shorter showers. 2  Replace you showerhead with an ultra-low-flow version. 3  Some units are available that allow you to cut off the flow without adjusting the water temperature knobs. 4  Use the minimum amount of water needed for a bath by closing the drain first and filling the tub only 1/3 full.",
+        "passage 2:Here are 20 water-saving tips to get you going…. 1. Shower Bucket. Instead of letting the water pour down the drain, stick a bucket under the faucet while you wait for your shower water to heat up. You can use the water for flushing the toilet or watering your plants. 2. Turn off the tap while brushing your teeth. Water comes out of the average faucet at 2.5 gallons per minute. Don’t let all that water go down the drain while you brush! Turn off the faucet after you wet your brush, and leave it off until it’s time to rinse. 3. Turn off the tap while washing your hands.",
+        "passage 3:Water lawns in the early morning or later evening in 20 minute intervals. Use a broom instead of your hose to remove debris from your driveway or sidewalk. Bathe your pets outdoors in areas that need water. Install a shut-off nozzle on your water hose; a garden hose left running can waste up to 20 litres per minute. Direct downspouts towards shrubs and trees in your garden."
+      ],
+      "reference_answer": null,
+      "reference_contexts": null,
+      "metadata": {
+        "source_dataset": "ragtruth",
+        "source_sample_id": "11865",
+        "source_id": "14293",
+        "task_type": "QA",
+        "source": "MARCO",
+        "model": "llama-2-7b-chat",
+        "temperature": 0.925,
+        "quality": "good",
+        "hallucination_labels": [],
+        "evaluation_stage": "existing_generated_result",
+        "reference_status": "not_provided_by_source"
+      }
+    }
+  ]
+}

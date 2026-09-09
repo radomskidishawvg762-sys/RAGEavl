@@ -1,0 +1,40 @@
+# RAGEval Studio — Docker Compose（MVP，仅应用容器）
+#
+# 数据库不在本文件中。
+# 数据库使用预配置的 Supabase Cloud PostgreSQL，通过 DATABASE_URL 连接。
+#
+# 已移除（本地 PostgreSQL → Supabase Cloud 迁移）：
+#   ✗ db service（postgres:xx 镜像）
+#   ✗ pgdata 数据卷
+#   ✗ 5432:5432 端口映射
+#   ✗ depends_on: db
+#   ✗ wait-for-postgres 等待脚本
+#
+# 数据库不可达时的行为：应用依赖连接重试 + /api/health 健康检查报错，
+# 而不是等待本地 db 容器就绪。
+#
+# 详见 docs/deployment/SUPABASE_CLOUD.md
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rageval-app
+    ports:
+      - "8000:8000"
+    env_file:
+      # 本地实际配置，不提交 Git
+      - .env.local
+    volumes:
+      # 三层配置（system / domains / evaluations）
+      - ./config:/app/config:ro
+      # 报告与数据集导出（MVP 继续本地挂载，不用 Supabase Storage）
+      - ./exports:/app/exports
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

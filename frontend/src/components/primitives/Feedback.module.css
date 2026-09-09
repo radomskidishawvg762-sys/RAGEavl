@@ -1,0 +1,47 @@
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  padding: var(--sp-7) var(--sp-5);
+  text-align: center;
+  color: var(--color-text-muted);
+  min-height: 160px;
+}
+
+.stateText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.emptyIcon {
+  color: var(--color-text-subtle);
+  opacity: 0.7;
+}
+
+.emptyDesc {
+  color: var(--color-text-subtle);
+  font-size: var(--fs-sm);
+  max-width: 420px;
+}
+
+.emptyAction {
+  margin-top: var(--sp-2);
+}
+
+.spinner {
+  display: inline-block;
+  border: 2px solid color-mix(in srgb, var(--color-brand) 30%, transparent);
+  border-top-color: var(--color-brand);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

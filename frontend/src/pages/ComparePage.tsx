@@ -1,0 +1,232 @@
+/**
+ * ComparePage — 版本对比（§十三）。Baseline/Candidate 两个 Run 的对比全部来自
+ * GET /api/comparisons：comparability（DIRECT/LIMITED/BLOCKED + reasons）、
+ * 逐指标 delta / relative_delta、overall。前端只渲染，绝不自行计算或判断
+ * 可比性；BLOCKED 时严格遵循后端返回（metrics = []，只展示原因）。
+ */
+
+import { useCallback, useEffect, useState } from 'react';
+
+import { api, endpoints } from '../api/client';
+import type { ComparisonResponse } from '../api/types';
+import { useProject } from '../context/ProjectContext';
+import { useRunOptions } from '../hooks/useRunOptions';
+import { PageHeader, Panel, Section } from '../components/primitives/Surfaces';
+import { EmptyState, LoadingState } from '../components/primitives/Feedback';
+import { ErrorState } from '../components/ErrorState';
+import { ScoreValue } from '../components/ScoreValue';
+import { ComparabilityBadge } from '../status/StatusBadge';
+import { presentComparability } from '../status/status';
+import { formatPercent } from '../utils/format';
+import styles from './ComparePage.module.css';
+
+export function ComparePage() {
+  const { activeProject } = useProject();
+  const { state, error, runs } = useRunOptions(activeProject?.id ?? null);
+  const [baseline, setBaseline] = useState('');
+  const [candidate, setCandidate] = useState('');
+  const [result, setResult] = useState<ComparisonResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<unknown>(null);
+
+  const compare = useCallback(async () => {
+    if (!baseline || !candidate) return;
+    setLoading(true);
+    setFetchError(null);
+    try {
+      const data = await api.get<ComparisonResponse>(endpoints.comparisons(baseline, candidate));
+      setResult(data);
+    } catch (e) {
+      setResult(null);
+      setFetchError(e);
+    } finally {
+      setLoading(false);
+    }
+  }, [baseline, candidate]);
+
+  useEffect(() => {
+    setResult(null);
+    setFetchError(null);
+  }, [baseline, candidate]);
+
+  if (!activeProject) {
+    return (
+      <>
+        <PageHeader title="版本对比 Compare" subtitle="在项目上下文中对比两个 Run 的逐指标表现。" />
+        <EmptyState title="请选择项目" description="对比在项目内进行：先在右上角选择项目。" icon="circle" />
+      </>
+    );
+  }
+  if (state === 'loading') return <LoadingState label="正在加载运行列表…" />;
+  if (state === 'error') return <ErrorState error={error} onRetry={() => void 0} />;
+
+  const terminal = runs.filter((r) => !['pending', 'running'].includes(r.status));
+
+  return (
+    <>
+      <PageHeader
+        title="版本对比 Compare"
+        subtitle={`项目 ${activeProject.name} · 两个 Run 的逐指标对比（delta 全部来自后端）`}
+      />
+
+      <Panel title="选择 Run" accent="info">
+        <div className={styles.selectors}>
+          <label className={styles.field}>
+            <span>Baseline Run</span>
+            <select value={baseline} onChange={(e) => setBaseline(e.target.value)} data-testid="baseline-select">
+              <option value="">— 选择 Baseline —</option>
+              {terminal.map((r) => (
+                <option key={r.runId} value={r.runId}>{r.label}</option>
+              ))}
+            </select>
+          </label>
+          <span className={styles.vs}>VS</span>
+          <label className={styles.field}>
+            <span>Candidate Run</span>
+            <select value={candidate} onChange={(e) => setCandidate(e.target.value)} data-testid="candidate-select">
+              <option value="">— 选择 Candidate —</option>
+              {terminal.map((r) => (
+                <option key={r.runId} value={r.runId}>{r.label}</option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            className={styles.primaryBtn}
+            disabled={!baseline || !candidate || loading || baseline === candidate}
+            onClick={() => void compare()}
+            data-testid="compare-submit"
+          >
+            {loading ? '对比中…' : '开始对比'}
+          </button>
+        </div>
+        {baseline && baseline === candidate ? (
+          <p className={styles.hint}>Baseline 与 Candidate 不能是同一个 Run。</p>
+        ) : null}
+      </Panel>
+
+      {fetchError ? <ErrorState error={fetchError} onRetry={() => void compare()} /> : null}
+
+      {result ? <ComparisonResult result={result} /> : null}
+      {!result && !fetchError && baseline && candidate && !loading ? (
+        <EmptyState title="尚无结果" description="点击「开始对比」获取后端对比结果。" icon="circle" />
+      ) : null}
+    </>
+  );
+}
+
+function ComparisonResult({ result }: { result: ComparisonResponse }) {
+  const cmp = presentComparability(result.comparability.status);
+  return (
+    <>
+      <Panel
+        title="可比性 Comparability"
+        accent={result.comparability.status === 'DIRECT' ? 'pass' : result.comparability.status === 'LIMITED' ? 'warning' : 'error'}
+      >
+        <div className={styles.banner} data-testid="comparability-banner">
+          <ComparabilityBadge status={result.comparability.status} />
+          <span className={styles.bannerText}>{cmp.label}</span>
+        </div>
+        {result.comparability.reasons.length ? (
+          <ul className={styles.reasons} data-testid="comparability-reasons">
+            {result.comparability.reasons.map((r, i) => (
+              <li key={i}>{r}</li>
+            ))}
+          </ul>
+        ) : null}
+        {result.comparability.status === 'BLOCKED' ? (
+          <p className={styles.blockedNote} data-testid="blocked-note">
+            两个 Run 不可比较：以上原因由后端判定。以下仅展示后端返回的数据（通常为空）。
+          </p>
+        ) : null}
+      </Panel>
+
+      <Section title="总体对比 Overall">
+        <div className={styles.overall} data-testid="overall-comparison">
+          <div className={styles.overallCell}>
+            <span className={styles.cellLabel}>Baseline Overall</span>
+            <ScoreValue score={result.overall.baseline_overall} />
+          </div>
+          <div className={styles.overallCell}>
+            <span className={styles.cellLabel}>Candidate Overall</span>
+            <ScoreValue score={result.overall.candidate_overall} />
+          </div>
+          <div className={styles.overallCell}>
+            <span className={styles.cellLabel}>Delta</span>
+            <DeltaValue delta={result.overall.delta} />
+          </div>
+          {result.overall.comparable ? null : (
+            <div className={styles.overallReason}>{result.overall.reason ?? '不可比'}</div>
+          )}
+        </div>
+      </Section>
+
+      <Section title="指标对比 Metrics" actions={<span className={styles.count}>{result.metrics.length} 项</span>}>
+        {result.metrics.length === 0 ? (
+          <EmptyState
+            title="无可对比指标"
+            description="后端未返回可对比的指标（常见于不可比较或两侧均无有效分数）。"
+            icon="circle"
+          />
+        ) : (
+          <Panel padded={false}>
+            <table className={styles.table} data-testid="comparison-table">
+              <thead>
+                <tr>
+                  <th align="left">指标</th>
+                  <th align="left">类别</th>
+                  <th align="right">Baseline</th>
+                  <th align="right">Candidate</th>
+                  <th align="right">Delta</th>
+                  <th align="right">Relative Delta</th>
+                  <th align="left">状态</th>
+                </tr>
+              </thead>
+              <tbody>
+                {result.metrics.map((m) => (
+                  <tr key={m.name} data-testid={`cmp-${m.name}`}>
+                    <td className="mono">{m.name}</td>
+                    <td>{m.category ?? '—'}</td>
+                    <td align="right" className="mono"><ScoreValue score={m.baseline_score} /></td>
+                    <td align="right" className="mono"><ScoreValue score={m.candidate_score} /></td>
+                    <td align="right" className="mono"><DeltaValue delta={m.delta} /></td>
+                    <td align="right" className="mono">
+                      {m.relative_delta === null ? '—' : formatPercent(m.relative_delta)}
+                    </td>
+                    <td>
+                      {m.comparable ? (
+                        <span className={styles.ok}>可比</span>
+                      ) : (
+                        <span className={styles.incomparable} title={m.incomparable_reason ?? ''}>
+                          {incomparableLabel(m.baseline_status, m.candidate_status)}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Panel>
+        )}
+      </Section>
+    </>
+  );
+}
+
+export function DeltaValue({ delta }: { delta: number | null }) {
+  if (delta === null || Number.isNaN(delta)) return <ScoreValue score={null} />;
+  const text = `${delta > 0 ? '+' : ''}${delta.toFixed(4).replace(/0+$/, '').replace(/\.$/, '')}`;
+  return (
+    <span className={delta > 0 ? styles.deltaUp : delta < 0 ? styles.deltaDown : ''} data-delta={delta}>
+      {text}
+    </span>
+  );
+}
+
+function incomparableLabel(baselineStatus: string, candidateStatus: string): string {
+  if (baselineStatus === 'missing') return 'Baseline 缺失该指标';
+  if (candidateStatus === 'missing') return 'Candidate 缺失该指标';
+  if (baselineStatus !== 'completed') return `Baseline ${baselineStatus}`;
+  if (candidateStatus !== 'completed') return `Candidate ${candidateStatus}`;
+  return '不可比';
+}

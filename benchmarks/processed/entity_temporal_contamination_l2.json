@@ -1,0 +1,354 @@
+{
+  "experiment": "level2_entity_temporal_contamination",
+  "method": "deterministic",
+  "entity": {
+    "cases": [
+      {
+        "kind": "clean_same",
+        "ref": "中国平安",
+        "ans": "中国平安",
+        "expect": "match",
+        "ref_canonical": "中国平安",
+        "ans_canonical": "中国平安",
+        "ref_status": "ok",
+        "ans_status": "ok",
+        "comparison_type": "match",
+        "score": 1.0,
+        "correct": true
+      },
+      {
+        "kind": "clean_alias",
+        "ref": "中国平安",
+        "ans": "平安",
+        "expect": "match",
+        "ref_canonical": "中国平安",
+        "ans_canonical": "中国平安",
+        "ref_status": "ok",
+        "ans_status": "ok",
+        "comparison_type": "match",
+        "score": 1.0,
+        "correct": true
+      },
+      {
+        "kind": "polluted_entity",
+        "ref": "中国平安",
+        "ans": "招商银行",
+        "expect": "mismatch",
+        "ref_canonical": "中国平安",
+        "ans_canonical": "招商银行",
+        "ref_status": "ok",
+        "ans_status": "ok",
+        "comparison_type": "entity_mismatch",
+        "score": 0.0,
+        "correct": true
+      },
+      {
+        "kind": "polluted_entity",
+        "ref": "招商银行",
+        "ans": "中国平安",
+        "expect": "mismatch",
+        "ref_canonical": "招商银行",
+        "ans_canonical": "中国平安",
+        "ref_status": "ok",
+        "ans_status": "ok",
+        "comparison_type": "entity_mismatch",
+        "score": 0.0,
+        "correct": true
+      },
+      {
+        "kind": "polluted_unknown",
+        "ref": "中国平安",
+        "ans": "某某公司",
+        "expect": "non_match",
+        "ref_canonical": "中国平安",
+        "ans_canonical": null,
+        "ref_status": "ok",
+        "ans_status": "ambiguous",
+        "comparison_type": "ambiguous",
+        "score": null,
+        "correct": true
+      }
+    ],
+    "stats": {
+      "total": 5,
+      "correct": 5,
+      "accuracy": 1.0,
+      "per_kind": {
+        "clean_alias": {
+          "n": 1,
+          "correct": 1,
+          "comparison_types": [
+            "match"
+          ]
+        },
+        "clean_same": {
+          "n": 1,
+          "correct": 1,
+          "comparison_types": [
+            "match"
+          ]
+        },
+        "polluted_entity": {
+          "n": 2,
+          "correct": 2,
+          "comparison_types": [
+            "entity_mismatch"
+          ]
+        },
+        "polluted_unknown": {
+          "n": 1,
+          "correct": 1,
+          "comparison_types": [
+            "ambiguous"
+          ]
+        }
+      }
+    }
+  },
+  "temporal": {
+    "cases": [
+      {
+        "kind": "clean_same",
+        "ref": "2024年",
+        "ans": "2024年",
+        "expect": "match",
+        "ref_interval": [
+          "2024-01-01",
+          "2024-12-31"
+        ],
+        "ans_interval": [
+          "2024-01-01",
+          "2024-12-31"
+        ],
+        "ref_status": "ok",
+        "ans_status": "ok",
+        "comparison_type": "match",
+        "score": 1.0,
+        "correct": true
+      },
+      {
+        "kind": "clean_equivalent",
+        "ref": "2024年",
+        "ans": "2024年度",
+        "expect": "match",
+        "ref_interval": [
+          "2024-01-01",
+          "2024-12-31"
+        ],
+        "ans_interval": [
+          "2024-01-01",
+          "2024-12-31"
+        ],
+        "ref_status": "ok",
+        "ans_status": "ok",
+        "comparison_type": "match",
+        "score": 1.0,
+        "correct": true
+      },
+      {
+        "kind": "polluted_year_minus1",
+        "ref": "2024年",
+        "ans": "2023年",
+        "expect": "mismatch",
+        "ref_interval": [
+          "2024-01-01",
+          "2024-12-31"
+        ],
+        "ans_interval": [
+          "2023-01-01",
+          "2023-12-31"
+        ],
+        "ref_status": "ok",
+        "ans_status": "ok",
+        "comparison_type": "temporal_mismatch",
+        "score": 0.0,
+        "correct": true
+      },
+      {
+        "kind": "polluted_year_plus1",
+        "ref": "2024年",
+        "ans": "2025年",
+        "expect": "mismatch",
+        "ref_interval": [
+          "2024-01-01",
+          "2024-12-31"
+        ],
+        "ans_interval": [
+          "2025-01-01",
+          "2025-12-31"
+        ],
+        "ref_status": "ok",
+        "ans_status": "ok",
+        "comparison_type": "temporal_mismatch",
+        "score": 0.0,
+        "correct": true
+      },
+      {
+        "kind": "polluted_quarter",
+        "ref": "2024Q1",
+        "ans": "2024Q2",
+        "expect": "mismatch",
+        "ref_interval": [
+          "2024-01-01",
+          "2024-03-31"
+        ],
+        "ans_interval": [
+          "2024-04-01",
+          "2024-06-30"
+        ],
+        "ref_status": "ok",
+        "ans_status": "ok",
+        "comparison_type": "temporal_mismatch",
+        "score": 0.0,
+        "correct": true
+      },
+      {
+        "kind": "polluted_half",
+        "ref": "2024年上半年",
+        "ans": "2024年下半年",
+        "expect": "mismatch",
+        "ref_interval": [
+          "2024-01-01",
+          "2024-06-30"
+        ],
+        "ans_interval": [
+          "2024-07-01",
+          "2024-12-31"
+        ],
+        "ref_status": "ok",
+        "ans_status": "ok",
+        "comparison_type": "temporal_mismatch",
+        "score": 0.0,
+        "correct": true
+      },
+      {
+        "kind": "granularity_contained",
+        "ref": "2024年",
+        "ans": "2024Q1",
+        "expect": "non_match",
+        "ref_interval": [
+          "2024-01-01",
+          "2024-12-31"
+        ],
+        "ans_interval": [
+          "2024-01-01",
+          "2024-03-31"
+        ],
+        "ref_status": "ok",
+        "ans_status": "ok",
+        "comparison_type": "ambiguous",
+        "score": null,
+        "correct": true
+      },
+      {
+        "kind": "relative_no_anchor",
+        "ref": "2024年",
+        "ans": "去年",
+        "expect": "non_match",
+        "ref_interval": [
+          "2024-01-01",
+          "2024-12-31"
+        ],
+        "ans_interval": [
+          null,
+          null
+        ],
+        "ref_status": "ok",
+        "ans_status": "ambiguous",
+        "comparison_type": "ambiguous",
+        "score": null,
+        "correct": true
+      },
+      {
+        "kind": "polluted_fy_mismatch",
+        "ref": "FY2024",
+        "ans": "FY2023",
+        "expect": "mismatch",
+        "ref_interval": [
+          "2024-01-01",
+          "2024-12-31"
+        ],
+        "ans_interval": [
+          "2023-01-01",
+          "2023-12-31"
+        ],
+        "ref_status": "ok",
+        "ans_status": "ok",
+        "comparison_type": "temporal_mismatch",
+        "score": 0.0,
+        "correct": true
+      }
+    ],
+    "stats": {
+      "total": 9,
+      "correct": 9,
+      "accuracy": 1.0,
+      "per_kind": {
+        "clean_equivalent": {
+          "n": 1,
+          "correct": 1,
+          "comparison_types": [
+            "match"
+          ]
+        },
+        "clean_same": {
+          "n": 1,
+          "correct": 1,
+          "comparison_types": [
+            "match"
+          ]
+        },
+        "granularity_contained": {
+          "n": 1,
+          "correct": 1,
+          "comparison_types": [
+            "ambiguous"
+          ]
+        },
+        "polluted_fy_mismatch": {
+          "n": 1,
+          "correct": 1,
+          "comparison_types": [
+            "temporal_mismatch"
+          ]
+        },
+        "polluted_half": {
+          "n": 1,
+          "correct": 1,
+          "comparison_types": [
+            "temporal_mismatch"
+          ]
+        },
+        "polluted_quarter": {
+          "n": 1,
+          "correct": 1,
+          "comparison_types": [
+            "temporal_mismatch"
+          ]
+        },
+        "polluted_year_minus1": {
+          "n": 1,
+          "correct": 1,
+          "comparison_types": [
+            "temporal_mismatch"
+          ]
+        },
+        "polluted_year_plus1": {
+          "n": 1,
+          "correct": 1,
+          "comparison_types": [
+            "temporal_mismatch"
+          ]
+        },
+        "relative_no_anchor": {
+          "n": 1,
+          "correct": 1,
+          "comparison_types": [
+            "ambiguous"
+          ]
+        }
+      }
+    }
+  },
+  "overall_accuracy": 1.0
+}

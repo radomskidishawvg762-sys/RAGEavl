@@ -1,0 +1,34 @@
+# Three-layer config layer 1/3. Secrets referenced via env vars, never written here.
+system:
+  database:
+    url: ${RAGEVAL_DB_URL}      # resolved in-memory by ConfigService; db/session uses DATABASE_URL directly
+  judge:
+    provider: ${JUDGE_PROVIDER:}
+    model: ${JUDGE_MODEL:}
+    model_version: ${JUDGE_MODEL_VERSION:}
+    temperature: 0
+    max_tokens: 1024
+    timeout: 30
+    retry: 3
+  # T-14B formal RAG input: url set -> HttpRagAdapter (POST {"question": ...});
+  # empty -> explicit GoldenRunMetadataAdapter (test/golden-run bridge only).
+  rag_input:
+    url: ${RAG_INPUT_URL:}
+    timeout: 30
+    retry: 2
+  logging:
+    level: INFO
+    redact_fields:
+      - api_key
+      - authorization
+      - password
+      - database_url
+      - connection_string
+  limits:
+    max_records_per_dataset: 1000
+  # T-16C regression epsilon — Engineering Target, provisional ONLY. NOT a
+  # product baseline, NOT a financial threshold. Unset -> RegressionService
+  # uses epsilon=0.01 with epsilon_source="provisional_default". To take
+  # ownership, set it explicitly:
+  #   regression:
+  #     epsilon: 0.05
