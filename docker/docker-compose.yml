@@ -13,24 +13,30 @@
 # 数据库不可达时的行为：应用依赖连接重试 + /api/health 健康检查报错，
 # 而不是等待本地 db 容器就绪。
 #
+# 本文件位于 docker/ 子目录：相对路径均以本文件所在目录为基准，
+# 仓库根的内容用 ../ 引用；构建上下文 context 指向仓库根（..）。
+#
 # 详见 docs/deployment/SUPABASE_CLOUD.md
+
+# 固定项目名（否则默认取 compose 文件所在目录名 "docker"）
+name: rageval-studio
 
 services:
   app:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
     container_name: rageval-app
     ports:
       - "8000:8000"
     env_file:
       # 本地实际配置，不提交 Git
-      - .env.local
+      - ../.env.local
     volumes:
       # 三层配置（system / domains / evaluations）
-      - ./config:/app/config:ro
+      - ../config:/app/config:ro
       # 报告与数据集导出（MVP 继续本地挂载，不用 Supabase Storage）
-      - ./exports:/app/exports
+      - ../exports:/app/exports
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8000/api/health"]

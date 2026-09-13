@@ -294,7 +294,7 @@ cp .env.example .env.local
 alembic upgrade head
 
 # 3. 启动应用（仅 app 容器）
-docker compose up --build
+docker compose -f docker/docker-compose.yml up --build
 
 # 4. 验证
 curl http://localhost:8000/api/health

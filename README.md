@@ -26,7 +26,7 @@ Evaluation → Failure Detection → Diagnosis → Evidence → Root Cause
 数据库：  Supabase Cloud 托管 PostgreSQL 17（外部预置服务，不随 Compose 启动）
 ```
 
-**数据库是外部预置服务。** `docker compose up` 不会自动创建 PostgreSQL，必须先完成下文第 1–4 步。
+**数据库是外部预置服务。** `docker compose -f docker/docker-compose.yml up` 不会自动创建 PostgreSQL，必须先完成下文第 1–4 步。
 
 ---
 
@@ -91,7 +91,7 @@ evaluation_results · metric_results · diagnoses · recommendations · metric_d
 
 ```bash
 # 方式 A：Docker Compose（仅 app 容器）
-docker compose up --build
+docker compose -f docker/docker-compose.yml up --build
 
 # 方式 B：本机开发
 uvicorn app.main:app --reload

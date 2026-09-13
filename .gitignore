@@ -31,8 +31,19 @@ exports/
 *.dump
 *.sql.gz
 
+# ============ Supabase CLI 本地状态（非项目配置，不入库） ============
+# .temp/     : CLI 版本缓存（cli-latest，每次升级都变）+ start-secrets
+# .branches/ : CLI 分支指针
+# 说明：带中间斜杠的模式锚定到仓库根，`supabase/.temp/` 无法覆盖嵌套层级
+# （supabase/supabase/.temp/），故用 `**` 一次覆盖所有层级。
+# 注意：config.toml 属项目配置，不在此列，仍受版本控制。
+supabase/**/.temp/
+supabase/**/.branches/
+
 # ============ 本地模型权重（不提交到 Git） ============
-models/
+# 注意：必须带前导斜杠锚定到仓库根。裸写 `models/` 会匹配**任意层级**的同名目录，
+# 会把 app/models/（全部 10 张表的 SQLAlchemy ORM 定义）一并排除在版本控制之外。
+/models/
 
 # ============ IDE / 系统 ============
 .idea/
@@ -43,3 +54,9 @@ Thumbs.db
 # ============ 日志 ============
 *.log
 logs/
+
+# ============ e2e 残留输出（scripts/run_e2e.py 产物，不入库） ============
+.e2e_*
+
+# ============ WorkBuddy 工作记忆（工具元数据，不入库） ============
+.workbuddy/
