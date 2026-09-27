@@ -66,6 +66,81 @@
   集成测试（`tests/test_postgres_integration.py`，含双线程 cancel/finish 竞态）
   均已就位，后者同样待 TEST_DATABASE_URL 生效后执行。
 
+### 0.4 Status Re-audit（2026-09-28 — 部署形态与测试基线更新）
+
+> 本节依据**当前 `.env.local` / `.env.test` / `config.toml` + 本次实际测试运行**做出，
+> 其中与 §0.3 及 §11 冲突之处**以本节为准**。
+
+**部署形态（本次核对的最重要变化）**
+
+日常运行形态是**本机 Supabase CLI 自建栈**，不是 Supabase Cloud：
+
+| 项 | 实测值 | 来源 |
+|---|---|---|
+| `DATABASE_URL` host | `127.0.0.1:54322`（本地栈） | `.env.local` |
+| `ALEMBIC_DATABASE_URL` | 空 → 回退 `DATABASE_URL` | `.env.local` |
+| `TEST_DATABASE_URL`（`.env.local`） | 空 | `.env.local` |
+| `RAGEVAL_ENV` | `dev` | `.env.local` |
+| Judge | `JUDGE_PROVIDER=openai` / `JUDGE_MODEL=deepseek-v4-flash` | `.env.local` |
+| 本地栈端口 | api 54321 / db 54322 / shadow 54320 / studio 54323，`major_version = 17` | `supabase/supabase/config.toml` |
+| Supabase CLI | v2.116.0 可用 | `supabase --version` |
+
+云端连接串仍以注释形式保留在 `.env.local`（标记 `CLOUD-BACKUP`），属备份，不参与运行。
+**切换到云端 = 改 `DATABASE_URL`，代码零改动**；§5 及本文档标题中的「Supabase Cloud」
+应按此理解——Supabase 仍是 PostgreSQL 的**运行载体**而非 BaaS，§2 的架构约束与
+ADR-01~09 均未被推翻。
+
+**测试基线（2026-09-28 实测）**
+
+```bash
+.venv/Scripts/python.exe -m pytest -q
+#   534 tests collected
+#   521 passed, 13 skipped, 30 warnings in 52.73s
+
+.venv/Scripts/python.exe -m ruff check .
+#   All checks passed!
+
+cd frontend && npx vitest run
+#   Test Files  7 passed (7)
+#        Tests  63 passed (63)
+```
+
+相对 §0.3 的变化：后端 **417 → 521 passed**（+104），collected **534**；前端 **60 → 63**，
+用例文件 **6 → 7**（新增 `bilingual.test.tsx`）。
+
+**集成测试 skip 的语义已改变（关键，不只是数字）**
+
+- 旧状态（§0.3 / §11）：`TEST_DATABASE_URL` **未配置** → 13 个集成测试 skip。
+- **新状态**：`TEST_DATABASE_URL` **已在 `.env.test` 中配置**，指向同一本地栈的
+  `rageval_test` 库；但本次核对的机器上**本地栈未启动**
+  （54320/54321/54322/54323 无监听，Docker Desktop 未运行）→ 13 个集成测试走
+  conftest 的 **"unreachable"** 分支 skip。
+
+即：skip 数量仍是 13，但**原因从「没配」变成「配了但连不上」**。
+当前结论：这 13 个集成测试状态为 **NOT VERIFIED**，不计入 passed。
+
+判定方法：pytest 末尾汇总行打印的是含糊措辞
+`(TEST_DATABASE_URL not configured or unreachable)`；**区分靠其上一行是否出现
+`TEST_DATABASE_URL configured`** —— 出现即「不可达」而非「未配置」。
+
+验证路径：
+
+```bash
+supabase start      # 拉起本地栈
+pytest              # conftest 自动对 rageval_test 执行 alembic upgrade head
+```
+
+**已复现的弃用告警**（30 条 warning 中的真实项，均为依赖侧预警、当前不影响功能）：
+
+| 位置 | 内容 |
+|---|---|
+| `app/engines/ragas.py:121` | 从 `ragas.metrics` 导入指标已弃用，RAGAS v1.0 移除，应改用 `ragas.metrics.collections` |
+| `ragas/utils.py:113`（间接） | `LangchainEmbeddingsWrapper` 已弃用 |
+| `alembic/config.py:604` | 未配置 `path_separator`，回退 legacy 分隔逻辑 |
+
+**其余状态未变**：FR-12 结论仍为 §0.1 的 DONE（仅剩引擎级选择 UI 为 Backlog）；
+Migration 仍 `0003 (head)`；§13 的测试数据清理候选**仍未清理**，仍待用户批准。
+
 ---
 
 ## 1. Executive Summary
@@ -222,6 +297,21 @@ Status 判据 = 真实行为（Chrome E2E + API E2E + 测试），「页面存�
 
 ## 11. TEST_DATABASE_URL Status
 
+> ### ⚠️ 2026-09-28 状态更新 —— 本节前提已失效
+>
+> **`TEST_DATABASE_URL` 现在已配置**（在 `.env.test` 中，指向本地栈的 `rageval_test` 库；
+> `.env.local` 中该键仍为空，但 `.env.test` 优先级更高，conftest 已按「已配置」分支处理）。
+>
+> 因此本节的 **"TEST_DATABASE_URL = NOT CONFIGURED"** 前提**已不成立**：
+> 13 个集成测试仍然 skip，但原因已从「未配置」变为
+> **「已配置但本地 Supabase 栈未启动（unreachable）」**。
+> 当前真实结论：**NOT VERIFIED**（既非通过，也非「因为没配所以跳过」）。
+>
+> 同时测试基线已更新：**521 passed / 13 skipped / 534 collected**（2026-09-28 实测），
+> 见 §0.4。下文 T-22 的「激活 3 个集成测试」描述亦已过时——集成测试现为 **13 个**。
+>
+> 下文保留为 2026-09-01 Gate 当时的历史快照。
+
 - **TEST_DATABASE_URL = NOT CONFIGURED**（`.env.local` 中该键存在但为空，T-22 前启用）。
 - 未秘密配置为 DATABASE_URL（conftest.py 硬隔离守卫在位）。
 - 因此无法执行的集成测试（3 个，诚实 skip，不视为通过）：
@@ -273,7 +363,7 @@ Status 判据 = 真实行为（Chrome E2E + API E2E + 测试），「页面存�
 | 引擎级 Pipeline 选择 UI + `diagnosis.enabled` 执行语义 + `pipeline_config` 执行语义 | FR-12 审计 | P1 | *（2026-09-04 复审：后两项已落地（§0.1），仅剩引擎级选择 UI 为 P1 Backlog）* |
 | 项目编辑/归档（PATCH/DELETE）+ `POST /datasets/{id}/versions` | PRD Appendix C | P2 |
 | Settings 只读端点（G7：Judge/RAG/limits 安全字段） | Settings 页 | P2 |
-| T-22：配置 `TEST_DATABASE_URL` → 激活 3 个集成测试 | §11 | P1 |
+| T-22：配置 `TEST_DATABASE_URL` → 激活 **13** 个集成测试 | §11 | P1 | *（2026-09-28 更新：`TEST_DATABASE_URL` **已配置**（`.env.test`）；剩余动作仅是在跑测试前 `supabase start` 拉起本地栈。见 §0.4 / §11）*
 | Run 级 RAG Input 配置端点 | New Evaluation Step4 | P2 |
 | PDF 导出（FR-32）、ARGUS（FR-42）、LLM 诊断展示（FR-27） | PRD P1 | P2 |
 | ECharts manualChunks 分包 | build 警告 | P3 |
