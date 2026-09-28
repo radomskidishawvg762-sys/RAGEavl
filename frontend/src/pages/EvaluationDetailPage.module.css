@@ -78,6 +78,9 @@
   border-bottom: 1px solid var(--color-border-muted);
   color: var(--color-text);
   vertical-align: middle;
+  /* 与 DashboardPage 同因：不可断行的长标识符决定 min-content 宽度，撑破卡片。
+     `anywhere` 参与 min-content 计算，`break-word` 不参与。 */
+  overflow-wrap: anywhere;
 }
 
 .num {
