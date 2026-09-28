@@ -130,8 +130,16 @@ class EvaluationService:
 
 
     def is_run_cancelled(self, run_id: str) -> bool:
-        """Use persisted state as the cancellation source of truth."""
-        return self._repo.get_run(run_id).status == "cancelled"
+        """Use persisted state as the cancellation source of truth.
+
+        Read via get_run_status (a fresh column read), NOT get_run: the executor
+        session loaded this run and never expires it (expire_on_commit=False), so
+        the identity map would keep returning the status from run creation and a
+        cancel committed by the request's session would never be seen — the run
+        would keep evaluating every remaining record and then persist full
+        coverage onto a row that says "cancelled".
+        """
+        return self._repo.get_run_status(run_id) == "cancelled"
 
     # ---- T-13 read surface (Router -> Service -> Repository) ----
 

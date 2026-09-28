@@ -21,6 +21,7 @@ from app.metrics.integrity.entity import NormalizedEntity
 from app.metrics.integrity.numerical import (
     DEFAULT_ABSOLUTE_TOLERANCE,
     DEFAULT_RELATIVE_TOLERANCE,
+    UNIT_CLASS_BY_UNIT,
     NormalizedNumerical,
 )
 from app.metrics.integrity.temporal import NormalizedTemporal
@@ -116,11 +117,13 @@ def compare_temporal(ref: NormalizedTemporal, ans: NormalizedTemporal) -> Compar
 # ---------------- numerical ----------------
 
 def _unit_class(unit: str | None) -> str:
-    if unit in ("percent", "permille"):
-        return "ratio"
-    if unit in ("元", "万元", "百万元", "亿元", "万亿元"):
-        return "currency"
-    return "unitless"
+    """Comparison class for a NORMALIZED unit token.
+
+    Derived from _UNIT_TABLE (numerical.py) rather than re-listed, so the table's
+    currency metadata and this classification cannot drift apart — see the note
+    on UNIT_CLASS_BY_UNIT for the English/CJK unit_mismatch bug that drift caused.
+    """
+    return UNIT_CLASS_BY_UNIT.get(unit or "", "unitless")
 
 
 def _base(n: NormalizedNumerical) -> float | None:

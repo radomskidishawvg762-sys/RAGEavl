@@ -219,9 +219,8 @@ Smoke Test
 配置来源优先级：**环境变量 > `.env.test` > `.env.local`**。
 
 > **注意当前的真实状态（2026-09-28）**：本地栈未启动时，13 个集成测试会 skip，
-> 但**原因不是「未配置」而是「不可达」**。pytest 汇总行打印的措辞
-> `(TEST_DATABASE_URL not configured or unreachable)` 是二选一的含糊表述；
-> 区分看其上一行是否出现 `TEST_DATABASE_URL configured`。
+> 但**原因不是「未配置」而是「不可达」**。汇总行会直接打印真实原因，例如
+> `Integration tests skipped: 13 (TEST_DATABASE_URL unreachable: OperationalError)`。
 > 跑集成测试前先 `supabase start`。
 
 ---

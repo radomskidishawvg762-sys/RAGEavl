@@ -23,7 +23,6 @@ from app.engines.judge import JudgeConfig
 class OpenAIJudge:
     def __init__(self, config: JudgeConfig) -> None:
         self._config = config
-        self._client = None  # lazy: SDK imported only on first call
         self._sdk_available: bool | None = None
 
     # ---- JudgeClient protocol ----
@@ -45,39 +44,41 @@ class OpenAIJudge:
     # ---- internals ----
 
     def _get_client(self):
-        if self._client is None:
-            try:
-                from openai import AsyncOpenAI  # lazy import — SDK isolated here
-            except ImportError as e:  # pragma: no cover - SDK optional extra
-                raise ExtJudgeUnavailableError(
-                    "openai SDK not installed (pip install -e '.[eval]')",
-                    context={"provider": "openai"},
-                ) from e
-            key = self._config.api_key.get_secret_value() if self._config.api_key else None
-            self._client = AsyncOpenAI(
-                api_key=key,
-                base_url=self._config.base_url or None,
-                timeout=self._config.timeout,
-            )
-        return self._client
+        """Build an SDK client for ONE call. Lazy import — the SDK stays in this module."""
+        try:
+            from openai import AsyncOpenAI  # lazy import — SDK isolated here
+        except ImportError as e:  # pragma: no cover - SDK optional extra
+            raise ExtJudgeUnavailableError(
+                "openai SDK not installed (pip install -e '.[eval]')",
+                context={"provider": "openai"},
+            ) from e
+        key = self._config.api_key.get_secret_value() if self._config.api_key else None
+        return AsyncOpenAI(
+            api_key=key,
+            base_url=self._config.base_url or None,
+            timeout=self._config.timeout,
+        )
 
     async def _invoke(self, prompt: str) -> str:
-        client = self._get_client()
         retries = max(1, self._config.retry)
         last_error: Exception | None = None
-        for attempt in range(retries):
-            try:
-                resp = await client.chat.completions.create(
-                    model=self._config.model,
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=self._config.temperature,
-                    max_tokens=self._config.max_tokens,
-                )
-                return resp.choices[0].message.content or ""
-            except Exception as e:  # noqa: BLE001 — retry, then wrap as EXT
-                last_error = e
-                if attempt < retries - 1:
-                    await asyncio.sleep(0.5 * (attempt + 1))
+        # Scoped per call, like the anthropic provider: a client cached on the
+        # adapter was never closed, so every run leaked one AsyncOpenAI transport
+        # pool for the life of the process.
+        async with self._get_client() as client:
+            for attempt in range(retries):
+                try:
+                    resp = await client.chat.completions.create(
+                        model=self._config.model,
+                        messages=[{"role": "user", "content": prompt}],
+                        temperature=self._config.temperature,
+                        max_tokens=self._config.max_tokens,
+                    )
+                    return resp.choices[0].message.content or ""
+                except Exception as e:  # noqa: BLE001 — retry, then wrap as EXT
+                    last_error = e
+                    if attempt < retries - 1:
+                        await asyncio.sleep(0.5 * (attempt + 1))
         raise ExtJudgeUnavailableError(
             f"judge provider call failed after {retries} attempts: {type(last_error).__name__}: {last_error}",
             context={"provider": self._config.provider, "model": self._config.model},

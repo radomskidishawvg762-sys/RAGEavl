@@ -55,8 +55,9 @@
 ### 0.3 集成测试状态（Phase 2 后）
 
 - 单元/行为套件：**417 passed**，ruff 全绿（2026-09-04 实测）。
-- PostgreSQL 集成测试：**13 个存在（3 既有 + Phase 2 新增 10），当前
-  TEST_DATABASE_URL 未配置 → 全部显式 skip —— NOT VERIFIED，不计入 passed**。
+- PostgreSQL 集成测试：**13 个存在（3 既有 + Phase 2 新增 10）**。本行是 Phase 2
+  当时的结论（未配置 → 全部显式 skip，NOT VERIFIED）；**已于 2026-09-28 晚被 §0.4
+  取代** —— 本地栈启动后 13/13 真跑通过。
 - 隔离守卫已实测：`TEST_DATABASE_URL == DATABASE_URL` 时 pytest 启动即报错退出
   （`tests/conftest.py`；配置来源优先级 os.environ > `.env.test` > `.env.local`；
   已配置时首跑自动对专用测试库执行 `alembic upgrade head`，每测试前后 TRUNCATE 隔离）。
@@ -117,11 +118,14 @@ cd frontend && npx vitest run
   conftest 的 **"unreachable"** 分支 skip。
 
 即：skip 数量仍是 13，但**原因从「没配」变成「配了但连不上」**。
-当前结论：这 13 个集成测试状态为 **NOT VERIFIED**，不计入 passed。
 
-判定方法：pytest 末尾汇总行打印的是含糊措辞
-`(TEST_DATABASE_URL not configured or unreachable)`；**区分靠其上一行是否出现
-`TEST_DATABASE_URL configured`** —— 出现即「不可达」而非「未配置」。
+**同日晚些时候更新**：本地栈已启动（`supabase start`；54321-54327 监听，
+`rageval_test` 可达，PostgreSQL 17.6，11 张表），13 个集成测试**全部真跑并通过
+（13/13）**。状态由此从 NOT VERIFIED 变为**已验证通过**。
+
+判定方法：pytest 末尾汇总行**直接打印真实原因**，例如
+`Integration tests skipped: 13 (TEST_DATABASE_URL unreachable: OperationalError)`
+—— 「unreachable」即「配了但连不上」，而非「未配置」。
 
 验证路径：
 
@@ -303,11 +307,10 @@ Status 判据 = 真实行为（Chrome E2E + API E2E + 测试），「页面存�
 > `.env.local` 中该键仍为空，但 `.env.test` 优先级更高，conftest 已按「已配置」分支处理）。
 >
 > 因此本节的 **"TEST_DATABASE_URL = NOT CONFIGURED"** 前提**已不成立**：
-> 13 个集成测试仍然 skip，但原因已从「未配置」变为
-> **「已配置但本地 Supabase 栈未启动（unreachable）」**。
-> 当前真实结论：**NOT VERIFIED**（既非通过，也非「因为没配所以跳过」）。
+> 13 个集成测试已不再 skip。**2026-09-28 晚本地栈启动后，13/13 真跑通过**，
+> 结论为**已验证通过**（此前同日的 NOT VERIFIED 是栈未启动时的中间状态）。
 >
-> 同时测试基线已更新：**521 passed / 13 skipped / 534 collected**（2026-09-28 实测），
+> 同时测试基线已更新：**540 passed / 0 skipped / 540 collected**（2026-09-28 实测），
 > 见 §0.4。下文 T-22 的「激活 3 个集成测试」描述亦已过时——集成测试现为 **13 个**。
 >
 > 下文保留为 2026-09-01 Gate 当时的历史快照。
@@ -325,8 +328,9 @@ Status 判据 = 真实行为（Chrome E2E + API E2E + 测试），「页面存�
 > （已实测），已配置时自动 `alembic upgrade head` + 每测试 TRUNCATE 隔离；
 > 集成测试扩至 **13 个**（3 既有 + 新增 10：事务 / JSONB / 行锁 / Config /
 > Run / Cancel 竞态（含双线程）/ Diagnosis，见 `tests/test_postgres_integration.py`）。
-> 当前 TEST_DATABASE_URL 仍未配置 → 13 个集成测试显式 skip，**NOT VERIFIED**，
-> 不计入 passed。当前基线：pytest 417 passed / 13 skipped。
+> **2026-09-28 晚更新**：`TEST_DATABASE_URL` 已在 `.env.test` 中配置，且本地栈已
+> 启动 → 13 个集成测试**全部真跑通过（13/13）**，不再是 NOT VERIFIED。
+> 当前基线：**pytest 540 passed / 0 skipped / 540 collected**（同日实测）。
 
 ## 12. Security Audit
 

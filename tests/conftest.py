@@ -157,6 +157,31 @@ def pg_db(pg_engine):
         conn.execute(text(_TRUNCATE_SQL))
 
 
+def _skip_causes(reports) -> str:
+    """Distinct skip causes, deduped, taken from the reports themselves.
+
+    The two causes are NOT interchangeable: a test database that is configured
+    but down must never read as an unconfigured one. Reporting the reports'
+    own wording keeps that distinction visible instead of collapsing both into
+    a fixed two-way guess.
+    """
+    causes: list[str] = []
+    for report in reports:
+        longrepr = getattr(report, "longrepr", None)
+        text = str(longrepr[2]) if isinstance(longrepr, tuple) and len(longrepr) >= 3 else str(longrepr or "")
+        line = text.strip().splitlines()[0].strip() if text.strip() else ""
+        if not line:
+            continue
+        # Both messages are "TEST_DATABASE_URL <cause> — <remediation prose>";
+        # keep the identifying head, drop the shared tail.
+        head = line.split(" — ")[0].strip()
+        if head.startswith("Skipped: "):  # pytest's own prefix, redundant here
+            head = head[len("Skipped: ") :].strip()
+        if head and head not in causes:
+            causes.append(head)
+    return "; ".join(causes)
+
+
 def pytest_terminal_summary(terminalreporter, exitstatus, config) -> None:
     """Mandated integration-test visibility: configured / executed / passed.
 
@@ -174,9 +199,10 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config) -> None:
     if errored:
         terminalreporter.write_line(f"Integration tests ERRORED: {len(errored)}")
     if skipped:
+        causes = _skip_causes(skipped)
+        detail = f" ({causes})" if causes else ""
         terminalreporter.write_line(
-            f"Integration tests skipped: {len(skipped)} "
-            "(TEST_DATABASE_URL not configured or unreachable) — NOT counted as passed"
+            f"Integration tests skipped: {len(skipped)}{detail} — NOT counted as passed"
         )
     if passed:
         terminalreporter.write_line(f"Integration tests executed: {len(passed)}")

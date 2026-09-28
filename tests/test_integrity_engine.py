@@ -123,14 +123,31 @@ def test_numerical_opposite_sign_is_mismatch() -> None:
 
 
 def test_numerical_english_magnitude_units_same_base() -> None:
-    """Layer-1 contamination fix: English magnitude words normalize into the
-    same base space as each other and as bare unitless numbers."""
+    """English magnitude words normalize into the same base space as each other
+    and as the CJK currency tokens (million == 百万元 == 1e6).
+
+    They are classified as CURRENCY (decided 2026-09-28), not as bare unitless
+    magnitudes: a bare number states no unit, so "12.6 million" vs "12600000" is
+    a unit-class mismatch — the two sides are only comparable once both state
+    the currency.
+    """
     out = compare_numerical(normalize_numerical("1000 million"), normalize_numerical("1 billion"))
     assert out.comparison_type == "match" and out.score == 1.0
     out2 = compare_numerical(normalize_numerical("1 million"), normalize_numerical("1000 thousand"))
     assert out2.comparison_type == "match"
+    # Same numeric base, but only one side states a unit.
     out3 = compare_numerical(normalize_numerical("12.6 million"), normalize_numerical("12600000"))
-    assert out3.comparison_type == "match"
+    assert out3.comparison_type == "unit_mismatch" and out3.score is None
+
+
+def test_numerical_english_and_cjk_currency_are_comparable() -> None:
+    """Regression: an English magnitude and its CJK currency equivalent used to
+    come back a CONFIRMED unit_mismatch failure, because _unit_class() knew only
+    the CJK tokens while _UNIT_TABLE had already tagged the English ones CNY."""
+    out = compare_numerical(normalize_numerical("5 million"), normalize_numerical("500万元"))
+    assert out.comparison_type == "match" and out.score == 1.0
+    out2 = compare_numerical(normalize_numerical("200 million"), normalize_numerical("2亿元"))
+    assert out2.comparison_type == "match"
 
 
 def test_numerical_english_scale_confusion_detected() -> None:

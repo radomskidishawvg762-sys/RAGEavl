@@ -15,6 +15,7 @@ from __future__ import annotations
 import io
 from datetime import UTC, datetime
 from typing import Any
+from xml.sax.saxutils import escape as _xml_escape
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
@@ -56,13 +57,22 @@ def _styles() -> dict[str, ParagraphStyle]:
 
 
 def _s(v: Any) -> str:
+    """Stringify a persisted value for a reportlab Paragraph.
+
+    Paragraph parses mini-HTML, so DATA must be escaped here — this is the escape
+    boundary: anything returned by _s() is safe to interpolate, and raw values are
+    not. Without it, a dataset name, question, answer or evidence fragment
+    containing "<" (e.g. "a < b", "答案 <br> 换行", "<font color=red>") raised
+    ValueError inside doc.build() and turned the PDF export into a 500 with no
+    structured error code, while format=json succeeded for the same run.
+    """
     if v is None:
         return "—"
     if isinstance(v, float):
         return f"{v:.4f}".rstrip("0").rstrip(".")
     if isinstance(v, bool):
         return str(v).lower()
-    return str(v)
+    return _xml_escape(str(v))
 
 
 def _ts(v: Any) -> str:
@@ -231,13 +241,13 @@ def render_report_pdf(payload: dict) -> bytes:
     if not failures:
         story.append(Paragraph("本 Run 无确认失败 no confirmed failures。", st["body"]))
     for i, f in enumerate(failures, 1):
-        head = (f"<b>#{i} {f['failure_type']}</b> · {_s(f['severity'])} · "
+        head = (f"<b>#{i} {_s(f['failure_type'])}</b> · {_s(f['severity'])} · "
                 f"metric {_s(f['related_metric'])} · record {_s(f['record_id'])}")
         story.append(Paragraph(head, st["body"]))
         if f.get("question"):
-            story.append(Paragraph(f"问题 Question: {f['question']}", st["note"]))
+            story.append(Paragraph(f"问题 Question: {_s(f['question'])}", st["note"]))
         if f.get("root_cause"):
-            story.append(Paragraph(f"根因 Root cause: {f['root_cause']}", st["small"]))
+            story.append(Paragraph(f"根因 Root cause: {_s(f['root_cause'])}", st["small"]))
         for line in _basis_lines(f.get("comparison_basis")):
             story.append(Paragraph(f"· {line}", st["small"]))
         items = f.get("evidence") or []

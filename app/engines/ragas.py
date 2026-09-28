@@ -106,6 +106,20 @@ class RagasScorer:
             raise ExtJudgeUnavailableError(
                 "ragas is not installed (pip install -e '.[eval]')"
             )
+        # Deprecated on ragas 0.4.3, slated for removal in ragas v1.0. Kept
+        # deliberately: `ragas==0.4.3` is hard-pinned in pyproject.toml, so this
+        # is tracked debt, not a live risk.
+        #
+        # Do NOT follow the DeprecationWarning's "Example: from
+        # ragas.metrics.collections import faithfulness" — that name is a
+        # *submodule* there, not the metric. The real replacement is the
+        # class-based component API (collections.Faithfulness et al.), which is
+        # NOT a drop-in: it takes an InstructorBaseRagasLLM / BaseRagasEmbedding
+        # (different protocols than the Langchain*Wrapper classes below) and
+        # scores via ascore() instead of single_turn_ascore(sample, ...).
+        # Migrating therefore means rewriting this scorer AND both bridges in
+        # ragas_bridge.py — a scoring-path change that needs a live judge to
+        # verify, so it belongs in its own task, not a drive-by fix.
         from ragas import metrics as ragas_metrics
         from ragas.embeddings import LangchainEmbeddingsWrapper
         from ragas.llms import LangchainLLMWrapper

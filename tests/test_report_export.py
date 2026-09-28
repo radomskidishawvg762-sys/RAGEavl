@@ -328,3 +328,41 @@ def test_endpoint_unknown_run_404() -> None:
         assert resp.json()["code"] == "BIZ_NOT_FOUND"
     finally:
         app.dependency_overrides.clear()
+
+
+# ---------- PDF escaping: _s() is the boundary between data and reportlab markup ----------
+
+
+def test_s_escapes_tag_like_data() -> None:
+    """_s() must escape: reportlab's Paragraph parses mini-HTML."""
+    from app.services.report_pdf import _s
+
+    assert _s("a < b <c") == "a &lt; b &lt;c"
+    assert _s("<br>") == "&lt;br&gt;"
+    assert _s("<font color=red>x") == "&lt;font color=red&gt;x"
+    assert _s("A&B") == "A&amp;B"
+    # non-strings keep their formatting contract
+    assert _s(None) == "—"
+    assert _s(1.5) == "1.5"
+
+
+def test_paragraph_builds_with_tag_like_dataset_content() -> None:
+    """Regression: unescaped "<" in dataset content made Paragraph raise inside
+    doc.build(), turning the PDF export into a 500 with no structured error code
+    while format=json succeeded for the same run."""
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.platypus import Paragraph
+
+    from app.services.report_pdf import FONT, _s
+
+    st = ParagraphStyle("probe", fontName=FONT, fontSize=9)
+    hostile = [
+        "答案 <br> 换行",
+        "<font color=red>x",
+        "a < b <c",
+        "A&B <tag>",
+        "</para>",
+        "<b>unclosed",
+    ]
+    for value in hostile:
+        Paragraph(f"问题 Question: {_s(value)}", st)  # must not raise

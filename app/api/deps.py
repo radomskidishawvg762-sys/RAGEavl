@@ -101,6 +101,13 @@ class EvaluationLauncher(Protocol):
     ) -> Awaitable: ...
 
 
+# Strong references to in-flight run tasks. asyncio keeps only a WEAK reference to
+# a task, so a dropped return value lets a GC pass close the coroutine at an
+# arbitrary await — the run row then stays "running" forever, with no error_summary
+# and no log line. Entries are discarded as soon as the task finishes.
+_launched_tasks: set[asyncio.Task] = set()
+
+
 def _default_launcher() -> Callable[..., asyncio.Task]:
     """Real path: build engines from the profile, then execute_run on a
     DEDICATED session in a background task
@@ -133,9 +140,12 @@ def _default_launcher() -> Callable[..., asyncio.Task]:
                 logger.exception("failed to mark run %s as failed", run_id)
 
     def launch(run_id: str, *, enabled_metrics, params) -> asyncio.Task:
-        return asyncio.create_task(
+        task = asyncio.create_task(
             _background(run_id, enabled_metrics=enabled_metrics, params=params)
         )
+        _launched_tasks.add(task)  # see _launched_tasks — the loop holds only a weak ref
+        task.add_done_callback(_launched_tasks.discard)
+        return task
 
     return launch
 

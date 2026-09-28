@@ -242,10 +242,10 @@ C. no-re-execution spy —— 只读服务在真实库上必须仍然成功
 
 | 套件 | 位置 | 规模（2026-09-28 实测） |
 |------|------|------|
-| 后端 | `tests/`（46 个 `.py`） | 534 collected → 521 passed / 13 skipped |
+| 后端 | `tests/`（47 个 `.py`） | 540 collected → 540 passed / 0 skipped |
 | 前端 | `frontend/tests/`（7 个文件） | 63 passed |
 
-后端 13 个 skipped 是 PostgreSQL 集成测试，当前**未验证**（原因见 §6.1）。
+后端含 13 个 PostgreSQL 集成测试；本地栈启动后**全部真跑通过**（13/13，见 §6.1）。
 
 ---
 
@@ -273,9 +273,11 @@ cd frontend && npx vitest run
 | `TEST_DATABASE_URL` | 未配置 | **已在 `.env.test` 中配置**（指向本地栈的 `rageval_test` 库） |
 | skip 原因 | 「未配置」 | **「已配置，但本地栈没启动 → unreachable」** |
 
-skip 数量碰巧仍是 13，但**语义完全不同**了。pytest 汇总行打印的措辞是含糊的 `not configured or unreachable`；要区分，看上一行的 `TEST_DATABASE_URL configured` 是否出现——出现了就是「不可达」。
+skip 数量碰巧仍是 13，但**语义完全不同**了。汇总行会打印真实原因，例如
+`Integration tests skipped: 13 (TEST_DATABASE_URL unreachable: OperationalError)`，
+不再用「not configured or unreachable」这种二选一的含糊措辞。
 
-当前本机实测：**本地栈未启动**（54320 / 54321 / 54322 / 54323 均无监听），**Docker Desktop 未运行**（`docker info` 连不上 daemon）。所以这 13 个集成测试的真实结论是 **NOT VERIFIED**，不能算通过。
+当前本机实测（2026-09-28 晚）：**本地栈已启动** —— `supabase start` 拉起，54321-54327 均监听，`rageval_test` 可达（PostgreSQL 17.6，11 张表），Docker Desktop 运行中。所以这 13 个集成测试**已真跑并全部通过**（13/13）。此前的「栈未启动 → unreachable → NOT VERIFIED」是同一会话早些时候的状态。
 
 要真正验证：
 
@@ -298,7 +300,7 @@ pytest
 
 ## 7. 已知限制（诚实清单）
 
-1. **13 个 PostgreSQL 集成测试当前未验证**（§6.1），因为本地栈没起。
+1. ~~**13 个 PostgreSQL 集成测试当前未验证**（§6.1），因为本地栈没起。~~ **已解除（2026-09-28 晚）**：本地栈启动后 13/13 真跑通过。
 2. **没有 CI pipeline**。ADR-03（业务层不许按引擎名分支）、I-8（`api/`/`services/`/`domain/` 下不许 import supabase）这类 spec 静态检查，在本仓库是 **review 时人工保证**，不是自动化门禁。
 3. **引擎级 Pipeline 选择 UI 缺失**（FR-12 剩余项）。指标级的启用/阈值/权重覆盖是全链生效的；引擎级选择只有后端能力，没有 UI。
 4. **Run 级 RAG Input 配置无后端 API**，当前由 `system.yaml` 决定，UI 如实标注为 Backend Gap。
@@ -325,7 +327,7 @@ pytest
 | 端口 54320-54323 / PG 17 | `supabase/supabase/config.toml` 实测 | ✅ 实测 2026-09-28 |
 | `DATABASE_URL` → `127.0.0.1:54322` | `.env.local` 实测（只看 host，密码打码） | ✅ 实测 2026-09-28 |
 | 7 个指标 | 代码注册表（`ragas.py` / `integrity.py` 的 `MetricSpec`） | ✅ 代码可查 |
-| 13 个集成测试**通过与否** | — | ❌ **未验证**（栈未启动） |
+| 13 个集成测试**通过与否** | pytest 实测 | ✅ **13/13 通过**（2026-09-28，本地栈已启动） |
 | 前端 / 后端 E2E 通过数（75/75、50/50） | `MVP_FINAL_ACCEPTANCE.md` §7/§5 记录 | ⚠️ 历史记录（2026-09-01），本次未重跑 |
 | Benchmark v0.1 全维度 100% | `MVP_FINAL_ACCEPTANCE.md` §8 | ⚠️ 历史记录（2026-09-01），本次未重跑 |
 

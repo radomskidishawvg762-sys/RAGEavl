@@ -95,6 +95,21 @@ class EvaluationRepository(BaseRepository[EvaluationRun]):
             raise NotFoundError(f"run {run_id} not found")
         return run
 
+    def get_run_status(self, run_id: str) -> str:
+        """Status read that bypasses the ORM identity map.
+
+        get_run() is a Session.get() and the session is built with
+        expire_on_commit=False, so a session that already loaded this run keeps
+        serving the status it loaded. Callers that must observe another
+        session's committed write (cancellation) read the column directly.
+        """
+        status = self._session.execute(
+            select(EvaluationRun.status).where(EvaluationRun.id == run_id)
+        ).scalar_one_or_none()
+        if status is None:
+            raise NotFoundError(f"run {run_id} not found")
+        return status
+
     def update_run(
         self,
         run_id: str,

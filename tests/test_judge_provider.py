@@ -79,6 +79,12 @@ def test_2_secret_never_logged(caplog) -> None:
     assert isinstance(judge, OpenAIJudge)
 
     class _FailingClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc) -> bool:
+            return False
+
         async def chat_completions_create(self, **kw):  # noqa: ARG002
             raise RuntimeError("boom")
 
@@ -134,6 +140,12 @@ def test_6_provider_error_maps_to_ext_judge_unavailable() -> None:
     judge = build_judge(_configured_cfg())
 
     class _BoomClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc) -> bool:
+            return False
+
         async def chat_completions_create(self, **kw):  # noqa: ARG002
             raise ConnectionError("upstream refused")
 
@@ -291,10 +303,22 @@ class _FakeCompletions:
         return outcome
 
 
+class _AsyncCM:
+    """Minimal async context manager — _invoke() scopes its client per call."""
+
+    def __init__(self, inner) -> None:
+        self._inner = inner
+
+    async def __aenter__(self):
+        return self._inner
+
+    async def __aexit__(self, *exc) -> bool:
+        return False
+
+
 def _wire(judge: OpenAIJudge, completions: _FakeCompletions) -> None:
-    judge._client = SimpleNamespace(
-        chat=SimpleNamespace(completions=completions)
-    )
+    client = SimpleNamespace(chat=SimpleNamespace(completions=completions))
+    judge._get_client = lambda: _AsyncCM(client)  # type: ignore[assignment]
 
 
 def _ok_response() -> SimpleNamespace:
