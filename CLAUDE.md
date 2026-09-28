@@ -102,7 +102,7 @@ React + TypeScript + Ant Design + ECharts + Axios (Vite, target `es2020`). `fron
 These are deliberate design rules — violating them breaks invariants this project enforces (by the test suite, except I-8 which is review-time only; see Testing).
 
 - **Supabase is hosting only.** No `supabase-py`/`supabase-js`/Auth/Storage/Realtime/Self-Hosted. No `app/services/supabase_service.py`. DB code lives only in `db/`, `repositories/`, `configuration/`. Spec static check I-8: no supabase import under `api/`, `services/`, `domain/` — this holds in code today (Supabase appears only in comments/config text, e.g. `alembic/env.py`, `app/core/config.py`); there is no CI pipeline in this repo, so it is a review-time invariant rather than an automated gate.
-- **No Redis / Celery / ARQ / Kafka / Kubernetes / OpenTelemetry SDK** in MVP. Async work uses FastAPI `BackgroundTasks` + asyncio; an in-process `asyncio.Lock` serializes runs (ADR-02).
+- **No Redis / Celery / ARQ / Kafka / Kubernetes / OpenTelemetry SDK** in MVP. Async work uses FastAPI `BackgroundTasks` + asyncio. Runs on the **same dataset** are serialized by the `datasets.is_locked` row lock (ADR-06: that lock is never released, a re-run needs a new dataset version); **different datasets may run concurrently**, and record-level concurrency inside a run is the `LocalAsyncRunner`'s `asyncio.Semaphore`. There is **no process-wide run lock** — so per-run state must never be assigned onto module-level shared objects (ADR-02).
 - **Alembic is the only migration system.** Never create tables in Supabase Dashboard, never `supabase db push`, never `Drop Database → Create Again`. Never touch Supabase platform schemas (`auth`, `storage`, `realtime`, `supabase_*`).
 - **Repository is the sole data-access boundary.** Service layer never uses `Session` / `session.query(...)` directly (P-8). No implicit autocommit — explicit transaction boundaries.
 - **No `localhost:5432` / `127.0.0.1:5432` as a production default**, no db container, no `pg_isready`/`wait-for-postgres`/`pgdata`/`depends_on: db`. docker-compose has only the `app` service.
@@ -120,7 +120,7 @@ pytest + pytest-asyncio. `conftest.py` must assert `TEST_DATABASE_URL != DATABAS
 ## ADRs (spec §9)
 
 - **ADR-01** Layered monolith, not microservices (MVP local single-user tool).
-- **ADR-02** No Redis/MQ in MVP — `BackgroundTasks` + asyncio; in-process `asyncio.Lock` serializes runs.
+- **ADR-02** No Redis/MQ in MVP — `BackgroundTasks` + asyncio; same-dataset runs serialized by the `datasets.is_locked` row lock, different datasets may run concurrently (no process-wide run lock).
 - **ADR-03** Engine abstraction via Protocol + Registry; no branching on engine names.
 - **ADR-04** Diagnosis = rules-first + LLM fallback; inconclusive → `ambiguous`, never guesses.
 - **ADR-05** Three-layer YAML config + content-hash snapshot; no DB config tables, no hot reload.

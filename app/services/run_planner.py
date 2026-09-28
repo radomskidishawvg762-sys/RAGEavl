@@ -146,6 +146,8 @@ def resolve_effective_pipeline(merged: dict, enabled_metrics: list[str]) -> dict
       selected_engines  the raw whitelist (None = derive from metrics)
       excluded_metrics  enabled metrics dropped by the whitelist, {name: engine}
                         — explicit selection, NEVER silent
+      unknown_metrics   enabled metrics absent from the registry (engine backend
+                        not installed); resolve_profile turns these into a 409
       diagnosis         {"enabled": bool} — pipeline.diagnosis.enabled wins over
                         the legacy top-level diagnosis.enabled; default True
     """
@@ -158,11 +160,20 @@ def resolve_effective_pipeline(merged: dict, enabled_metrics: list[str]) -> dict
 
     actual: list[str] = []
     excluded: dict[str, str] = {}
+    unknown: list[str] = []
     for name in enabled_metrics:
         try:
             engine = default_registry.get_metric(name).spec.engine
         except KeyError:
-            continue  # unknown metrics are factory-skipped, as before
+            # NOT silently skipped. An enabled metric with no registry entry (its
+            # engine backend is not installed) produces zero rows, yet the run
+            # used to finish "completed" with a plausible overall_score while the
+            # snapshot claimed every configured metric. Collected here and raised
+            # by resolve_profile, which runs BEFORE any run row is created and
+            # before the dataset row lock is taken (ADR-06: that lock is never
+            # released, so failing later would consume the dataset version).
+            unknown.append(name)
+            continue
         if selected is not None and engine not in selected:
             excluded[name] = engine
             continue
@@ -172,6 +183,7 @@ def resolve_effective_pipeline(merged: dict, enabled_metrics: list[str]) -> dict
         "engines": sorted(actual),
         "selected_engines": selected,
         "excluded_metrics": excluded,
+        "unknown_metrics": unknown,
         "diagnosis": {"enabled": bool(diag_enabled)},
     }
 
@@ -226,6 +238,17 @@ def resolve_profile(merged: dict) -> RunPlan:
     # enabled set (excluded metrics are EXPLICIT, recorded in extra), and the
     # diagnosis on/off switch the service orchestration layer honors.
     pipeline_cfg = resolve_effective_pipeline(merged, enabled)
+    if pipeline_cfg["unknown_metrics"]:
+        raise ConfigInvalidError(
+            "enabled metrics have no engine backend (not registered): "
+            f"{', '.join(pipeline_cfg['unknown_metrics'])} — disable them in the "
+            "profile or install the extra that provides their engine",
+            code="BIZ_CONFIG_INVALID",
+            context={
+                "metrics": pipeline_cfg["unknown_metrics"],
+                "reason": "not_registered",
+            },
+        )
     extra["pipeline"] = {
         "selected_engines": pipeline_cfg["selected_engines"],
         "excluded_metrics": pipeline_cfg["excluded_metrics"],

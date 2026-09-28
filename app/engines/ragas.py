@@ -132,7 +132,20 @@ class RagasScorer:
         emb_client = embeddings  # None -> bridge builds placeholder from judge config
         emb_wrapper = None
         for name, ragas_name in _RAGAS_NAME_MAP.items():
-            metric = getattr(ragas_metrics, ragas_name)
+            # Build a PRIVATE instance per scorer rather than configuring the
+            # module-level singleton `ragas.metrics.<name>` returns. Those are
+            # shared process-globally, so assigning .llm/.embeddings onto one
+            # leaks this run's judge into every other in-flight run — and the
+            # last scorer to be constructed wins, silently, while each run's
+            # snapshot still claims its own configured judge.
+            #
+            # Zero-arg construction is used instead of copy.deepcopy: deepcopy
+            # walks prompts and numpy-ish payloads and can fail or drift, whereas
+            # the constructor is the object's own supported entry point. Verified
+            # on ragas 0.4.3 that every dataclass field of type(singleton)()
+            # equals the singleton's (so no default drifts).
+            singleton = getattr(ragas_metrics, ragas_name)
+            metric = type(singleton)()
             metric.llm = llm_wrapper
             if hasattr(metric, "embeddings"):
                 if emb_wrapper is None:

@@ -188,7 +188,7 @@ config/system.yaml  <  config/domains/<domain>.yaml  <  config/evaluations/<prof
 - 不引入 `supabase-py` / `supabase-js` / Auth / Storage / Realtime / Self-Hosted。
 - **Alembic 是唯一建表途径**，禁止在 Dashboard/Studio 手工建表、禁止 `supabase db push`。
 - 不碰 Supabase 平台 schema（`auth` / `storage` / `realtime` / `supabase_*`）。
-- 不引入 Redis / Celery / ARQ / Kafka / Kubernetes / OpenTelemetry SDK；异步用 `BackgroundTasks` + asyncio，进程内 `asyncio.Lock` 串行化 Run（ADR-02）。
+- 不引入 Redis / Celery / ARQ / Kafka / Kubernetes / OpenTelemetry SDK；异步用 `BackgroundTasks` + asyncio。**同一数据集**由 `datasets.is_locked` 行锁互斥（ADR-06：锁上后不可重跑，需新版本），**不同数据集可并发**，记录级并发是 `LocalAsyncRunner` 的 `asyncio.Semaphore`。**没有进程级的 Run 锁** —— 因此 per-run 状态绝不可挂在模块级共享对象上。
 
 `docker/docker-compose.yml` 只有一个 `app` service，没有 db service、没有 `depends_on: db`、没有 pgdata 卷。
 

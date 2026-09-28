@@ -294,3 +294,28 @@ def test_input_requirements_mirror_ragas(name: str) -> None:
     metric = getattr(rm, name)  # module uses lazy __getattr__ — not in __dict__
     expected = sorted(field_map[c] for c in metric.required_columns["SINGLE_TURN"])
     assert sorted(d.input_requirements) == expected
+
+
+def test_scorer_does_not_mutate_the_ragas_module_singletons() -> None:
+    """Regression: .llm/.embeddings were assigned onto the module-level ragas
+    metric singletons. Those are process-global, so constructing a second scorer
+    silently rewrote the first run's judge — while each run's snapshot still
+    claimed its own configured judge."""
+    import ragas.metrics as rm
+
+    from app.engines.ragas import RagasScorer
+
+    emb = RagasEmbeddingsBridge(
+        RagasEmbeddingsBridge.default_from_judge(PlaceholderJudge(JudgeConfig()))
+    )
+    first = RagasScorer(PlaceholderJudge(JudgeConfig()), embeddings=emb)
+    second = RagasScorer(PlaceholderJudge(JudgeConfig()), embeddings=emb)
+
+    for name in ALL_METRICS:
+        # each scorer owns its own metric instance...
+        assert first._metrics[name] is not second._metrics[name]
+        # ...and the process-global singleton was never configured
+        singleton = getattr(rm, name)
+        assert singleton.llm is None
+        if hasattr(singleton, "embeddings"):  # only some metrics take embeddings
+            assert singleton.embeddings is None

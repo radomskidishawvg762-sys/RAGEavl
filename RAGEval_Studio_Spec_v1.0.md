@@ -1171,7 +1171,7 @@ sequenceDiagram
 | 报告页首屏 P95 ≤ 2s | B | `(run_id, is_failure)` 索引 + 分页 + 报告聚合结果落 `evaluation_runs` 避免实时聚合 |
 | 失败样本查询 P95 ≤ 500ms | B | 复合索引 + 游标分页 + 列表页不返回 contexts 正文 |
 | 版本对比 ≤ 5s | B | 仅读两个 Run 的聚合指标，不扫描明细 |
-| 并发 Run ≥ 1 | B | 进程内 `asyncio.Lock` 串行化；P1 再引入队列 |
+| 并发 Run ≥ 1 | B | 同一数据集由 `datasets.is_locked` 行锁互斥；不同数据集可并发；记录级并发为 `LocalAsyncRunner` 的 `asyncio.Semaphore`；P1 再引入队列 |
 | Judge 方差 / 稳定性 | C | 固定 `temperature=0` + 固定 prompt/model 版本 + 提供 Benchmark 脚本统计方差 |
 | **云端数据库往返开销** | C | 连接池 `pool_pre_ping` + 合理 `pool_size`（默认 5/10）；批量写入减少往返；实测后定基线 |
 | 浏览器兼容 Chrome/Edge | B | Vite 构建目标 `es2020`；Ant Design 5 官方支持矩阵 |
