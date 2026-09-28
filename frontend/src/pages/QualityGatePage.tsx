@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { api, endpoints } from '../api/client';
 import type { QualityGateResponse } from '../api/types';
+import { REASON_EXPLAIN } from '../api/mappers';
 import { useProject } from '../context/ProjectContext';
 import { useRunOptions } from '../hooks/useRunOptions';
 import { PageHeader, Panel, Section } from '../components/primitives/Surfaces';
@@ -19,14 +20,6 @@ import { ScoreValue } from '../components/ScoreValue';
 import { QualityGateBadge } from '../status/StatusBadge';
 import { formatTimestamp } from '../utils/format';
 import styles from './QualityGatePage.module.css';
-
-const REASON_EXPLAIN: Record<string, string> = {
-  QUALITY_THRESHOLD_FAILED: '必需指标有有效分数，但低于配置阈值（真实质量失败）。',
-  REQUIRED_METRIC_NOT_EVALUABLE: '必需指标无法评估（分数为空：未配置 / 执行错误 / 无法判定 / 未执行）。这不是 0 分。',
-  QUALITY_GATE_DISABLED: '当前 Profile 的 quality_gate.enabled = false，门禁未启用。',
-  QUALITY_GATE_NOT_CONFIGURED: '当前 Profile 未配置 quality_gate，门禁不可用。',
-  QUALITY_GATE_CONFIG_INVALID: '门禁配置无效（必需指标未启用或未配置阈值）。',
-};
 
 export function QualityGatePage() {
   const { activeProject } = useProject();

@@ -35,10 +35,10 @@ export function ProjectSelector() {
         <span className={styles.projectIcon}><Icon name="spark" size={14} /></span>
         <span className={styles.meta}>
           <span className={styles.name}>
-            {loading ? 'Loading…' : activeProject?.name ?? 'No project'}
+            {loading ? '加载中…' : activeProject?.name ?? '未选择项目'}
           </span>
           <span className={styles.domain}>
-            {activeProject ? (activeProject.domain || 'general') : 'select a project'}
+            {activeProject ? (activeProject.domain || 'general') : '请选择项目'}
           </span>
         </span>
         <span className={styles.caret}><Icon name="arrow-down" size={12} /></span>
@@ -47,7 +47,7 @@ export function ProjectSelector() {
       {open ? (
         <div className={styles.menu} role="listbox">
           {projects.length === 0 ? (
-            <div className={styles.empty}>No projects yet</div>
+            <div className={styles.empty}>暂无项目</div>
           ) : (
             projects.map((p) => (
               <button

@@ -131,7 +131,7 @@ describe('数据集详情', () => {
     await renderWithProject(<DatasetDetailPage datasetId="ds-1111" />);
     fireEvent.click(await screen.findByTestId('tab-validation'));
     await waitFor(() => expect(screen.getByText('校验失败')).toBeInTheDocument());
-    expect(screen.getByText('Schema 校验')).toBeInTheDocument();
+    expect(screen.getByText('结构校验')).toBeInTheDocument();
     expect(screen.getByText('缺失字段检测')).toBeInTheDocument();
     expect(screen.getByText('引用有效性校验')).toBeInTheDocument();
     expect(screen.getByText('领域元数据校验')).toBeInTheDocument();

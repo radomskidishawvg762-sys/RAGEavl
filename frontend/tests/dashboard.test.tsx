@@ -141,7 +141,9 @@ describe('Dashboard — 数据接入', () => {
     await renderDash();
     await waitFor(() => expect(screen.getByText('指标概览')).toBeInTheDocument());
     expect(screen.getByText('未通过')).toBeInTheDocument();
-    expect(screen.getByText('QUALITY_THRESHOLD_FAILED')).toBeInTheDocument();
+    // The verdict still comes from the API, but it is rendered as the Chinese
+    // explanation — the raw code used to be printed on the entry screen.
+    expect(screen.getByText(/低于配置阈值/)).toBeInTheDocument();
   });
 });
 

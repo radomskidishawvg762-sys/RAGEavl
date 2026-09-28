@@ -14,7 +14,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import type { MetricReportItem, ReportResponse, RunOut, RunStatus } from '../api/types';
 import { TERMINAL_STATUSES } from '../api/types';
-import { toRunView } from '../api/mappers';
+import { REASON_EXPLAIN, toRunView } from '../api/mappers';
 import { useProject } from '../context/ProjectContext';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { EChart } from '../components/charts/EChart';
@@ -256,7 +256,9 @@ function QualitySummary({
       {qualityGateReasons.length > 0 ? (
         <div className={styles.gateReasons}>
           {qualityGateReasons.slice(0, 2).map((r) => (
-            <code key={r} className={styles.reason}>{r}</code>
+            // 展示中文说明，而不是原因码本身：入口页面上挂着一个黄色的
+            // `QUALITY_GATE_NOT_CONFIGURED` 对用户毫无意义。未收录的码原样显示，不猜。
+            <code key={r} className={styles.reason}>{REASON_EXPLAIN[r] ?? r}</code>
           ))}
         </div>
       ) : null}

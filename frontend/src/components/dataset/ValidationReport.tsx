@@ -9,12 +9,42 @@ import type { DatasetValidationCheck, DatasetValidationResponse } from '../../ap
 import styles from './ValidationReport.module.css';
 
 const CHECK_LABEL: Record<string, string> = {
-  schema: 'Schema 校验',
+  schema: '结构校验',
   duplicate: '重复检测',
   missing_field: '缺失字段检测',
   reference: '引用有效性校验',
   domain_metadata: '领域元数据校验',
 };
+
+/** 字段分组标题，按检查区分。
+ *
+ * 后端五个检查共用同一套 `field` 命名，但**含义不同**：重复检查的 field 指的是
+ * 「在哪一列上重复」，不是「缺了哪个字段」。原先一律渲染成「缺少字段：question」，
+ * 于是「第 3 行重复」被显示成「缺少字段：question」—— 权威口吻但是错的。 */
+const FIELD_GROUP_LABEL: Record<string, string> = {
+  schema: '字段',
+  duplicate: '重复字段',
+  missing_field: '缺少字段',
+  reference: '无效引用字段',
+  domain_metadata: '缺失的领域字段',
+};
+
+/** 后端 detail 码 → 中文。未知码原样显示，不猜。 */
+function detailLabel(detail: string): string {
+  if (!detail) return '';
+  const dup = /^duplicate of row (\d+)$/.exec(detail);
+  if (dup) return `与第 ${dup[1]} 行重复`;
+  const known: Record<string, string> = {
+    'must be an object': '必须是对象',
+    'must be a string': '必须是字符串',
+    'must be a list of strings': '必须是字符串列表',
+    missing: '缺失',
+    blank: '为空',
+    'empty list': '列表为空',
+    'required by enabled metrics': '被已启用的指标要求',
+  };
+  return known[detail] ?? detail;
+}
 
 export function ValidationReport({ validation }: { validation: DatasetValidationResponse | null }) {
   if (!validation) {
@@ -62,30 +92,34 @@ function CheckRow({ check }: { check: DatasetValidationCheck }) {
             问题数量：{check.issues.length}
             {check.count !== null ? ` · 受影响 ${check.count} 条` : ''}
           </div>
-          <GroupedIssues issues={check.issues} />
+          <GroupedIssues checkName={check.name} issues={check.issues} />
         </div>
       )}
     </div>
   );
 }
 
-function GroupedIssues({ issues }: { issues: Array<{ field: string; detail: string; row_index: number }> }) {
+function GroupedIssues({ checkName, issues }: {
+  checkName: string;
+  issues: Array<{ field: string; detail: string; row_index: number }>;
+}) {
   const byField = new Map<string, Array<{ row_index: number; detail: string }>>();
   for (const issue of issues) {
     if (!byField.has(issue.field)) byField.set(issue.field, []);
     byField.get(issue.field)!.push(issue);
   }
+  const groupLabel = FIELD_GROUP_LABEL[checkName] ?? '字段';
   return (
     <div className={styles.grouped}>
       {Array.from(byField.entries()).map(([field, rows]) => (
         <div key={field} className={styles.fieldGroup}>
-          <div className={styles.fieldName}>缺少字段：<code>{field}</code></div>
+          <div className={styles.fieldName}>{groupLabel}：<code>{field}</code></div>
           <div className={styles.rowList}>
             影响记录：
             {rows.map((r) => (
               <span key={`${field}-${r.row_index}`} className={styles.rowChip} data-testid="issue-row-index">
                 #{r.row_index}
-                {r.detail ? <span className={styles.rowDetail}>（{r.detail}）</span> : null}
+                {r.detail ? <span className={styles.rowDetail}>（{detailLabel(r.detail)}）</span> : null}
               </span>
             ))}
           </div>
