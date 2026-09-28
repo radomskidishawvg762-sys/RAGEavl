@@ -128,12 +128,36 @@ def normalize_rag_input(merged: dict) -> dict:
     system = merged.get("system") if isinstance(merged.get("system"), dict) else {}
     sys_rag = system.get("rag_input") if isinstance(system.get("rag_input"), dict) else {}
     src = profile_rag if profile_rag is not None else sys_rag
+
+    # An explicit profile-layer `rag_input` is authoritative and is never
+    # overridden. Only the SYSTEM layer (which is what ships: system.yaml carries
+    # `url: ${RAG_INPUT_URL:}`) falls back to the process Settings — the same
+    # .env.local / .env.test every other setting comes from.
+    settings_fallback = _settings() if profile_rag is None else None
+
     url = str(src.get("url") or "").strip() or None
+    if url is None and settings_fallback is not None:
+        url = (settings_fallback.rag_input_url or "").strip() or None
     mode = src.get("mode") or ("http" if url else "golden_replay")
     if mode not in ("golden_replay", "http"):  # tolerate unknown explicit mode
         mode = "http" if url else "golden_replay"
-    return {"mode": mode, "url": url,
-            "timeout": src.get("timeout"), "retry": src.get("retry")}
+    timeout = src.get("timeout")
+    retry = src.get("retry")
+    if settings_fallback is not None:
+        # Only fill gaps — an absent timeout/retry must not become None where
+        # system.yaml (or the adapter) supplies its own default.
+        if timeout is None:
+            timeout = settings_fallback.rag_input_timeout
+        if retry is None:
+            retry = settings_fallback.rag_input_retry
+    return {"mode": mode, "url": url, "timeout": timeout, "retry": retry}
+
+
+def _settings():
+    """Local import: keeps run_planner importable without a configured env."""
+    from app.core.config import settings
+
+    return settings
 
 
 def resolve_effective_pipeline(merged: dict, enabled_metrics: list[str]) -> dict:

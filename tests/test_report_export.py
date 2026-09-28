@@ -366,3 +366,24 @@ def test_paragraph_builds_with_tag_like_dataset_content() -> None:
     ]
     for value in hostile:
         Paragraph(f"问题 Question: {_s(value)}", st)  # must not raise
+
+
+def test_summary_exposes_input_mode_as_a_scalar() -> None:
+    """The run detail page needs RAG input mode as a SCALAR: the frontend's
+    safeReproducibility drops object values, so the snapshot's `rag_input` (an
+    object) never rendered — a run answering from golden-replay metadata was
+    indistinguishable from one hitting a real RAG."""
+    repo, run_id = _seed_repo()
+
+    report = ReportService(repo).build_report(run_id)
+
+    assert report["summary"]["input_mode"] == "golden_replay"
+
+
+def test_input_mode_is_none_when_the_snapshot_has_no_rag_input() -> None:
+    repo, run_id = _seed_repo()
+    repo.runs[run_id]["reproducibility_meta"] = {"enabled_metrics": ["temporal_consistency"]}
+
+    report = ReportService(repo).build_report(run_id)
+
+    assert report["summary"]["input_mode"] is None

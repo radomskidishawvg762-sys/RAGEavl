@@ -65,6 +65,12 @@ def metric_status(row: dict) -> str:
     return "not_run"
 
 
+def _rag_input_mode(meta: dict) -> str | None:
+    """Snapshot's RAG input mode, flattened to a scalar (see the summary block)."""
+    rag = meta.get("rag_input")
+    return rag.get("mode") if isinstance(rag, dict) else None
+
+
 def compute_overall_score(
     rows: list[dict], weights: dict[str, float] | None = None
 ) -> tuple[float | None, int, int]:
@@ -126,6 +132,11 @@ class ReportService:
                 "evaluated_records": run.evaluated_records,
                 "error_records": run.error_records,
                 "evaluation_coverage": run.evaluation_coverage,
+                # Scalar on purpose: the frontend's safeReproducibility filters out
+                # object values, so the snapshot's `rag_input` (an object) never
+                # rendered — the run detail page had no way to show that a run
+                # answered from golden-replay metadata instead of a real RAG.
+                "input_mode": _rag_input_mode(meta),
                 "valid_metric_count": sum(1 for r in metric_rows if r.get("score") is not None),
                 "total_enabled_metric_count": len(enabled_metrics)
                 or len({r["metric_name"] for r in metric_rows}),
