@@ -187,6 +187,15 @@ export const DIRECTION_LABEL: Record<MetricCatalogView['direction'], string> = {
   lower_is_better: '越低越好',
 };
 
+/** DIRECTION_LABEL for call sites whose `direction` is an untyped string (some
+ *  config/import views type it as plain `string`). An unrecognised token falls
+ *  back to itself rather than rendering `undefined`, so a new backend enum shows
+ *  up visibly instead of blanking the cell. */
+export function directionLabel(direction: string | null | undefined): string {
+  if (!direction) return '—';
+  return (DIRECTION_LABEL as Record<string, string>)[direction] ?? direction;
+}
+
 /**
  * Reproducibility view: shows dataset/config/metric/judge fingerprint only.
  * Defence in depth (§六) — anything that looks like a secret is dropped even

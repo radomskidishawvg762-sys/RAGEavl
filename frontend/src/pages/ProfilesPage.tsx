@@ -16,6 +16,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { api, endpoints, ApiError } from '../api/client';
 import {
+  directionLabel,
   toConfigDetailView,
   toConfigImportPreview,
 } from '../api/mappers';
@@ -264,7 +265,7 @@ function MetricsTab() {
                 <td><Tag>{m.category}</Tag></td>
                 <td className="mono">{m.engine}</td>
                 <td className="mono">{m.version}</td>
-                <td>{m.direction}</td>
+                <td>{directionLabel(m.direction)}</td>
                 <td>{m.defaultSeverity ?? '—'}</td>
                 <td className={styles.dimCell}>{m.inputRequirements?.join('、') || '—'}</td>
               </tr>
@@ -449,7 +450,7 @@ function ImportPreview({
               <td>{m.enabled ? <Tag tone="pass">启用</Tag> : <Tag>停用</Tag>}</td>
               <td className="mono">{m.threshold === null ? '无 PASS/FAIL' : m.threshold}</td>
               <td className="mono">{m.weight}</td>
-              <td>{m.direction}</td>
+              <td>{directionLabel(m.direction)}</td>
             </tr>
           ))}
         </tbody>
@@ -610,7 +611,7 @@ function ConfigDetailDrawer({ configId, onClose }: { configId: string; onClose: 
                           <td>{m.enabled ? '✓' : '✗'}</td>
                           <td className="mono">{m.threshold === null ? '无 PASS/FAIL' : m.threshold}</td>
                           <td className="mono">{m.weight}</td>
-                          <td>{m.direction}</td>
+                          <td>{directionLabel(m.direction)}</td>
                         </tr>
                       ))}
                     </tbody>

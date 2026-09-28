@@ -39,7 +39,7 @@ export function EmptyState({
         <Icon name={icon} size={22} />
       </div>
       <div className={styles.stateText}>
-         <strong><BilingualLabel zh={title} en="Status" /></strong>
+         <strong><BilingualLabel zh={title} /></strong>
         {description ? <p className={styles.emptyDesc}>{description}</p> : null}
       </div>
       {action ? <div className={styles.emptyAction}>{action}</div> : null}

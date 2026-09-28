@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api, endpoints } from '../api/client';
 import type { RunListResponse } from '../api/types';
+import { presentRun } from '../status/status';
 
 export interface RunOption {
   runId: string;
@@ -51,7 +52,10 @@ export function useRunOptions(projectId: string | null): {
             datasetVersion: version,
             overallScore: r.overall_score,
             createdAt: r.created_at,
-            label: `${short}… · ${version} · ${r.status}`,
+            // presentRun, not the raw enum: every other surface renders the
+            // bilingual badge ("部分完成"), so the pickers were the only place a
+            // user saw "completed_with_errors".
+            label: `${short}… · ${version} · ${presentRun(r.status).label}`,
           };
         }),
       );

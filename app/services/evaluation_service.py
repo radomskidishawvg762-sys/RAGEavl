@@ -236,7 +236,12 @@ class EvaluationService:
             current = self._repo.get_run(run_id)
             return {
                 "run_id": run_id,
-                "status": current.status,
+                # Fresh status read: the ORM-enabled UPDATE in
+                # start_run_if_pending synchronises its SET values onto the
+                # in-session object even when rowcount == 0, so `current` may
+                # claim "running" for a run a concurrent cancel just persisted
+                # as "cancelled".
+                "status": self._repo.get_run_status(run_id),
                 "total": current.total_records,
                 "evaluated": current.evaluated_records,
                 "errors": current.error_records,
@@ -389,8 +394,14 @@ class EvaluationService:
         )
         # When `finished` is None, cancellation may have committed while the
         # runner was finishing — never let the in-memory summary replace the
-        # persisted terminal state.
-        status = finished.status if finished is not None else self._repo.get_run(run_id).status
+        # persisted terminal state. Read the status through get_run_status (a
+        # fresh column read), NOT get_run: the ORM-enabled UPDATE in
+        # finish_run_if_running synchronises its SET values onto the in-session
+        # object even when rowcount == 0, so get_run would report "completed" for
+        # a row that a concurrent cancel persisted as "cancelled".
+        status = (
+            finished.status if finished is not None else self._repo.get_run_status(run_id)
+        )
         return {
             "run_id": run_id,
             "status": status,
