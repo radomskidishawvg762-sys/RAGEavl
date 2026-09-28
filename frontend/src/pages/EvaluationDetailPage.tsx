@@ -171,7 +171,7 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
                   <Grid cols={4} gap="lg">
                     <Card label="总体质量"><ScoreValue score={summary.overall_score} /></Card>
                     <Card label="评估覆盖率" value={formatPercent(summary.evaluation_coverage)} />
-                    <Card label="评估错误" value={String(summary.error_records)} />
+                    <Card label="记录错误 Record Errors" value={String(summary.error_records)} />
                     <Card label="质量门禁" accent={gateTone(qualityGate?.status ?? null)}>
                       {qualityGate ? <QualityGateBadge status={qualityGate.status} /> : <ScoreValue score={null} />}
                     </Card>
@@ -240,7 +240,11 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
                 <Section title="执行概览">
                   <div className={styles.execGrid}>
                     <div className={styles.execItem}><span className={styles.execLabel}>记录</span><span className={styles.execVal}>{summary.evaluated_records}/{summary.total_records}</span></div>
-                    <div className={styles.execItem}><span className={styles.execLabel}>评估错误</span><span className={styles.execVal}>{summary.error_records}</span></div>
+                    {/* 记录级：records that produced nothing。The metric-level count
+                        lives in the Execution Errors section as 执行错误 — the two
+                        used to both read 评估错误, so a page could show 0 here and
+                        43 there with nothing to say they measured different things. */}
+                    <div className={styles.execItem}><span className={styles.execLabel}>记录错误</span><span className={styles.execVal}>{summary.error_records}</span></div>
                     <div className={styles.execItem}><span className={styles.execLabel}>无法判定</span><span className={styles.execVal}>{undetermined.length}</span></div>
                     <div className={styles.execItem}><span className={styles.execLabel}>有效指标</span><span className={styles.execVal}>{summary.valid_metric_count}/{summary.total_enabled_metric_count}</span></div>
                     <div className={styles.execItem}>
