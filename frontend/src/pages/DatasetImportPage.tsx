@@ -14,6 +14,7 @@ import { api, endpoints, ApiError } from '../api/client';
 import type { DatasetImportOut, DatasetValidationResponse } from '../api/types';
 import { useProject } from '../context/ProjectContext';
 import { PageHeader, Panel, Tag } from '../components/primitives/Surfaces';
+import { BilingualLabel } from '../components/primitives/Bilingual';
 import { EmptyState, LoadingState } from '../components/primitives/Feedback';
 import { ErrorState } from '../components/ErrorState';
 import { ValidationReport } from '../components/dataset/ValidationReport';
@@ -132,7 +133,7 @@ export function DatasetImportPage() {
     <>
       <PageHeader
         breadcrumb={<><span>数据集</span><span>/</span><span>导入</span></>}
-        title="导入数据集"
+        title={<BilingualLabel zh="导入数据集" en="Import Dataset" />}
         subtitle={`目标项目：${activeProject.name}`}
       />
 

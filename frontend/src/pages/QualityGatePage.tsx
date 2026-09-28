@@ -115,9 +115,10 @@ function GateResult({ gate }: { gate: QualityGateResponse }) {
         {gate.reasons.length ? (
           <ul className={styles.reasons} data-testid="gate-reasons">
             {gate.reasons.map((r) => (
+              // 中文说明优先，原因码只作兜底 —— 与仪表盘同一套呈现：入口页面上挂着
+              // 一个黄色的 `QUALITY_GATE_NOT_CONFIGURED` 对用户毫无意义。
               <li key={r}>
-                <code>{r}</code>
-                <span className={styles.reasonExplain}>{REASON_EXPLAIN[r] ?? ''}</span>
+                <span className={styles.reasonExplain}>{REASON_EXPLAIN[r] ?? r}</span>
               </li>
             ))}
           </ul>

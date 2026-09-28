@@ -27,7 +27,12 @@ import { FailureAnalysisDrawer } from '../components/evaluation/FailureAnalysisD
 import type { DrawerTarget } from '../components/evaluation/FailureAnalysisDrawer';
 import type { RecommendationView } from '../components/analysis/types';
 import { formatPercent, formatTimestamp } from '../utils/format';
-import { safeReproducibility } from '../api/mappers';
+import {
+  diagnosisTextLabel,
+  evidenceSourceLabel,
+  evidenceTypeLabel,
+  safeReproducibility,
+} from '../api/mappers';
 import styles from './EvaluationDetailPage.module.css';
 
 const CATEGORY_ORDER = ['retrieval', 'generation', 'integrity'] as const;
@@ -188,7 +193,7 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
                   <Grid cols={4} gap="lg">
                     <Card label="总体质量"><ScoreValue score={summary.overall_score} /></Card>
                     <Card label="评估覆盖率" value={formatPercent(summary.evaluation_coverage)} />
-                    <Card label="记录错误 Record Errors" value={String(summary.error_records)} />
+                    <Card label="记录错误" value={String(summary.error_records)} />
                     <Card label="质量门禁" accent={gateTone(qualityGate?.status ?? null)}>
                       {qualityGate ? <QualityGateBadge status={qualityGate.status} /> : <ScoreValue score={null} />}
                     </Card>
@@ -344,7 +349,7 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
                             <SeverityBadge severity={f.severity ?? 'INFO'} />
                             <span className={`mono ${styles.diagType}`}>{f.failure_type ?? '—'}</span>
                           </div>
-                          <div className={styles.diagCause}>{f.root_cause ?? '—'}</div>
+                          <div className={styles.diagCause}>{diagnosisTextLabel(f.root_cause ?? '—')}</div>
                           <div className={styles.diagMeta}>
                             <span className="mono">{f.related_metric ?? '—'}</span>
                             <span>{f.question ?? '—'}</span>
@@ -362,8 +367,8 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
                       {undetermined.map((u) => (
                         <li key={u.diagnosis_id} className={styles.undeterminedItem} data-testid="undetermined-item">
                           <span className="mono">{u.related_metric ?? '—'}</span>
-                          <span className={styles.dim}>{u.reason ?? '—'}</span>
-                          <span className={styles.dim}>缺失证据：{u.missing_evidence.join(', ') || '—'}</span>
+                          <span className={styles.dim}>{diagnosisTextLabel(u.reason ?? '—')}</span>
+                          <span className={styles.dim}>缺失证据：{u.missing_evidence.map(evidenceTypeLabel).join('、') || '—'}</span>
                         </li>
                       ))}
                     </ul>
@@ -414,8 +419,10 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
                           <tr key={`${row.diagnosisId}-${i}`} data-testid="evidence-row">
                             <td className="mono">{row.failureType}</td>
                             <td className="mono">{row.metric}</td>
-                            <td><span className={styles.evType}>{row.item.type}</span></td>
-                            <td className={styles.dim}>{row.item.source}</td>
+                            {/* 类型 / 来源是后端标记，中文化；`locator` 保持原样 ——
+                                它是可核对的机器定位（如 answer[34:38]），翻译即失去意义。 */}
+                            <td><span className={styles.evType}>{evidenceTypeLabel(row.item.type)}</span></td>
+                            <td className={styles.dim}>{evidenceSourceLabel(row.item.source)}</td>
                             <td><code className={styles.evLocator}>{row.item.locator ?? '—'}</code></td>
                             <td className={styles.evContent}>{preview(row.item.content)}</td>
                             <td align="right">

@@ -14,7 +14,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import type { MetricReportItem, ReportResponse, RunOut, RunStatus } from '../api/types';
 import { TERMINAL_STATUSES } from '../api/types';
-import { REASON_EXPLAIN, toRunView } from '../api/mappers';
+import { diagnosisTextLabel, REASON_EXPLAIN, toRunView } from '../api/mappers';
 import { useProject } from '../context/ProjectContext';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { EChart } from '../components/charts/EChart';
@@ -204,7 +204,7 @@ function RecentDiagnoses({ report, runId }: { report: ReportResponse | null; run
                   <td><SeverityBadge severity={f.severity ?? 'INFO'} /></td>
                   <td className="mono">{f.failure_type ?? '—'}</td>
                   <td className="mono">{f.related_metric ?? '—'}</td>
-                  <td className={styles.diagQuestion}>{f.root_cause ?? f.question ?? '—'}</td>
+                  <td className={styles.diagQuestion}>{diagnosisTextLabel(f.root_cause ?? f.question ?? '—')}</td>
                 </tr>
               ))}
               {undetermined.map((u) => (
@@ -212,7 +212,7 @@ function RecentDiagnoses({ report, runId }: { report: ReportResponse | null; run
                   <td><SeverityBadge severity="INFO" /></td>
                   <td className={styles.dim}>无法判定</td>
                   <td className="mono">{u.related_metric ?? '—'}</td>
-                  <td className={styles.diagQuestion}>{u.reason ?? '—'}</td>
+                  <td className={styles.diagQuestion}>{diagnosisTextLabel(u.reason ?? '—')}</td>
                 </tr>
               ))}
             </tbody>

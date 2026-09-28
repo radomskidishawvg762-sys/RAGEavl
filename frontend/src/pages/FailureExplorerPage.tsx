@@ -13,6 +13,7 @@ import { useProject } from '../context/ProjectContext';
 import { useRunOptions } from '../hooks/useRunOptions';
 import { useEvaluationCatalog } from '../hooks/useEvaluationCatalog';
 import { PageHeader, Panel, Section } from '../components/primitives/Surfaces';
+import { BilingualLabel } from '../components/primitives/Bilingual';
 import { EmptyState, LoadingState } from '../components/primitives/Feedback';
 import { ErrorState } from '../components/ErrorState';
 import { FailureAnalysisDrawer } from '../components/evaluation/FailureAnalysisDrawer';
@@ -103,7 +104,7 @@ export function FailureExplorerPage() {
   if (!activeProject) {
     return (
       <>
-        <PageHeader title="失败浏览器" subtitle="跨指标浏览失败样本并下钻诊断。" />
+        <PageHeader title={<BilingualLabel zh="失败浏览器" en="Failure Explorer" />} subtitle="跨指标浏览失败样本并下钻诊断。" />
         <EmptyState title="请选择项目" description="失败浏览器在项目内工作：先在右上角选择项目。" icon="circle" />
       </>
     );
@@ -151,7 +152,7 @@ export function FailureExplorerPage() {
   return (
     <>
       <PageHeader
-        title="失败浏览器"
+        title={<BilingualLabel zh="失败浏览器" en="Failure Explorer" />}
         subtitle={`项目 ${activeProject.name} · 指标 → 失败 → 诊断 → 证据 → 建议`}
       />
 

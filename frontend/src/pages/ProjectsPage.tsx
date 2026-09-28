@@ -124,7 +124,7 @@ export function ProjectsPage() {
         ) : null}
       </Panel>
 
-      <Section title={`项目列表（${projects.length}）`}>
+      <Section title={<BilingualLabel zh={`项目列表（${projects.length}）`} en="Projects" />}>
         {projects.length === 0 ? (
           <EmptyState
             title="暂无项目"
@@ -197,7 +197,7 @@ function ProjectRow({
         <div className={styles.rowTitle}>
           <span className={styles.name}>{project.name}</span>
           {active ? <Tag tone="info">当前项目</Tag> : null}
-          <Tag tone={project.status === 'active' ? 'pass' : 'neutral'}>{project.status}</Tag>
+          <Tag tone={project.status === 'active' ? 'pass' : 'neutral'}>{projectStatusLabel(project.status)}</Tag>
           <Tag>{project.domain}</Tag>
         </div>
         <div className={styles.rowMeta}>
@@ -258,3 +258,13 @@ function ProjectRow({
 
 /** raw API mirror for the summary fetch (mapped via toProjectSummaryView). */
 type ProjectSummaryResponseRaw = Parameters<typeof toProjectSummaryView>[0];
+
+/** 项目状态 → 中文（后端取值 active | archived）。未收录的值原样显示，
+ *  后端加了新状态时应该显眼，而不是变成空白。 */
+function projectStatusLabel(status: string): string {
+  const known: Record<string, string> = {
+    active: '启用',
+    archived: '已归档',
+  };
+  return known[status] ?? status;
+}

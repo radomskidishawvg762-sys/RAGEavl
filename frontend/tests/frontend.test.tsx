@@ -273,8 +273,9 @@ describe('Evaluation detail', () => {
     await waitFor(() => expect(screen.getByText('质量概览')).toBeInTheDocument());
     fireEvent.click(screen.getByTestId('tab-diagnostics'));
     const item = await screen.findByTestId('undetermined-item');
-    expect(item).toHaveTextContent('comparison_type=ambiguous');
-    expect(item).toHaveTextContent('reference_evidence');
+    expect(item).toHaveTextContent('比较类型「无法判定」');
+    // 缺失证据列表也是同一批内部 token，同样走映射（原样渲染 reference_evidence）
+    expect(item).toHaveTextContent('参考证据');
   });
 
   it('9. execution error shows code and sanitized message', async () => {

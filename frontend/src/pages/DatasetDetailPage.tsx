@@ -74,7 +74,7 @@ export function DatasetDetailPage({ datasetId: datasetIdProp }: { datasetId?: st
           <>
             {active === 'overview' ? (
               <Grid cols={4} gap="lg">
-                <Card label="版本 Version" value={ds.version} />
+                <Card label="版本" value={ds.version} />
                 <Card label="记录数" value={String(ds.record_count)} />
                 <Card label="校验状态" accent={ds.validation_status === 'valid' ? 'pass' : 'error'}>
                   <Tag tone={ds.validation_status === 'valid' ? 'pass' : 'error'}>

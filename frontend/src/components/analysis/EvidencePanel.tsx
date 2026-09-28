@@ -7,6 +7,7 @@
 import { useState } from 'react';
 import type { EvidenceItem } from './types';
 import { BilingualLabel } from '../primitives/Bilingual';
+import { evidenceSourceLabel, evidenceTypeLabel } from '../../api/mappers';
 import styles from './Analysis.module.css';
 
 export function EvidencePanel({
@@ -48,9 +49,11 @@ function EvidenceRow({ item }: { item: EvidenceItem }) {
     <div className={styles.evidenceRow}>
       <div className={styles.evidenceHeader}>
         <span className={styles.evidenceType} data-testid={`evidence-${item.type}`}>
-          {item.type}
+          {evidenceTypeLabel(item.type)}
         </span>
-        <span className={styles.evidenceSource}>{item.source}</span>
+        <span className={styles.evidenceSource}>{evidenceSourceLabel(item.source)}</span>
+        {/* locator 原样渲染：它是可核对的机器定位（如 answer[34:38]），
+            翻译成中文就不再是一个能定位到原文的指针。 */}
         {item.locator ? <code className={styles.evidenceLocator}>{item.locator}</code> : null}
         {long ? (
           <button

@@ -176,7 +176,7 @@ describe('ComparePage', () => {
     fireEvent.click(screen.getByTestId('compare-submit'));
 
     expect(await screen.findByTestId('blocked-note')).toBeInTheDocument();
-    expect(screen.getByTestId('comparability-reasons')).toHaveTextContent('enabled metrics differ');
+    expect(screen.getByTestId('comparability-reasons')).toHaveTextContent('启用指标不同（仅基线：faithfulness；仅候选：context_recall）');
     expect(screen.queryByTestId('comparison-table')).not.toBeInTheDocument();
   });
 });
@@ -226,7 +226,7 @@ describe('QualityGatePage', () => {
     fireEvent.click(screen.getByTestId('gate-submit'));
 
     expect(await screen.findByTestId('gate-status')).toBeInTheDocument();
-    expect(screen.getByTestId('gate-reasons')).toHaveTextContent('QUALITY_THRESHOLD_FAILED');
+    expect(screen.getByTestId('gate-reasons')).not.toHaveTextContent('QUALITY_THRESHOLD_FAILED');
     // the reason explanation distinguishes threshold-fail from not-evaluable
     expect(screen.getByTestId('gate-reasons')).toHaveTextContent('低于配置阈值');
     expect(screen.getByTestId('gate-numerical_consistency')).toBeInTheDocument();

@@ -36,7 +36,7 @@ export function RecordExplorer({
               <thead>
                 <tr>
                   <th align="left">行号</th>
-                  <th align="left">问题 Question</th>
+                  <th align="left">问题</th>
                   <th align="left">参考答案</th>
                   <th align="left">参考上下文</th>
                   <th align="left">操作</th>

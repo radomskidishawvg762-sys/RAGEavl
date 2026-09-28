@@ -11,6 +11,7 @@ import { useEvaluations } from '../hooks/useEvaluations';
 import type { RunSort } from '../hooks/useEvaluations';
 import type { RunStatus } from '../api/types';
 import { PageHeader, Panel } from '../components/primitives/Surfaces';
+import { BilingualLabel } from '../components/primitives/Bilingual';
 import { EmptyState, LoadingState } from '../components/primitives/Feedback';
 import { ErrorState } from '../components/ErrorState';
 import { ScoreValue } from '../components/ScoreValue';
@@ -68,7 +69,7 @@ export function EvaluationListPage() {
     <>
       <PageHeader
         breadcrumb={<><span>评估</span><span>/</span><span>运行</span></>}
-        title="评估运行"
+        title={<BilingualLabel zh="评估运行" en="Evaluations" />}
         subtitle={`${activeProject.name} · 共 ${list.total} 次运行`}
         actions={
           <Link className={styles.linkBtn} to="/evaluations/new">

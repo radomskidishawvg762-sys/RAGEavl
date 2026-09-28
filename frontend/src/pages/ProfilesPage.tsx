@@ -34,6 +34,7 @@ import { useProject } from '../context/ProjectContext';
 import { useEvaluationCatalog } from '../hooks/useEvaluationCatalog';
 import { useProjectConfigs } from '../hooks/useProjectConfigs';
 import { PageHeader, Panel, Tag } from '../components/primitives/Surfaces';
+import { BilingualLabel } from '../components/primitives/Bilingual';
 import { Tabs } from '../components/primitives/Tabs';
 import { EmptyState, LoadingState } from '../components/primitives/Feedback';
 import { ErrorState } from '../components/ErrorState';
@@ -58,7 +59,7 @@ export function ProfilesPage() {
   if (!activeProject) {
     return (
       <>
-        <PageHeader title="配置" subtitle="配置按项目隔离。" />
+        <PageHeader title={<BilingualLabel zh="配置" en="Configuration" />} subtitle="配置按项目隔离。" />
         <EmptyState title="请选择项目" description="配置按项目隔离管理，请先选择项目。" icon="circle" />
       </>
     );
@@ -75,7 +76,7 @@ export function ProfilesPage() {
   return (
     <>
       <PageHeader
-        title="配置"
+        title={<BilingualLabel zh="配置" en="Configuration" />}
         subtitle={`项目 ${activeProject.name} · 分层合并：系统 → 领域 → 评估配置 → 运行覆盖 → 生效值 → 快照。旧版本不可变：变更只能通过创建新版本。`}
       />
 
@@ -173,7 +174,7 @@ function ProfilesTab({
         <table className={styles.configTable} data-testid="config-table">
           <thead>
             <tr>
-              <th>配置 Profile</th>
+              <th>配置</th>
               <th>领域</th>
               <th>版本</th>
               <th>状态</th>

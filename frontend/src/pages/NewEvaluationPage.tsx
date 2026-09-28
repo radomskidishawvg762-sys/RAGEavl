@@ -14,7 +14,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, endpoints, humanizeError } from '../api/client';
-import { DIRECTION_LABEL } from '../api/mappers';
+import { DIRECTION_LABEL, judgeFieldLabel } from '../api/mappers';
 import { presentCategory } from '../status/status';
 import type {
   ConfigDetailResponse,
@@ -30,6 +30,7 @@ import { useDatasets } from '../hooks/useDatasets';
 import { useEvaluationCatalog } from '../hooks/useEvaluationCatalog';
 import { useProjectConfigs } from '../hooks/useProjectConfigs';
 import { PageHeader, Panel, Tag } from '../components/primitives/Surfaces';
+import { BilingualLabel } from '../components/primitives/Bilingual';
 import { EmptyState, LoadingState } from '../components/primitives/Feedback';
 import { ErrorState } from '../components/ErrorState';
 import styles from './NewEvaluationPage.module.css';
@@ -131,7 +132,7 @@ export function NewEvaluationPage() {
     <>
       <PageHeader
         breadcrumb={<><span>评估</span><span>/</span><span>新建评估</span></>}
-        title="新建评估"
+        title={<BilingualLabel zh="新建评估" en="New Evaluation" />}
         subtitle={`项目 ${activeProject.name} · 五步向导`}
       />
 
@@ -382,15 +383,9 @@ function diagnosisReviewText(profile: ProfileView | null): string {
 function judgeReviewText(profile: ProfileView | null): string {
   const j = profile?.judge;
   if (!j) return '未配置（依赖 Judge 的指标会标记为未配置，不会静默跳过）';
-  const parts = [
-    `provider ${j.provider ?? '—'}`,
-    `model ${j.model ?? '—'}`,
-    `temperature ${j.temperature ?? '—'}`,
-    `max_tokens ${j.max_tokens ?? '—'}`,
-    `timeout ${j.timeout ?? '—'}`,
-    `retry ${j.retry ?? '—'}`,
-  ];
-  return parts.join(' · ');
+  // 标签与 Settings 表单同源（judgeFieldLabel），两处不会各写一套而漂移。
+  const fields = ['provider', 'model', 'temperature', 'max_tokens', 'timeout', 'retry'] as const;
+  return fields.map((key) => `${judgeFieldLabel(key)}：${j[key] ?? '—'}`).join(' · ');
 }
 
 /** stored imported 版本 → ProfileView（仅映射展示字段，不派生任何配置值）。 */

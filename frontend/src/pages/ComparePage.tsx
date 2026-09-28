@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { api, endpoints } from '../api/client';
 import type { ComparisonResponse, MetricExecutionStatus } from '../api/types';
+import { comparisonReasonLabel } from '../api/mappers';
 import { useProject } from '../context/ProjectContext';
 import { useRunOptions } from '../hooks/useRunOptions';
 import { PageHeader, Panel, Section } from '../components/primitives/Surfaces';
@@ -127,8 +128,9 @@ function ComparisonResult({ result }: { result: ComparisonResponse }) {
         </div>
         {result.comparability.reasons.length ? (
           <ul className={styles.reasons} data-testid="comparability-reasons">
+            {/* 后端给的是英文句子（不是术语），整句中文化；认不出的串原样显示。 */}
             {result.comparability.reasons.map((r, i) => (
-              <li key={i}>{r}</li>
+              <li key={i}>{comparisonReasonLabel(r)}</li>
             ))}
           </ul>
         ) : null}
@@ -161,7 +163,7 @@ function ComparisonResult({ result }: { result: ComparisonResponse }) {
             )}
           </div>
           {result.overall.comparable ? null : (
-            <div className={styles.overallReason}>{result.overall.reason ?? '不可比'}</div>
+            <div className={styles.overallReason}>{comparisonReasonLabel(result.overall.reason) || '不可比'}</div>
           )}
         </div>
       </Section>

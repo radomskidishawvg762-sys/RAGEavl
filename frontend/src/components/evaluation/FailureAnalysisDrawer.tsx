@@ -17,6 +17,7 @@ import { SeverityBadge } from '../../status/StatusBadge';
 import { MetricStatusBadge } from '../../status/StatusBadge';
 import { ScoreValue } from '../ScoreValue';
 import { BilingualLabel } from '../primitives/Bilingual';
+import { diagnosisTextLabel, evidenceTypeLabel } from '../../api/mappers';
 import styles from './FailureAnalysisDrawer.module.css';
 
 export interface DrawerTarget {
@@ -99,7 +100,7 @@ export function FailureAnalysisDrawer({
                  <Field label={<BilingualLabel zh="参考答案" en="Reference Answer" />}>
                   <Text value={detail.detail.referenceAnswer ?? '—'} mono />
                 </Field>
-                 <Field label={<BilingualLabel zh={`检索上下文（${detail.detail.contexts.length}）`} en={`Retrieved Contexts (${detail.detail.contexts.length})`} />}>
+                 <Field label={<BilingualLabel zh={`检索上下文（${detail.detail.contexts.length}）`} />}>
                   {detail.detail.contexts.length ? (
                     <ol className={styles.contextList}>
                       {detail.detail.contexts.map((c, i) => (
@@ -110,7 +111,7 @@ export function FailureAnalysisDrawer({
                     <span className={styles.emptyNote}>（无检索上下文）</span>
                   )}
                 </Field>
-                 <Field label={<BilingualLabel zh={`参考上下文（${detail.detail.referenceContexts?.length ?? 0}）`} en={`Reference Contexts (${detail.detail.referenceContexts?.length ?? 0})`} />}>
+                 <Field label={<BilingualLabel zh={`参考上下文（${detail.detail.referenceContexts?.length ?? 0}）`} />}>
                   {detail.detail.referenceContexts?.length ? (
                     <ol className={styles.contextList}>
                       {detail.detail.referenceContexts.map((c, i) => (
@@ -170,14 +171,14 @@ export function FailureAnalysisDrawer({
             {undetermined && diagnosis?.detail ? (
               <div className={styles.undeterminedBox}>
                 <div className={styles.label}>原因</div>
-                <div>{diagnosis.detail.reason ?? '—'}</div>
+                <div>{diagnosisTextLabel(diagnosis.detail.reason ?? '—')}</div>
                 <div className={styles.label}>缺失证据</div>
-                <div>{diagnosis.detail.missing_evidence?.join('、') || '—'}</div>
+                <div>{diagnosis.detail.missing_evidence?.map(evidenceTypeLabel).join('、') || '—'}</div>
               </div>
             ) : null}
             <div className={styles.rootCause}>
               <div className={styles.label}>根因 Root Cause</div>
-              <div className={styles.rootCauseText}>{diagnosis?.root_cause ?? '—（未判定，前端不猜测）'}</div>
+              <div className={styles.rootCauseText}>{diagnosisTextLabel(diagnosis?.root_cause ?? '—（未判定，前端不猜测）')}</div>
             </div>
             <Field label="置信度">{diagnosis?.confidence ?? '—'}</Field>
           </Section>

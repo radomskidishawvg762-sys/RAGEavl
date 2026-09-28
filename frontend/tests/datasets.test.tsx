@@ -112,7 +112,7 @@ describe('数据集详情', () => {
     stubFetch(handler);
     await renderWithProject(<DatasetDetailPage datasetId="ds-1111" />);
     // Overview Tab（默认）：元数据卡片
-    await waitFor(() => expect(screen.getByText('版本 Version')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('版本')).toBeInTheDocument());
     // Validation Tab：校验报告
     fireEvent.click(screen.getByTestId('tab-validation'));
     expect(screen.getByTestId('validation-summary')).toBeInTheDocument();

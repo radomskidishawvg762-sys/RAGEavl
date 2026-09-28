@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { api, endpoints } from '../api/client';
 import type { RegressionResponse } from '../api/types';
+import { comparisonReasonLabel } from '../api/mappers';
 import { useProject } from '../context/ProjectContext';
 import { useRunOptions } from '../hooks/useRunOptions';
 import { PageHeader, Panel, Section } from '../components/primitives/Surfaces';
@@ -120,7 +121,7 @@ function RegressionResult({ result }: { result: RegressionResponse }) {
             <SeverityBadge severity="WARNING" />
             <span>
               检测到指标间存在权衡（由后端判定）。
-              {result.overall.reason ? ` ${result.overall.reason}` : ''}
+              {result.overall.reason ? ` ${comparisonReasonLabel(result.overall.reason)}` : ''}
             </span>
           </div>
         </Panel>
@@ -134,7 +135,7 @@ function RegressionResult({ result }: { result: RegressionResponse }) {
               总分变化（辅助信息）：<span className="mono">{result.overall.overall_score_delta > 0 ? '+' : ''}{result.overall.overall_score_delta.toFixed(4)}</span>
             </span>
           ) : null}
-          {result.overall.reason ? <span className={styles.dim}>{result.overall.reason}</span> : null}
+          {result.overall.reason ? <span className={styles.dim}>{comparisonReasonLabel(result.overall.reason)}</span> : null}
         </div>
       </Panel>
 

@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { api, endpoints } from '../api/client';
 import type { HealthResponse, JudgeSettings } from '../api/types';
+import { judgeFieldLabel } from '../api/mappers';
 import { PageHeader, Panel, Section, Tag } from '../components/primitives/Surfaces';
 import { LoadingState } from '../components/primitives/Feedback';
 import { ErrorState } from '../components/ErrorState';
@@ -73,7 +74,7 @@ export function SettingsPage() {
                 <tbody>
                   <tr>
                     <td>运行环境</td>
-                    <td><Tag tone="info">{import.meta.env.MODE}</Tag></td>
+                    <td><Tag tone="info">{envModeLabel(import.meta.env.MODE)}</Tag></td>
                   </tr>
                   <tr>
                     <td>API 地址</td>
@@ -125,7 +126,7 @@ export function SettingsPage() {
             </Panel>
           </Section>
 
-          <Section title="3. Judge（LLM 评审）">
+          <Section title="3. LLM 评审（Judge）">
             {judgeForm ? (
               <JudgeSettingsPanel
                 value={judgeForm}
@@ -291,10 +292,10 @@ function JudgeSettingsPanel({
       </div>
       <div className={styles.formGrid} data-testid="judge-settings-form">
         {([
-          ['provider', '服务商 Provider'],
-          ['model', '模型 Model'],
-          ['model_version', '模型版本 Model Version'],
-          ['base_url', '接入地址 Base URL'],
+          ['provider', judgeFieldLabel('provider')],
+          ['model', judgeFieldLabel('model')],
+          ['model_version', judgeFieldLabel('model_version')],
+          ['base_url', judgeFieldLabel('base_url')],
         ] as const).map(([key, label]) => (
           <label key={key} className={styles.formField}>
             <span>{label}</span>
@@ -302,10 +303,10 @@ function JudgeSettingsPanel({
           </label>
         ))}
         {([
-          ['temperature', '采样温度 Temperature'],
-          ['max_tokens', '最大生成长度 Max Tokens'],
-          ['timeout', '超时（秒）'],
-          ['retry', '重试次数'],
+          ['temperature', judgeFieldLabel('temperature')],
+          ['max_tokens', judgeFieldLabel('max_tokens')],
+          ['timeout', judgeFieldLabel('timeout')],
+          ['retry', judgeFieldLabel('retry')],
         ] as const).map(([key, label]) => (
           <label key={key} className={styles.formField}>
             <span>{label}</span>
@@ -370,4 +371,17 @@ function judgeSourceLabel(source: string): string {
     environment: '环境变量',
   };
   return known[source] ?? source;
+}
+
+/** `import.meta.env.MODE` → 中文。渲染裸 `development` 等于把构建产物模式
+ *  摆给用户看；未收录的模式原样显示，不猜。 */
+function envModeLabel(mode: string): string {
+  const known: Record<string, string> = {
+    development: '开发',
+    dev: '开发',
+    test: '测试',
+    demo: '演示',
+    production: '生产',
+  };
+  return known[mode] ?? mode;
 }
