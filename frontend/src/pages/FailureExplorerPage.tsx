@@ -41,14 +41,14 @@ export function FailureExplorerPage() {
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<unknown>(null);
   const [diagnoses, setDiagnoses] = useState<DiagnosesPageResponse['items']>([]);
-  const [failureResults, setFailureResults] = useState<ResultsPageResponse['items']>([]);
+  const [runResults, setRunResults] = useState<ResultsPageResponse['items']>([]);
   const [recommendations, setRecommendations] = useState<FailureExplorerRecommendation[]>([]);
   const [selected, setSelected] = useState<DrawerTarget | null>(null);
 
   const load = useCallback(async () => {
     if (!runId) {
       setDiagnoses([]);
-      setFailureResults([]);
+      setRunResults([]);
       setRecommendations([]);
       return;
     }
@@ -67,19 +67,25 @@ export function FailureExplorerPage() {
           },
         ),
         fetchAllPages<ResultsPageResponse['items'][number]>(
-          (p, ps) => `/api/evaluations/${runId}/results?page=${p}&page_size=${ps}&is_failure=true`,
+          // NOT filtered to is_failure=true: the table shows every diagnosis, and
+          // an `undetermined` one points at a result with is_failure=false. The
+          // filter therefore left 65 of 80 rows with a blank Question cell even
+          // though the question exists. Results are one row per RECORD (not per
+          // metric), so the full list is the same order of magnitude as the
+          // diagnoses already fetched above.
+          (p, ps) => `/api/evaluations/${runId}/results?page=${p}&page_size=${ps}`,
         ),
       ]);
       const recs = await api.get<RecommendationsResponse>(
         `/api/evaluations/${runId}/recommendations`,
       );
       setDiagnoses(dia);
-      setFailureResults(res);
+      setRunResults(res);
       setRecommendations(recs.items as FailureExplorerRecommendation[]);
     } catch (e) {
       setFetchError(e);
       setDiagnoses([]);
-      setFailureResults([]);
+      setRunResults([]);
     } finally {
       setLoading(false);
     }
@@ -101,7 +107,7 @@ export function FailureExplorerPage() {
   if (state === 'error') return <ErrorState error={error} onRetry={() => void 0} />;
 
   const terminal = runs.filter((r) => !['pending', 'running'].includes(r.status));
-  const questionByResult = new Map(failureResults.map((r) => [r.id, r.question]));
+  const questionByResult = new Map(runResults.map((r) => [r.id, r.question]));
 
   // 展示层过滤选项（来自当前 Run 的诊断数据，非业务计算）
   const metricOptions = Array.from(

@@ -16,7 +16,6 @@ import { EmptyState, LoadingState } from '../components/primitives/Feedback';
 import { ErrorState } from '../components/ErrorState';
 import { ScoreValue } from '../components/ScoreValue';
 import { ComparabilityBadge } from '../status/StatusBadge';
-import { presentComparability } from '../status/status';
 import { formatPercent } from '../utils/format';
 import styles from './ComparePage.module.css';
 
@@ -116,7 +115,6 @@ export function ComparePage() {
 }
 
 function ComparisonResult({ result }: { result: ComparisonResponse }) {
-  const cmp = presentComparability(result.comparability.status);
   return (
     <>
       <Panel
@@ -125,7 +123,6 @@ function ComparisonResult({ result }: { result: ComparisonResponse }) {
       >
         <div className={styles.banner} data-testid="comparability-banner">
           <ComparabilityBadge status={result.comparability.status} />
-          <span className={styles.bannerText}>{cmp.label}</span>
         </div>
         {result.comparability.reasons.length ? (
           <ul className={styles.reasons} data-testid="comparability-reasons">
@@ -153,7 +150,14 @@ function ComparisonResult({ result }: { result: ComparisonResponse }) {
           </div>
           <div className={styles.overallCell}>
             <span className={styles.cellLabel}>Delta</span>
-            <DeltaValue delta={result.overall.delta} />
+            {/* What is unavailable is the DELTA, not the two scores beside it —
+                rendering ScoreValue's "暂无有效分数" here implied those were
+                invalid, which they are not. */}
+            {result.overall.comparable ? (
+              <DeltaValue delta={result.overall.delta} />
+            ) : (
+              <span>不可比</span>
+            )}
           </div>
           {result.overall.comparable ? null : (
             <div className={styles.overallReason}>{result.overall.reason ?? '不可比'}</div>
