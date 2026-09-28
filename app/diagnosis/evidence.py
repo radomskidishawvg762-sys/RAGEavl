@@ -40,6 +40,20 @@ class InsufficientEvidenceError(Exception):
         super().__init__(f"evidence contract unmet, missing: {missing}")
 
 
+def _answer_locator(answer: str, claim: str, index: int) -> str:
+    """`answer_claim` 的定位：片段在答案原文中的字符区间。
+
+    只在片段**唯一出现**时给出区间。出现多次时无法确定被比较的是哪一个，
+    此时猜一个「看起来权威但可能指错地方」的定位，比老实说「第 N 条声明」更坏
+    —— 证据的意义就在于能被核对。片段找不到（来自归一化改写而非原文）同样退回序号。
+    """
+    if claim and answer:
+        start = answer.find(claim)
+        if start != -1 and answer.find(claim, start + 1) == -1:
+            return f"answer[{start}:{start + len(claim)}]"
+    return f"claim[{index}]"
+
+
 class EvidenceCollector:
     """Collects Layer-1 evidence for integrity diagnoses from the record and
     Layer-2 facts from the ComparisonBasis. Pure — no mutation, no ORM."""
@@ -72,7 +86,7 @@ class EvidenceCollector:
                 Evidence(
                     type="answer_claim",
                     source="answer",
-                    locator="claim[0]",
+                    locator=_answer_locator(record.answer, claim_content, 0),
                     content=claim_content,
                     metadata=claim_meta,
                 )
