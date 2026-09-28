@@ -155,12 +155,22 @@ function RegressionResult({ result }: { result: RegressionResponse }) {
               <div key={cat} className={styles.categoryCard} data-testid={`regression-category-${cat}`}>
                 <div className={styles.categoryTitle}>{label}</div>
                 <RegressionBadge verdict={c.verdict} />
-                <div className={styles.categoryCounts}>
-                  <span>改进 {c.improvement_count}</span>
-                  <span>回归 {c.regression_count}</span>
-                  <span>稳定 {c.stable_count}</span>
-                  <span className={styles.dim}>可比 {c.comparable_count}</span>
-                </div>
+                {/* NOT_COMPARABLE means nothing was MEASURED, so every count is 0 —
+                    rendering "改进 0 回归 0 稳定 0" next to that badge reads as
+                    "nothing changed", which is the opposite of "nothing was
+                    compared". Same hazard as showing 0 where a value is absent. */}
+                {c.verdict === 'NOT_COMPARABLE' ? (
+                  <div className={styles.categoryCounts}>
+                    <span className={styles.dim}>测量未执行</span>
+                  </div>
+                ) : (
+                  <div className={styles.categoryCounts}>
+                    <span>改进 {c.improvement_count}</span>
+                    <span>回归 {c.regression_count}</span>
+                    <span>稳定 {c.stable_count}</span>
+                    <span className={styles.dim}>可比 {c.comparable_count}</span>
+                  </div>
+                )}
               </div>
             );
           })}
