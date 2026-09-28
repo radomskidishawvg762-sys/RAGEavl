@@ -178,7 +178,15 @@ def test_import_duplicate_skip_policy_dedupes() -> None:
     ])
     resp = c.post("/api/projects/p1/datasets:import", content=payload)
     assert resp.status_code == 201
-    assert fd.inserted_records[resp.json()["id"]] == 2  # later duplicate dropped
+    ds_id = resp.json()["id"]
+    assert fd.inserted_records[ds_id] == 2  # later duplicate dropped
+    # …and the recorded COUNT must describe what was stored, not what was parsed.
+    # This assertion was the gap: the rows were deduplicated correctly while
+    # record_count still said 3, so the dataset list showed "3 条记录" above a
+    # 2-row table, and a run created on it started with total_records=3 until the
+    # runner corrected it.
+    recorded = next(d for d in fd.datasets if d.id == ds_id)
+    assert recorded.record_count == 2
 
 
 def test_import_project_not_found_404() -> None:
