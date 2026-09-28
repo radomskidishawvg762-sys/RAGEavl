@@ -36,12 +36,12 @@ import styles from './NewEvaluationPage.module.css';
 const STEPS: Array<[number, string]> = [
   [1, '选择数据集'],
   [2, '评估配置'],
-  [3, '指标（Run Configuration）'],
+  [3, '指标覆盖'],
   [4, 'RAG 输入'],
   [5, '确认并启动'],
 ];
 
-/** Run 级指标覆盖：字段缺省 = 保留 Profile 值；threshold null = 本次运行无 PASS/FAIL。 */
+/** 运行级指标覆盖：字段缺省 = 保留 Profile 值；threshold null = 本次运行无 PASS/FAIL。 */
 interface MetricOverrideState {
   enabled?: boolean;
   threshold?: number | null;
@@ -217,11 +217,11 @@ export function NewEvaluationPage() {
           </Panel>
         )}
 
-        {/* Step 3: 指标（Run Configuration，G4 metric_overrides） */}
+        {/* Step 3: 指标（本次运行覆盖） */}
         {step === 3 && profile && (
-          <Panel title="指标（Run Configuration）">
+          <Panel title="指标覆盖">
             <div className={styles.gapHint} data-testid="metric-config-note">
-              这是 Run Configuration：仅对本次运行生效，不修改原 Profile（只读）。
+              这是本次运行的指标配置：仅对本次运行生效，不修改原配置 Profile（只读）。
               未修改的字段保留 Profile 值；阈值清空 = 本次运行无 PASS/FAIL 判定。
             </div>
             <MetricEditor
@@ -266,13 +266,13 @@ export function NewEvaluationPage() {
               />
               <ReviewRow label="评估配置" value={`${profile.name}（${profile.version || '—'} · ${profile.domain}）`} />
               <ReviewRow
-                label="Config Version"
+                label="配置指纹"
                 value={storedConfigVersion
                   ? <code className="mono" title={storedConfigVersion}>{storedConfigVersion.slice(0, 16)}…</code>
-                  : 'Run 创建时计算（sha256，写入 Run Snapshot）'}
+                  : '运行创建时计算（内容哈希，写入运行快照）'}
               />
               <ReviewRow
-                label="Pipeline"
+                label="执行流水线"
                 value={pipelineReviewText(profile)}
               />
               <ReviewRow
@@ -281,15 +281,15 @@ export function NewEvaluationPage() {
               />
               <ReviewRow
                 label="质量门禁"
-                value={profile.qualityGate ? JSON.stringify(profile.qualityGate) : '未配置（quality_gate: null）'}
+                value={profile.qualityGate ? JSON.stringify(profile.qualityGate) : '未配置'}
                 muted={!profile.qualityGate}
               />
               <ReviewRow label="RAG 输入" value={ragInputLabel(profile)} />
               <ReviewRow
-                label="Diagnosis"
+                label="诊断"
                 value={diagnosisReviewText(profile)}
               />
-              <ReviewRow label="Judge（公共字段，secret 不出后端）" value={judgeReviewText(profile)} />
+              <ReviewRow label="Judge（公共字段）" value={judgeReviewText(profile)} />
             </div>
 
             {launchError ? (
@@ -356,8 +356,8 @@ function effectiveEnabled(profile: ProfileView, name: string, overrides: Overrid
 }
 
 function ragInputLabel(profile: ProfileView | null): string {
-  if (!profile?.ragInput?.url) return 'Golden Replay（测试回放，非生产 RAG）';
-  const mode = profile.ragInput.mode === 'http' || profile.ragInput.url ? 'HTTP' : 'Golden Replay';
+  if (!profile?.ragInput?.url) return '金标回放（测试回放，非生产 RAG）';
+  const mode = profile.ragInput.mode === 'http' || profile.ragInput.url ? 'HTTP' : '金标回放';
   return `${mode} · ${profile.ragInput.url}（超时 ${profile.ragInput.timeout ?? '—'}s / 重试 ${profile.ragInput.retry ?? '—'}）`;
 }
 
@@ -365,7 +365,7 @@ function pipelineReviewText(profile: ProfileView | null): string {
   const pipe = profile?.pipeline as { engines?: unknown; diagnosis?: { enabled?: boolean } } | null;
   const engines = Array.isArray(pipe?.engines) && pipe.engines.length
     ? pipe.engines.join('、')
-    : '由启用指标推导（注册表 spec.engine）';
+    : '由启用指标推导';
   return `引擎：${engines}`;
 }
 
@@ -375,12 +375,12 @@ function diagnosisReviewText(profile: ProfileView | null): string {
   const legacy = (profile as unknown as { diagnosisEnabled?: boolean } | null)?.diagnosisEnabled;
   const enabled = diag ?? legacy ?? true; // 与后端 resolve_effective_pipeline 默认一致
   const severities = Object.keys(profile?.severityMapping ?? {}).length;
-  return `${enabled ? '执行' : '跳过（diagnosis.enabled=false）'} · severity_mapping ${severities} 类`;
+  return `${enabled ? '执行' : '跳过（配置中已关闭诊断）'} · 严重度映射 ${severities} 类`;
 }
 
 function judgeReviewText(profile: ProfileView | null): string {
   const j = profile?.judge;
-  if (!j) return '未配置（Judge 指标将标记 BIZ_JUDGE_NOT_CONFIGURED，不会静默跳过）';
+  if (!j) return '未配置（依赖 Judge 的指标会标记为未配置，不会静默跳过）';
   const parts = [
     `provider ${j.provider ?? '—'}`,
     `model ${j.model ?? '—'}`,
@@ -425,18 +425,18 @@ function StoredVersionPicker({
   onSelect: (row: ConfigSummaryView) => void | Promise<void>;
 }) {
   const imported = configs.items.filter((c) => c.source === 'imported');
-  if (configs.loading) return <div className={styles.gapHint}>正在加载已导入的 Profile 版本…</div>;
+  if (configs.loading) return <div className={styles.gapHint}>正在加载已导入的配置版本…</div>;
   if (imported.length === 0) {
     return (
       <div className={styles.gapHint} data-testid="stored-versions-empty">
-        该项目还没有导入的 Profile 版本。可在 Configuration → Import YAML 导入；
-        下方为部署 Profile（只读 YAML，走指针保存链路）。
+        该项目还没有导入的配置版本。可在「配置」页的「导入 YAML」中导入；
+        下方为部署配置（只读 YAML）。
       </div>
     );
   }
   return (
     <>
-      <div className={styles.gapHint}>已导入的 Profile 版本（不可变，选择后直接使用其 config_id）：</div>
+      <div className={styles.gapHint}>已导入的配置版本（不可变，选择后直接使用该版本）：</div>
       <div className={styles.datasetList}>
         {imported.map((row) => (
           <button
@@ -451,7 +451,7 @@ function StoredVersionPicker({
             </div>
             <div className={styles.datasetMeta}>
               <span className="mono">{row.configVersion.slice(0, 8)}</span>
-              <Tag tone="pass">PUBLISHED</Tag>
+              <Tag tone="pass">已发布</Tag>
             </div>
           </button>
         ))}
@@ -474,7 +474,7 @@ function StepTwoCatalog({
   if (catalog.loading) return <LoadingState label="正在加载评估配置…" />;
   if (catalog.error) return <ErrorState error={catalog.error} onRetry={catalog.reload} />;
   if (catalog.profiles.length === 0) {
-    return <EmptyState title="暂无评估配置" description="后端 config/evaluations 下没有可用 Profile。" icon="circle" />;
+    return <EmptyState title="暂无评估配置" description="没有可用的评估配置。" icon="circle" />;
   }
   return (
     <div className={styles.datasetList}>
@@ -546,9 +546,9 @@ function MetricEditor({
         <span className={[styles.metricCell, styles.metricHead].join(' ')}>类别</span>
         <span className={[styles.metricCell, styles.metricHead].join(' ')}>方向 / 版本</span>
         <span className={[styles.metricCell, styles.metricHead].join(' ')}>启用</span>
-        <span className={[styles.metricCell, styles.metricHead].join(' ')}>Profile Default</span>
-        <span className={[styles.metricCell, styles.metricHead].join(' ')}>Run Override</span>
-        <span className={[styles.metricCell, styles.metricHead].join(' ')}>Effective</span>
+        <span className={[styles.metricCell, styles.metricHead].join(' ')}>配置默认值</span>
+        <span className={[styles.metricCell, styles.metricHead].join(' ')}>本次运行覆盖</span>
+        <span className={[styles.metricCell, styles.metricHead].join(' ')}>生效值</span>
         <span className={[styles.metricCell, styles.metricHead].join(' ')}>状态</span>
       </div>
       {profile.metrics.map((m) => {
@@ -626,8 +626,8 @@ function MetricEditor({
         );
       })}
       <p className={styles.gapDesc}>
-        Profile Default 来自所选 Profile（只读）；Run Override 仅对本次运行生效（G4），
-        留空的字段保留 Profile 值；Effective = 本次运行实际生效值。原 Profile YAML 永不被修改。
+        「配置默认值」来自所选配置 Profile（只读）；「本次运行覆盖」仅对本次运行生效，
+        留空的字段保留 Profile 值；「生效值」= 本次运行实际生效值。原配置 YAML 永不被修改。
       </p>
     </div>
   );
@@ -638,11 +638,11 @@ function RagReview({ profile }: { profile: ProfileView }) {
   if (!rag?.url) {
     return (
       <div className={styles.gapHint} data-testid="rag-not-configured">
-        <strong>Golden Metadata Replay（测试回放）</strong>：未配置 RAG Endpoint。
+        <strong>金标元数据回放（测试回放）</strong>：未配置 RAG Endpoint。
         评估将以样本 metadata 中的 answer / contexts 作为输入 —— 仅适用于
-        GoldenRunMetadataAdapter 测试回放，<strong>不是生产 RAG</strong>。
+        测试回放，<strong>不是生产 RAG</strong>。
         <br />
-        Run 级 RAG 输入配置需后端支持（当前由部署配置 system.yaml 决定）—— Backend Gap，如实标注。
+        运行级 RAG 输入配置需后端支持（当前由部署配置 system.yaml 决定）。
       </div>
     );
   }
@@ -651,9 +651,9 @@ function RagReview({ profile }: { profile: ProfileView }) {
       <div className={styles.gapHint} data-testid="rag-http-configured">
         <strong>HTTP Endpoint（生产路径）</strong>：评估将通过 POST 调用该 RAG Endpoint 获取 answer / contexts。
         <br />
-        Run 级 RAG 输入配置需后端支持（当前由部署配置 system.yaml 决定）—— Backend Gap，如实标注。
+        运行级 RAG 输入配置需后端支持（当前由部署配置 system.yaml 决定）。
       </div>
-      <ReviewRow label="RAG Endpoint" value={rag.url} />
+      <ReviewRow label="RAG 接入地址" value={rag.url} />
       <ReviewRow label="超时" value={`${rag.timeout ?? '—'} s`} />
       <ReviewRow label="重试" value={`${rag.retry ?? '—'}`} />
     </div>

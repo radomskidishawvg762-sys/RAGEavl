@@ -52,7 +52,7 @@ export function QualityGatePage() {
   if (!activeProject) {
     return (
       <>
-        <PageHeader title="质量门禁 Quality Gate" subtitle="单次 Run 的绝对质量标准判定。" />
+        <PageHeader title="质量门禁 Quality Gate" subtitle="单次运行的绝对质量标准判定。" />
         <EmptyState title="请选择项目" description="门禁评估在项目内进行：先在右上角选择项目。" icon="circle" />
       </>
     );
@@ -66,15 +66,15 @@ export function QualityGatePage() {
     <>
       <PageHeader
         title="质量门禁 Quality Gate"
-        subtitle={`项目 ${activeProject.name} · 判定来自 Profile 的 quality_gate 配置（平台不内置任何默认阈值）`}
+        subtitle={`项目 ${activeProject.name} · 判定来自配置 Profile 的质量门禁设置（平台不内置任何默认阈值）`}
       />
 
-      <Panel title="选择 Run" accent="info">
+      <Panel title="选择运行" accent="info">
         <div className={styles.selectors}>
           <label className={styles.field}>
-            <span>Run</span>
+            <span>运行</span>
             <select value={runId} onChange={(e) => setRunId(e.target.value)} data-testid="gate-run-select">
-              <option value="">— 选择 Run —</option>
+              <option value="">— 选择运行 —</option>
               {terminal.map((r) => (
                 <option key={r.runId} value={r.runId}>{r.label}</option>
               ))}
@@ -164,7 +164,7 @@ function GateResult({ gate }: { gate: QualityGateResponse }) {
           </Panel>
         )}
         <p className={styles.hint}>
-          「无法评估」表示必需指标没有有效分数（score=null），与「有分数但低于阈值」是两类不同原因；覆盖率等执行信息见评估工作台。
+          「无法评估」表示必需指标没有有效分数（分数为空），与「有分数但低于阈值」是两类不同原因；覆盖率等执行信息见评估工作台。
         </p>
       </Section>
     </>

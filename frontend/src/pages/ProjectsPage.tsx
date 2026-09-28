@@ -80,7 +80,7 @@ export function ProjectsPage() {
     <>
       <PageHeader
          title={<BilingualLabel zh="项目" en="Projects" />}
-        subtitle="Project 是整个 Workspace 的一级上下文：数据集、评估配置与运行都归属项目。"
+        subtitle="项目是整个工作区的一级上下文：数据集、评估配置与运行都归属项目。"
         actions={
           <button type="button" className={styles.primaryBtn} onClick={() => setSummaryOf(null)} data-testid="projects-refresh">
             刷新
@@ -111,11 +111,11 @@ export function ProjectsPage() {
             onClick={() => void create()}
             data-testid="project-create-submit"
           >
-            {creating ? '创建中…' : '新建 Project'}
+            {creating ? '创建中…' : '新建项目'}
           </button>
         </div>
         <p className={styles.hint}>
-          domain 需为部署配置 config/domains 中已配置的领域（默认 general）；重复名称将被拒绝。
+          domain 需为部署环境中已配置的领域标识（默认 general）；重复名称将被拒绝。
         </p>
         {createError ? (
           <div className={styles.createError} role="alert" data-testid="project-create-error">
@@ -206,7 +206,7 @@ function ProjectRow({
         </div>
         <div className={styles.rowActions}>
           <button type="button" className={styles.linkBtn} onClick={onEnter} data-testid={`enter-${project.name}`}>
-            进入 Workspace
+            进入工作区
           </button>
           <button type="button" className={styles.linkBtn} onClick={onToggle} data-testid={`summary-${project.name}`}>
             {expanded ? '收起摘要' : '查看摘要'}
@@ -220,19 +220,19 @@ function ProjectRow({
           {sumState === 'ready' && summary ? (
             <>
               <Grid cols={4} gap="md">
-                <div className={styles.stat}><span className={styles.statLabel}>Datasets</span><span className={styles.statValue}>{summary.datasetCount}</span></div>
-                <div className={styles.stat}><span className={styles.statLabel}>Evaluation Runs</span><span className={styles.statValue}>{summary.runCount}</span></div>
+                <div className={styles.stat}><span className={styles.statLabel}>数据集</span><span className={styles.statValue}>{summary.datasetCount}</span></div>
+                <div className={styles.stat}><span className={styles.statLabel}>评估运行</span><span className={styles.statValue}>{summary.runCount}</span></div>
                 <div className={styles.stat}>
-                  <span className={styles.statLabel}>Latest Score</span>
+                  <span className={styles.statLabel}>最近总体质量</span>
                   <span className={styles.statValue}><ScoreValue score={summary.latestRun?.overallScore ?? null} /></span>
                 </div>
                 <div className={styles.stat}>
-                  <span className={styles.statLabel}>Latest Quality Gate</span>
+                  <span className={styles.statLabel}>最近质量门禁</span>
                   <span className={styles.statValue}>
                     {summary.latestQualityGate ? (
                       <QualityGateBadge status={summary.latestQualityGate.status} />
                     ) : (
-                      <span className={styles.dim}>暂无（Run 未完成或未配置门禁）</span>
+                      <span className={styles.dim}>暂无（运行未完成或未配置门禁）</span>
                     )}
                   </span>
                 </div>

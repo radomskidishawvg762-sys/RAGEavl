@@ -175,17 +175,17 @@ describe('Dashboard — 状态', () => {
 });
 
 describe('Dashboard — 质量趋势', () => {
-  it('不足两次带分运行显示“暂无足够的历史 Run”', async () => {
+  it('不足两次带分运行显示“暂无足够的历史运行”', async () => {
     stubFetch(dashboardHandler(fx.runList())); // only one run with a non-null score
     await renderDash();
     await waitFor(() => expect(screen.getByText('质量趋势')).toBeInTheDocument());
-    expect(screen.getByText('暂无足够的历史 Run')).toBeInTheDocument();
+    expect(screen.getByText('暂无足够的历史运行')).toBeInTheDocument();
   });
 
   it('两次带分运行渲染趋势图', async () => {
     stubFetch(dashboardHandler(twoScoredRuns()));
     await renderDash();
     await waitFor(() => expect(screen.getByTestId('chart')).toBeInTheDocument());
-    expect(screen.queryByText('暂无足够的历史 Run')).toBeNull();
+    expect(screen.queryByText('暂无足够的历史运行')).toBeNull();
   });
 });

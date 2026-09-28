@@ -15,17 +15,21 @@ import { EmptyState, LoadingState } from '../components/primitives/Feedback';
 import { ErrorState } from '../components/ErrorState';
 import { ScoreValue } from '../components/ScoreValue';
 import { RunStatusBadge, QualityGateBadge } from '../status/StatusBadge';
+import { presentRun } from '../status/status';
 import { formatPercent, formatTimestamp } from '../utils/format';
 import styles from './EvaluationListPage.module.css';
 
+/** The filter's options take their labels from the same function the status
+ *  badge uses — otherwise the dropdown said 等待中 / 完成但有错误 while the
+ *  badge beside it said 等待执行 / 部分完成 for the very same run. */
 const STATUS_OPTIONS: Array<{ value: RunStatus | ''; label: string }> = [
   { value: '', label: '全部状态' },
-  { value: 'pending', label: '等待中' },
-  { value: 'running', label: '运行中' },
-  { value: 'completed', label: '已完成' },
-  { value: 'completed_with_errors', label: '完成但有错误' },
-  { value: 'failed', label: '执行失败' },
-  { value: 'cancelled', label: '已取消' },
+  { value: 'pending', label: presentRun('pending').label },
+  { value: 'running', label: presentRun('running').label },
+  { value: 'completed', label: presentRun('completed').label },
+  { value: 'completed_with_errors', label: presentRun('completed_with_errors').label },
+  { value: 'failed', label: presentRun('failed').label },
+  { value: 'cancelled', label: presentRun('cancelled').label },
 ];
 
 export function EvaluationListPage() {

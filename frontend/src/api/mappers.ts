@@ -193,10 +193,10 @@ export const DIRECTION_LABEL: Record<MetricCatalogView['direction'], string> = {
  *  仪表盘也展示门禁状态 —— 而仪表盘此前直接渲染原因码本身，于是入口页面上出现
  *  一个黄色的 `QUALITY_GATE_NOT_CONFIGURED`。 */
 export const REASON_EXPLAIN: Record<string, string> = {
-  QUALITY_THRESHOLD_FAILED: '必需指标有有效分数，但低于配置阈值（真实质量失败）。',
-  REQUIRED_METRIC_NOT_EVALUABLE: '必需指标无法评估（分数为空：未配置 / 执行错误 / 无法判定 / 未执行）。这不是 0 分。',
-  QUALITY_GATE_DISABLED: '当前 Profile 的 quality_gate.enabled = false，门禁未启用。',
-  QUALITY_GATE_NOT_CONFIGURED: '当前 Profile 未配置 quality_gate，门禁不可用。',
+  QUALITY_THRESHOLD_FAILED: '必需指标有有效分数，但低于配置阈值。',
+  REQUIRED_METRIC_NOT_EVALUABLE: '必需指标无法评估（分数为空：未配置 / 执行错误 / 无法判定 / 未执行）。',
+  QUALITY_GATE_DISABLED: '当前配置中已关闭质量门禁，门禁未启用。',
+  QUALITY_GATE_NOT_CONFIGURED: '当前配置未设置质量门禁，门禁不可用。',
   QUALITY_GATE_CONFIG_INVALID: '门禁配置无效（必需指标未启用或未配置阈值）。',
 };
 

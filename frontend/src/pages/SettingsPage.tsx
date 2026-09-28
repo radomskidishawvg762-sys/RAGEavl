@@ -67,39 +67,39 @@ export function SettingsPage() {
 
       {state === 'ready' ? (
         <div className={styles.sections}>
-          <Section title="1. Runtime">
+          <Section title="1. 运行环境">
             <Panel padded={false}>
               <table className={styles.table} data-testid="settings-runtime">
                 <tbody>
                   <tr>
-                    <td>Environment</td>
+                    <td>运行环境</td>
                     <td><Tag tone="info">{import.meta.env.MODE}</Tag></td>
                   </tr>
                   <tr>
-                    <td>API URL</td>
+                    <td>API 地址</td>
                     <td className="mono">同源 /api（前端与后端同源部署）</td>
                   </tr>
                   <tr>
-                    <td>Secret 管理</td>
-                    <td>DATABASE_URL / Judge API Key 仅存在于环境变量；日志经 RedactingFilter 脱敏；前端永不展示 secret 值。</td>
+                    <td>密钥管理</td>
+                    <td>数据库连接串与 Judge API Key 仅存在于环境变量；日志写入前已脱敏；前端永不展示密钥值。</td>
                   </tr>
                 </tbody>
               </table>
             </Panel>
           </Section>
 
-          <Section title="2. Database">
+          <Section title="2. 数据库">
             <Panel padded={false}>
               <table className={styles.table} data-testid="settings-database">
                 <tbody>
                   <tr>
-                    <td>Database Status</td>
+                    <td>数据库状态</td>
                     <td>
                       {health ? (
                         health.database === 'healthy' ? (
-                          <span className={styles.ok}>healthy（{health.detail?.db_latency_ms ?? '—'} ms）</span>
+                          <span className={styles.ok}>正常（{health.detail?.db_latency_ms ?? '—'} ms）</span>
                         ) : (
-                          <span className={styles.bad}>unavailable</span>
+                          <span className={styles.bad}>不可用</span>
                         )
                       ) : (
                         <span className={styles.dim}>—</span>
@@ -107,8 +107,14 @@ export function SettingsPage() {
                     </td>
                   </tr>
                   <tr>
-                    <td>App Status</td>
-                    <td>{health ? <span className={styles.ok}>{health.app}</span> : <span className={styles.dim}>—</span>}</td>
+                    <td>应用状态</td>
+                    <td>
+                      {health ? (
+                        <span className={styles.ok}>{health.app === 'healthy' ? '正常' : health.app}</span>
+                      ) : (
+                        <span className={styles.dim}>—</span>
+                      )}
+                    </td>
                   </tr>
                   <tr>
                     <td>连接方式</td>
@@ -119,7 +125,7 @@ export function SettingsPage() {
             </Panel>
           </Section>
 
-          <Section title="3. Judge（LLM-as-a-Judge）">
+          <Section title="3. Judge（LLM 评审）">
             {judgeForm ? (
               <JudgeSettingsPanel
                 value={judgeForm}
@@ -177,17 +183,17 @@ export function SettingsPage() {
             )}
           </Section>
 
-          <Section title="4. RAG Input">
+          <Section title="4. RAG 输入">
             <EnvManagedTable
               rows={[
-                ['Default Endpoint', 'RAG_INPUT_URL（留空 → GoldenRunMetadataAdapter 测试回放，非生产 RAG）'],
-                ['Timeout / Retry', 'system.yaml system.rag_input'],
+                ['默认接入地址', 'RAG_INPUT_URL（留空 → 金标元数据回放，非生产 RAG）'],
+                ['超时 / 重试', 'system.yaml 中的 system.rag_input'],
               ]}
               testId="settings-rag"
             />
           </Section>
 
-          <Section title="5. Evaluation Dependencies">
+          <Section title="5. 评估依赖">
             <Panel padded={false}>
               <table className={styles.table} data-testid="settings-evaluation-dependencies">
                 <tbody>
@@ -210,23 +216,23 @@ export function SettingsPage() {
             </Panel>
           </Section>
 
-          <Section title="6. Limits">
+          <Section title="6. 限制">
             <EnvManagedTable
               rows={[
-                ['Max Dataset Records', 'system.yaml system.limits.max_records_per_dataset'],
-                ['Default Concurrency', '执行器内置（MVP 单进程串行，ADR-02）'],
-                ['阈值 / 权重 / 严重度', 'Evaluation Profile（见 Evaluation Profiles 页，只读）'],
+                ['数据集记录数上限', 'system.yaml 中的 system.limits.max_records_per_dataset'],
+                ['默认并发', '执行器内置（单进程串行）'],
+                ['阈值 / 权重 / 严重度', '评估配置 Profile（见「配置」页，只读）'],
               ]}
               testId="settings-limits"
             />
           </Section>
 
-          <Section title="7. Health">
+          <Section title="7. 健康状态">
             <div className={styles.healthGrid} data-testid="settings-health">
-              <HealthItem name="Database" ok={health?.database === 'healthy'} detail={health?.database === 'healthy' ? `${health.detail?.db_latency_ms ?? '—'} ms` : health ? 'unavailable' : '—'} />
-              <HealthItem name="API" ok={Boolean(health)} detail={health ? 'healthy' : 'unreachable'} />
-              <HealthItem name="Judge" ok={judge?.configured ?? null} detail={judge ? (judge.configured ? `${judge.provider} / ${judge.model}` : '配置不完整') : '—'} />
-              <HealthItem name="RAG Input" ok={null} detail="由 Run 执行时的适配器调用验证" />
+              <HealthItem id="database" name="数据库" ok={health?.database === 'healthy'} detail={health?.database === 'healthy' ? `${health.detail?.db_latency_ms ?? '—'} ms` : health ? '不可用' : '—'} />
+              <HealthItem id="api" name="API" ok={Boolean(health)} detail={health ? '正常' : '不可达'} />
+              <HealthItem id="judge" name="Judge" ok={judge?.configured ?? null} detail={judge ? (judge.configured ? `${judge.provider} / ${judge.model}` : '配置不完整') : '—'} />
+              <HealthItem id="rag input" name="RAG 输入" ok={null} detail="由运行执行时的适配器调用验证" />
             </div>
           </Section>
         </div>
@@ -285,10 +291,10 @@ function JudgeSettingsPanel({
       </div>
       <div className={styles.formGrid} data-testid="judge-settings-form">
         {([
-          ['provider', 'Provider'],
-          ['model', 'Model'],
-          ['model_version', 'Model Version'],
-          ['base_url', 'Base URL'],
+          ['provider', '服务商 Provider'],
+          ['model', '模型 Model'],
+          ['model_version', '模型版本 Model Version'],
+          ['base_url', '接入地址 Base URL'],
         ] as const).map(([key, label]) => (
           <label key={key} className={styles.formField}>
             <span>{label}</span>
@@ -296,10 +302,10 @@ function JudgeSettingsPanel({
           </label>
         ))}
         {([
-          ['temperature', 'Temperature'],
-          ['max_tokens', 'Max Tokens'],
-          ['timeout', 'Timeout (s)'],
-          ['retry', 'Retry'],
+          ['temperature', '采样温度 Temperature'],
+          ['max_tokens', '最大生成长度 Max Tokens'],
+          ['timeout', '超时（秒）'],
+          ['retry', '重试次数'],
         ] as const).map(([key, label]) => (
           <label key={key} className={styles.formField}>
             <span>{label}</span>
@@ -319,9 +325,9 @@ function JudgeSettingsPanel({
         </label>
       </div>
       <div className={styles.judgeMeta}>
-        <Tag tone={value.configured ? 'pass' : 'warning'}>{value.configured ? 'Configured' : 'Not Configured'}</Tag>
-        <span>API Key: {value.api_key_configured ? 'Configured' : 'Not Configured'}</span>
-        <span>来源: {value.source}</span>
+        <Tag tone={value.configured ? 'pass' : 'warning'}>{value.configured ? '已配置' : '未配置'}</Tag>
+        <span>API Key：{value.api_key_configured ? '已配置' : '未配置'}</span>
+        <span>来源：{judgeSourceLabel(value.source)}</span>
       </div>
       {message ? <div className={styles.formMessage}>{message}</div> : null}
       <div className={styles.formActions}>
@@ -343,14 +349,25 @@ function JudgeSettingsPanel({
   );
 }
 
-function HealthItem({ name, ok, detail }: { name: string; ok: boolean | null; detail: string }) {
+function HealthItem({ id, name, ok, detail }: { id: string; name: string; ok: boolean | null; detail: string }) {
   return (
-    <div className={styles.healthItem} data-testid={`health-${name.toLowerCase()}`}>
+    <div className={styles.healthItem} data-testid={`health-${id}`}>
       <div className={styles.healthName}>
         {name}
-        {ok === true ? <span className={styles.ok}> ● Healthy</span> : ok === false ? <span className={styles.bad}> ● Unavailable</span> : <span className={styles.dim}> ● 无数据</span>}
+        {ok === true ? <span className={styles.ok}> ● 正常</span> : ok === false ? <span className={styles.bad}> ● 不可用</span> : <span className={styles.dim}> ● 无数据</span>}
       </div>
       <div className={styles.healthDetail}>{detail}</div>
     </div>
   );
+}
+
+/** Where the active Judge configuration came from. A backend token rendered
+ *  raw ("runtime" / "environment") tells the user nothing; unknown tokens fall
+ *  back to themselves rather than blanking the field. */
+function judgeSourceLabel(source: string): string {
+  const known: Record<string, string> = {
+    runtime: '当前进程内配置（重启后失效）',
+    environment: '环境变量',
+  };
+  return known[source] ?? source;
 }

@@ -187,13 +187,13 @@ describe('Evaluation detail', () => {
     expect(screen.getByTestId('metric-numerical_consistency')).toBeInTheDocument();
     // Failures Tab
     fireEvent.click(screen.getByTestId('tab-failures'));
-    expect(screen.getByText('失败样本 Failure Samples')).toBeInTheDocument();
+    expect(screen.getByText('失败样本', { selector: 'h2' })).toBeInTheDocument();
     // Diagnostics Tab
     fireEvent.click(screen.getByTestId('tab-diagnostics'));
     expect(screen.getByText('无法判定 Undetermined')).toBeInTheDocument();
     // Configuration Tab
     fireEvent.click(screen.getByTestId('tab-configuration'));
-    expect(screen.getByText('Run 快照 Configuration')).toBeInTheDocument();
+    expect(screen.getByText('运行快照', { selector: 'h2' })).toBeInTheDocument();
   });
 
   it('4b. surfaces the RAG input mode in the execution overview', async () => {
@@ -315,7 +315,7 @@ describe('Evaluation detail', () => {
     );
     await waitFor(() => expect(screen.getByText('质量概览')).toBeInTheDocument());
     fireEvent.click(screen.getByTestId('tab-configuration'));
-    await waitFor(() => expect(screen.getByText('Run 快照 Configuration')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('运行快照', { selector: 'h2' })).toBeInTheDocument());
     expect(screen.queryByText(/sk-SHOULD-NEVER-APPEAR/)).toBeNull();
     expect(screen.getByText('judge_model')).toBeInTheDocument();
     expect(screen.getByText('gpt-4o-mini')).toBeInTheDocument();

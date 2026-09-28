@@ -33,6 +33,16 @@ import styles from './EvaluationDetailPage.module.css';
 const CATEGORY_ORDER = ['retrieval', 'generation', 'integrity'] as const;
 const CATEGORY_LABEL: Record<string, string> = { retrieval: '检索 Retrieval', generation: '生成 Generation', integrity: '一致性 Integrity' };
 const CATEGORY_EMPTY: Record<string, string> = { retrieval: '无检索指标', generation: '无生成指标', integrity: '无一致性指标' };
+/** 质量维度的名称由后端给出（retrieval / generation / groundedness /
+ *  correctness）；presentCategory 只覆盖其中三个，所以这里单独列全。
+ *  未收录的名称原样显示，不猜。 */
+const DIMENSION_LABEL: Record<string, string> = {
+  retrieval: '检索 Retrieval',
+  generation: '生成 Generation',
+  groundedness: '有据性 Groundedness',
+  correctness: '正确性 Correctness',
+  integrity: '一致性 Integrity',
+};
 
 /** 原样下载后端 JSON（机器报告 / 失败清单）— 不做任何数据加工。 */
 function downloadJson(filename: string, data: unknown) {
@@ -125,7 +135,7 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
               data-testid="export-report-pdf"
               title="一键导出完整评估报告 PDF（只读快照，双语；不重跑评估）"
             >
-              导出报告 PDF Export
+              导出报告 PDF
             </a>
             <a
               className={styles.linkBtn}
@@ -144,8 +154,8 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
             >
               导出失败清单
             </button>
-            <Link className={styles.linkBtn} to="/compare">Compare</Link>
-            <Link className={styles.linkBtn} to={`/failures`}>Failure Explorer</Link>
+            <Link className={styles.linkBtn} to="/compare">版本对比</Link>
+            <Link className={styles.linkBtn} to={`/failures`}>失败浏览器</Link>
           </>
         }
       />
@@ -154,12 +164,12 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
 
       <Tabs
         items={[
-          { key: 'overview', label: 'Overview' },
-          { key: 'metrics', label: 'Metrics', count: report.metrics.length },
-          { key: 'failures', label: 'Failures', count: report.failures.length },
-          { key: 'diagnostics', label: 'Diagnostics', count: diagnosed.length + undetermined.length },
-          { key: 'evidence', label: 'Evidence', count: evidenceRows.length },
-          { key: 'configuration', label: 'Configuration' },
+          { key: 'overview', label: '概览' },
+          { key: 'metrics', label: '指标', count: report.metrics.length },
+          { key: 'failures', label: '失败样本', count: report.failures.length },
+          { key: 'diagnostics', label: '诊断', count: diagnosed.length + undetermined.length },
+          { key: 'evidence', label: '证据', count: evidenceRows.length },
+          { key: 'configuration', label: '运行快照' },
         ]}
         initial="overview"
       >
@@ -178,7 +188,7 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
                   </Grid>
                 </Section>
 
-                <Section title="质量维度（Overall Score 不代表单维度质量）Quality Dimensions">
+                <Section title="质量维度（总体质量不代表单维度质量）">
                   {report.quality_dimensions.length === 0 ? (
                     <div className={styles.metricEmpty}>无维度数据。</div>
                   ) : (
@@ -186,21 +196,21 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
                       <table className={styles.failureTable} data-testid="quality-dimensions">
                         <thead>
                           <tr>
-                            <th align="left">维度 Dimension</th>
-                            <th align="right">分数 Score</th>
-                            <th align="right">失败 Failures</th>
-                            <th align="right">无法判定 Undetermined</th>
-                            <th align="right">诊断覆盖 Diagnosis Coverage</th>
-                            <th align="right">证据覆盖 Evidence Coverage</th>
-                            <th align="left">指标 Metrics</th>
+                            <th align="left">维度</th>
+                            <th align="right">分数</th>
+                            <th align="right">失败数</th>
+                            <th align="right">无法判定</th>
+                            <th align="right">诊断覆盖率</th>
+                            <th align="right">证据覆盖率</th>
+                            <th align="left">指标</th>
                           </tr>
                         </thead>
                         <tbody>
                           {report.quality_dimensions.map((d) => (
                               <tr key={d.dimension} data-testid={`dimension-${d.dimension}`}>
                                 <td className={d.is_weakest ? styles.weakest : ''}>
-                                  <strong>{d.dimension}</strong>
-                                  {d.is_weakest ? <span className={styles.weakestTag}>最弱维度 Weakest</span> : null}
+                                  <strong>{DIMENSION_LABEL[d.dimension] ?? d.dimension}</strong>
+                                  {d.is_weakest ? <span className={styles.weakestTag}>最弱维度</span> : null}
                                 </td>
                                 <td align="right" className={styles.num}><ScoreValue score={d.score} /></td>
                                 <td align="right" className={styles.num}>{d.failure_count}</td>
@@ -272,7 +282,7 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
             ) : null}
 
             {active === 'failures' ? (
-              <Section title="失败样本 Failure Samples" actions={<span className={styles.count}>{report.failures.length} 条</span>}>
+              <Section title="失败样本" actions={<span className={styles.count}>{report.failures.length} 条</span>}>
                 {report.failures.length === 0 ? (
                   <EmptyState title="无失败样本" description="该运行未发现质量失败样本。" icon="check" />
                 ) : (
@@ -283,7 +293,7 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
                           <th align="left">严重度</th>
                           <th align="left">失败类型</th>
                           <th align="left">指标</th>
-                          <th align="left">Question</th>
+                          <th align="left">问题</th>
                           <th align="right">操作</th>
                         </tr>
                       </thead>
@@ -385,10 +395,10 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
                         <tr>
                           <th align="left">失败类型</th>
                           <th align="left">指标</th>
-                          <th align="left">Type</th>
-                          <th align="left">Source</th>
-                          <th align="left">Locator</th>
-                          <th align="left">Content</th>
+                          <th align="left">类型</th>
+                          <th align="left">来源</th>
+                          <th align="left">定位</th>
+                          <th align="left">内容</th>
                           <th align="right">操作</th>
                         </tr>
                       </thead>
@@ -417,7 +427,7 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
 
             {active === 'configuration' ? (
               <>
-                <Section title="Run 快照 Configuration">
+                <Section title="运行快照">
                   <div className={styles.repro}>
                     {safeReproducibility(report.reproducibility).map((entry) => (
                       <div key={entry.key} className={styles.reproRow}>
@@ -445,9 +455,9 @@ function EffectiveMetricsPanel({ meta }: { meta: Record<string, unknown> }) {
   const overrides = (meta.metric_overrides ?? null) as Record<string, Record<string, unknown>> | null;
   const overrideNames = overrides ? Object.keys(overrides) : [];
   return (
-    <Section title="Run 级指标覆盖 Metric Overrides" actions={<span className={styles.count}>{overrideNames.length} 项</span>}>
+    <Section title="运行级指标覆盖" actions={<span className={styles.count}>{overrideNames.length} 项</span>}>
       {!overrides || overrideNames.length === 0 ? (
-        <div className={styles.metricEmpty}>无 Run 级覆盖 —— 本次运行完全按 Profile 配置执行。</div>
+        <div className={styles.metricEmpty}>无运行级覆盖 —— 本次运行完全按配置 Profile 执行。</div>
       ) : (
         <Panel padded={false}>
           <table className={styles.failureTable}>

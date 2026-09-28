@@ -12,13 +12,14 @@ import { PageHeader, Panel, Section, Tag } from '../components/primitives/Surfac
 import { BilingualLabel } from '../components/primitives/Bilingual';
 import { EmptyState, LoadingState } from '../components/primitives/Feedback';
 import { ErrorState } from '../components/ErrorState';
+import { presentCategory, presentSeverity } from '../status/status';
 import styles from './MetricsPage.module.css';
 
 const CATEGORY_ORDER = ['retrieval', 'generation', 'integrity'] as const;
 const CATEGORY_LABEL: Record<string, string> = {
-  retrieval: 'RETRIEVAL · 检索',
-  generation: 'GENERATION · 生成',
-  integrity: 'INTEGRITY · 一致性',
+  retrieval: '检索 Retrieval',
+  generation: '生成 Generation',
+  integrity: '一致性 Integrity',
 };
 
 export function MetricsPage() {
@@ -46,7 +47,7 @@ export function MetricsPage() {
     <>
       <PageHeader
          title={<BilingualLabel zh="指标" en="Metrics" />}
-        subtitle="代码注册的指标目录（MetricRegistry 只读镜像）。MVP 不支持 UI 自定义指标（PRD Q8）。"
+        subtitle="平台内置的指标目录（只读）。当前版本不支持自定义指标。"
       />
 
       <div className={styles.toolbar}>
@@ -73,7 +74,7 @@ export function MetricsPage() {
       </div>
 
       {metrics.length === 0 ? (
-        <EmptyState title="暂无注册指标" description="MetricRegistry 中没有任何指标（异常状态，请检查后端）。" icon="alert" />
+        <EmptyState title="暂无注册指标" description="指标目录中没有任何指标（属异常状态，请检查后端）。" icon="alert" />
       ) : (
         <div className={styles.groups}>
           {CATEGORY_ORDER.map((cat) => {
@@ -88,18 +89,18 @@ export function MetricsPage() {
                         <div className={styles.metricHead}>
                           <span className={styles.metricName}>{m.name}</span>
                           <Tag tone={m.category === 'integrity' ? 'warning' : m.category === 'generation' ? 'info' : 'neutral'}>
-                            {m.category}
+                            {presentCategory(m.category).label}
                           </Tag>
                         </div>
                         <p className={styles.desc}>{m.description}</p>
                         <dl className={styles.props}>
-                          <div><dt>Engine</dt><dd className="mono">{m.engine}</dd></div>
-                          <div><dt>Version</dt><dd className="mono">{m.version}</dd></div>
-                          <div><dt>Direction</dt><dd>{DIRECTION_LABEL[m.direction]}</dd></div>
-                          <div><dt>Default Severity</dt><dd>{m.defaultSeverity ?? '—（无默认，由 Profile severity_mapping 决定）'}</dd></div>
+                          <div><dt>引擎</dt><dd className="mono">{m.engine}</dd></div>
+                          <div><dt>版本</dt><dd className="mono">{m.version}</dd></div>
+                          <div><dt>方向</dt><dd>{DIRECTION_LABEL[m.direction]}</dd></div>
+                          <div><dt>默认严重度</dt><dd>{m.defaultSeverity ? presentSeverity(m.defaultSeverity).label : '—（无默认，由配置 Profile 的严重度映射决定）'}</dd></div>
                         </dl>
                         <div className={styles.reqs}>
-                          <div className={styles.reqsTitle}>Input Requirements</div>
+                          <div className={styles.reqsTitle}>输入要求</div>
                           <ul>
                             {m.inputRequirements.map((r) => (
                               <li key={r} className="mono">{r}</li>

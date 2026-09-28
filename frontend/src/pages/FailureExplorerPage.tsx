@@ -19,7 +19,12 @@ import { FailureAnalysisDrawer } from '../components/evaluation/FailureAnalysisD
 import type { DrawerTarget } from '../components/evaluation/FailureAnalysisDrawer';
 import type { RecommendationView } from '../components/analysis/types';
 import { SeverityBadge } from '../status/StatusBadge';
+import { presentCategory, presentSeverity } from '../status/status';
 import styles from './FailureExplorerPage.module.css';
+
+/** 展示层可选的严重度档位（后端枚举），label 由 presentSeverity 提供，
+ *  与下面表格里的徽标保持同一套中文。 */
+const SEVERITY_OPTIONS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO'] as const;
 
 export interface FailureExplorerRecommendation extends RecommendationView {
   diagnosis_id: string;
@@ -98,8 +103,8 @@ export function FailureExplorerPage() {
   if (!activeProject) {
     return (
       <>
-        <PageHeader title="Failure Explorer" subtitle="跨指标浏览失败样本并下钻诊断。" />
-        <EmptyState title="请选择项目" description="Failure Explorer 在项目内工作：先在右上角选择项目。" icon="circle" />
+        <PageHeader title="失败浏览器" subtitle="跨指标浏览失败样本并下钻诊断。" />
+        <EmptyState title="请选择项目" description="失败浏览器在项目内工作：先在右上角选择项目。" icon="circle" />
       </>
     );
   }
@@ -146,33 +151,32 @@ export function FailureExplorerPage() {
   return (
     <>
       <PageHeader
-        title="Failure Explorer"
-        subtitle={`项目 ${activeProject.name} · Metric → Failure → Diagnosis → Evidence → Recommendation`}
+        title="失败浏览器"
+        subtitle={`项目 ${activeProject.name} · 指标 → 失败 → 诊断 → 证据 → 建议`}
       />
 
       <Panel title="过滤" accent="info">
         <div className={styles.filters}>
           <label className={styles.field}>
-            <span>Run</span>
+            <span>运行</span>
             <select value={runId} onChange={(e) => setRunId(e.target.value)} data-testid="failure-run-select">
-              <option value="">— 选择 Run —</option>
+              <option value="">— 选择运行 —</option>
               {terminal.map((r) => (
                 <option key={r.runId} value={r.runId}>{r.label}</option>
               ))}
             </select>
           </label>
           <label className={styles.field}>
-            <span>Severity</span>
+            <span>严重度</span>
             <select value={severity} onChange={(e) => setSeverity(e.target.value)} data-testid="failure-severity-filter">
               <option value="">全部</option>
-              <option value="CRITICAL">CRITICAL</option>
-              <option value="ERROR">ERROR</option>
-              <option value="WARNING">WARNING</option>
-              <option value="INFO">INFO</option>
+              {SEVERITY_OPTIONS.map((s) => (
+                <option key={s} value={s}>{presentSeverity(s).label}</option>
+              ))}
             </select>
           </label>
           <label className={styles.field}>
-            <span>Failure Type</span>
+            <span>失败类型</span>
             <select value={failureType} onChange={(e) => setFailureType(e.target.value)} data-testid="failure-type-filter">
               <option value="">全部</option>
               {failureTypeOptions.map((t) => (
@@ -181,7 +185,7 @@ export function FailureExplorerPage() {
             </select>
           </label>
           <label className={styles.field}>
-            <span>Metric</span>
+            <span>指标</span>
             <select value={metric} onChange={(e) => setMetric(e.target.value)} data-testid="failure-metric-filter">
               <option value="">全部</option>
               {metricOptions.map((m) => (
@@ -190,7 +194,7 @@ export function FailureExplorerPage() {
             </select>
           </label>
           <label className={styles.field}>
-            <span>Category</span>
+            <span>类别</span>
             <select value={category} onChange={(e) => setCategory(e.target.value)} data-testid="failure-category-filter">
               <option value="">全部</option>
               <option value="retrieval">检索 Retrieval</option>
@@ -218,7 +222,7 @@ export function FailureExplorerPage() {
           ) : rows.length === 0 ? (
             <EmptyState
               title="无匹配记录"
-              description="该 Run（或当前过滤条件）下没有失败/诊断记录。"
+              description="该运行（或当前过滤条件）下没有失败/诊断记录。"
               icon="check"
             />
           ) : (
@@ -231,7 +235,7 @@ export function FailureExplorerPage() {
                     <th align="left">失败类型</th>
                     <th align="left">指标</th>
                     <th align="left">类别</th>
-                    <th align="left">Question</th>
+                    <th align="left">问题</th>
                     <th align="right">操作</th>
                   </tr>
                 </thead>
@@ -248,9 +252,9 @@ export function FailureExplorerPage() {
                       </td>
                       <td className="mono">{d.failure_type ?? '—'}</td>
                       <td className="mono">{d.related_metric ?? '—'}</td>
-                      <td>{d.related_metric ? categoryByMetric.get(d.related_metric) ?? '—' : '—'}</td>
+                      <td>{d.related_metric ? presentCategory(categoryByMetric.get(d.related_metric) ?? null).label : '—'}</td>
                       <td className={styles.question}>
-                        {d.result_id ? questionByResult.get(d.result_id) ?? '—' : '（Run 级诊断）'}
+                        {d.result_id ? questionByResult.get(d.result_id) ?? '—' : '（运行级诊断）'}
                       </td>
                       <td align="right">
                         <button type="button" className={styles.openBtn} onClick={() => openDrawer(d)} data-testid="open-diagnosis">
@@ -265,7 +269,7 @@ export function FailureExplorerPage() {
           )}
         </Section>
       ) : (
-        <EmptyState title="选择一个 Run" description="选择 Run 后浏览其失败样本与诊断。" icon="circle" />
+        <EmptyState title="选择一个运行" description="选择一个运行后浏览其失败样本与诊断。" icon="circle" />
       )}
 
       <FailureAnalysisDrawer target={selected} onClose={() => setSelected(null)} />

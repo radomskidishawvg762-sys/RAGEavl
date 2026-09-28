@@ -140,7 +140,7 @@ export function DatasetImportPage() {
 
       {versionOf ? (
         <div className={styles.versionHint} data-testid="version-of-hint">
-          为数据集 <strong>{versionOf}</strong> 创建新版本：请导入同名（name={versionOf}）的 JSON 信封，
+          为数据集 <strong>{versionOf}</strong> 创建新版本：请导入同名（name={versionOf}）的 JSON 文件，
           后端将自动生成新版本。
         </div>
       ) : null}
@@ -168,7 +168,7 @@ export function DatasetImportPage() {
                   }}
                 />
               </label>
-              <div className={styles.dropNote}>支持 Golden Dataset 的 JSON 信封（name / records）。</div>
+              <div className={styles.dropNote}>支持含 name 与 records 字段的 JSON 文件。</div>
             </div>
           </Panel>
         ) : null}

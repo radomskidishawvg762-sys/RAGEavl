@@ -309,7 +309,7 @@ describe('ProfilesPage (Configuration workspace)', () => {
     yaml: 'profile:\n  name: strict_financial\n',
   };
 
-  it('工程配置工作区：三页签 + 配置版本表（PUBLISHED）+ View 抽屉，无假保存按钮', async () => {
+  it('工程配置工作区：三页签 + 配置版本表（已发布）+ View 抽屉，无假保存按钮', async () => {
     stubFetch((url) => {
       if (url.includes('/api/projects/p1/configs')) {
         return {
@@ -339,9 +339,9 @@ describe('ProfilesPage (Configuration workspace)', () => {
     expect(screen.getByTestId('tab-metrics')).toBeInTheDocument();
     expect(screen.getByTestId('tab-import')).toBeInTheDocument();
 
-    // 配置版本表：stored imported 行显示 PUBLISHED + 完整操作集
+    // 配置版本表：stored imported 行显示 已发布 + 完整操作集
     expect(screen.getByTestId('config-row-strict_financial:v1')).toBeInTheDocument();
-    expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
+    expect(screen.getByText('已发布')).toBeInTheDocument();
     expect(screen.getByTestId('config-view-c1')).toBeInTheDocument();
     expect(screen.getByTestId('config-duplicate-c1')).toBeInTheDocument();
     expect(screen.getByTestId('config-import-version-c1')).toBeInTheDocument();
@@ -349,10 +349,10 @@ describe('ProfilesPage (Configuration workspace)', () => {
     // 无假保存 —— 旧版本不可变，唯一变更路径是 Duplicate / Import New Version
     expect(screen.queryByRole('button', { name: '保存' })).not.toBeInTheDocument();
 
-    // View 打开详情抽屉（切到 Raw YAML 页签，只读 + 复制/导出）
+    // View 打开详情抽屉（切到「原始 YAML」页签，只读 + 复制/导出）
     fireEvent.click(screen.getByTestId('config-view-c1'));
     await screen.findByTestId('config-detail-drawer');
-    fireEvent.click(screen.getByRole('tab', { name: 'Raw YAML' }));
+    fireEvent.click(screen.getByRole('tab', { name: '原始 YAML' }));
     expect(await screen.findByTestId('detail-yaml')).toBeInTheDocument();
     expect(screen.getByTestId('yaml-copy')).toBeInTheDocument();
     expect(screen.getByTestId('yaml-export')).toBeInTheDocument();
@@ -373,9 +373,9 @@ describe('MetricsPage', () => {
 
     expect(screen.getByTestId('metric-card-context_recall')).toBeInTheDocument();
     expect(screen.getByTestId('metric-card-numerical_consistency')).toBeInTheDocument();
-    expect(screen.getByText('RETRIEVAL · 检索（2）')).toBeInTheDocument();
-    expect(screen.getByText('GENERATION · 生成（2）')).toBeInTheDocument();
-    expect(screen.getByText('INTEGRITY · 一致性（3）')).toBeInTheDocument();
+    expect(screen.getByText('检索 Retrieval（2）')).toBeInTheDocument();
+    expect(screen.getByText('生成 Generation（2）')).toBeInTheDocument();
+    expect(screen.getByText('一致性 Integrity（3）')).toBeInTheDocument();
 
     fireEvent.change(screen.getByTestId('metrics-search'), { target: { value: 'numerical' } });
     expect(screen.getByTestId('metric-card-numerical_consistency')).toBeInTheDocument();
@@ -396,7 +396,7 @@ describe('SettingsPage', () => {
     renderWithProject(<SettingsPage />);
     await settled();
 
-    expect(screen.getByTestId('settings-database')).toHaveTextContent('healthy');
+    expect(screen.getByTestId('settings-database')).toHaveTextContent('正常');
     expect(screen.getByTestId('health-database')).toHaveTextContent('12 ms');
     // judge settings declared as env-managed, never fabricated values
     expect(screen.getByTestId('settings-judge')).toHaveTextContent('由环境变量');

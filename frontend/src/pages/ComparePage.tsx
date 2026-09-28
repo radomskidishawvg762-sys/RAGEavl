@@ -8,7 +8,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { api, endpoints } from '../api/client';
-import type { ComparisonResponse } from '../api/types';
+import type { ComparisonResponse, MetricExecutionStatus } from '../api/types';
 import { useProject } from '../context/ProjectContext';
 import { useRunOptions } from '../hooks/useRunOptions';
 import { PageHeader, Panel, Section } from '../components/primitives/Surfaces';
@@ -16,6 +16,7 @@ import { EmptyState, LoadingState } from '../components/primitives/Feedback';
 import { ErrorState } from '../components/ErrorState';
 import { ScoreValue } from '../components/ScoreValue';
 import { ComparabilityBadge } from '../status/StatusBadge';
+import { presentCategory, presentMetric } from '../status/status';
 import { formatPercent } from '../utils/format';
 import styles from './ComparePage.module.css';
 
@@ -51,7 +52,7 @@ export function ComparePage() {
   if (!activeProject) {
     return (
       <>
-        <PageHeader title="版本对比 Compare" subtitle="在项目上下文中对比两个 Run 的逐指标表现。" />
+        <PageHeader title="版本对比 Compare" subtitle="在项目上下文中对比两个运行的逐指标表现。" />
         <EmptyState title="请选择项目" description="对比在项目内进行：先在右上角选择项目。" icon="circle" />
       </>
     );
@@ -65,15 +66,15 @@ export function ComparePage() {
     <>
       <PageHeader
         title="版本对比 Compare"
-        subtitle={`项目 ${activeProject.name} · 两个 Run 的逐指标对比（delta 全部来自后端）`}
+        subtitle={`项目 ${activeProject.name} · 两个运行的逐指标对比（变化量 delta 全部来自后端）`}
       />
 
-      <Panel title="选择 Run" accent="info">
+      <Panel title="选择运行" accent="info">
         <div className={styles.selectors}>
           <label className={styles.field}>
-            <span>Baseline Run</span>
+            <span>基线运行 Baseline</span>
             <select value={baseline} onChange={(e) => setBaseline(e.target.value)} data-testid="baseline-select">
-              <option value="">— 选择 Baseline —</option>
+              <option value="">— 选择基线运行 —</option>
               {terminal.map((r) => (
                 <option key={r.runId} value={r.runId}>{r.label}</option>
               ))}
@@ -81,9 +82,9 @@ export function ComparePage() {
           </label>
           <span className={styles.vs}>VS</span>
           <label className={styles.field}>
-            <span>Candidate Run</span>
+            <span>候选运行 Candidate</span>
             <select value={candidate} onChange={(e) => setCandidate(e.target.value)} data-testid="candidate-select">
-              <option value="">— 选择 Candidate —</option>
+              <option value="">— 选择候选运行 —</option>
               {terminal.map((r) => (
                 <option key={r.runId} value={r.runId}>{r.label}</option>
               ))}
@@ -100,7 +101,7 @@ export function ComparePage() {
           </button>
         </div>
         {baseline && baseline === candidate ? (
-          <p className={styles.hint}>Baseline 与 Candidate 不能是同一个 Run。</p>
+          <p className={styles.hint}>基线运行与候选运行不能是同一次运行。</p>
         ) : null}
       </Panel>
 
@@ -133,7 +134,7 @@ function ComparisonResult({ result }: { result: ComparisonResponse }) {
         ) : null}
         {result.comparability.status === 'BLOCKED' ? (
           <p className={styles.blockedNote} data-testid="blocked-note">
-            两个 Run 不可比较：以上原因由后端判定。以下仅展示后端返回的数据（通常为空）。
+            两次运行不可比较：以上原因由后端判定。以下仅展示后端返回的数据（通常为空）。
           </p>
         ) : null}
       </Panel>
@@ -141,15 +142,15 @@ function ComparisonResult({ result }: { result: ComparisonResponse }) {
       <Section title="总体对比 Overall">
         <div className={styles.overall} data-testid="overall-comparison">
           <div className={styles.overallCell}>
-            <span className={styles.cellLabel}>Baseline Overall</span>
+            <span className={styles.cellLabel}>基线总体</span>
             <ScoreValue score={result.overall.baseline_overall} />
           </div>
           <div className={styles.overallCell}>
-            <span className={styles.cellLabel}>Candidate Overall</span>
+            <span className={styles.cellLabel}>候选总体</span>
             <ScoreValue score={result.overall.candidate_overall} />
           </div>
           <div className={styles.overallCell}>
-            <span className={styles.cellLabel}>Delta</span>
+            <span className={styles.cellLabel}>变化量 Delta</span>
             {/* What is unavailable is the DELTA, not the two scores beside it —
                 rendering ScoreValue's "暂无有效分数" here implied those were
                 invalid, which they are not. */}
@@ -179,10 +180,10 @@ function ComparisonResult({ result }: { result: ComparisonResponse }) {
                 <tr>
                   <th align="left">指标</th>
                   <th align="left">类别</th>
-                  <th align="right">Baseline</th>
-                  <th align="right">Candidate</th>
-                  <th align="right">Delta</th>
-                  <th align="right">Relative Delta</th>
+                  <th align="right">基线</th>
+                  <th align="right">候选</th>
+                  <th align="right">变化量 Delta</th>
+                  <th align="right">相对变化 Relative</th>
                   <th align="left">状态</th>
                 </tr>
               </thead>
@@ -190,7 +191,7 @@ function ComparisonResult({ result }: { result: ComparisonResponse }) {
                 {result.metrics.map((m) => (
                   <tr key={m.name} data-testid={`cmp-${m.name}`}>
                     <td className="mono">{m.name}</td>
-                    <td>{m.category ?? '—'}</td>
+                    <td>{presentCategory(m.category).label}</td>
                     <td align="right" className="mono"><ScoreValue score={m.baseline_score} /></td>
                     <td align="right" className="mono"><ScoreValue score={m.candidate_score} /></td>
                     <td align="right" className="mono"><DeltaValue delta={m.delta} /></td>
@@ -228,9 +229,14 @@ export function DeltaValue({ delta }: { delta: number | null }) {
 }
 
 function incomparableLabel(baselineStatus: string, candidateStatus: string): string {
-  if (baselineStatus === 'missing') return 'Baseline 缺失该指标';
-  if (candidateStatus === 'missing') return 'Candidate 缺失该指标';
-  if (baselineStatus !== 'completed') return `Baseline ${baselineStatus}`;
-  if (candidateStatus !== 'completed') return `Candidate ${candidateStatus}`;
+  if (baselineStatus === 'missing') return '基线缺失该指标';
+  if (candidateStatus === 'missing') return '候选缺失该指标';
+  // 状态本身不再原样露出英文枚举 —— 走的还是徽标用的那一套中文。
+  if (baselineStatus !== 'completed') {
+    return `基线：${presentMetric(baselineStatus as MetricExecutionStatus, null).label}`;
+  }
+  if (candidateStatus !== 'completed') {
+    return `候选：${presentMetric(candidateStatus as MetricExecutionStatus, null).label}`;
+  }
   return '不可比';
 }

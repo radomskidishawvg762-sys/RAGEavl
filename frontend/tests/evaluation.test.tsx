@@ -160,7 +160,7 @@ describe('评估工作台', () => {
     fireEvent.click(screen.getByTestId('tab-metrics'));
     expect(screen.getByText('指标概览')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('tab-failures'));
-    expect(screen.getByText('失败样本 Failure Samples')).toBeInTheDocument();
+    expect(screen.getByText('失败样本', { selector: 'h2' })).toBeInTheDocument();
     // null 分数不显示为 0
     fireEvent.click(screen.getByTestId('tab-metrics'));
     expect(screen.getAllByTestId('no-score').length).toBeGreaterThan(0);

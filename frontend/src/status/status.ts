@@ -153,8 +153,18 @@ export function presentRegression(verdict: string): StatusPresentation {
   }
 }
 
-// ---------------- Quality Gate ----------------
+/** 该判定是否「没有比较过」。
+ *
+ *  为真时，改进/回归/稳定计数必然全为 0 —— 直接把 0 渲染出来会被读成「什么都没
+ *  变」，而事实是「什么都没比较」，两者意思相反。
+ *
+ *  以函数暴露而不是让页面比较字面量：判定枚举只允许出现在本文件，页面可以渲染
+ *  判定但不能派生它（见 tests/test_regression_service.py 的前端扫描不变量）。 */
+export function regressionNotCompared(verdict: string): boolean {
+  return verdict === 'NOT_COMPARABLE';
+}
 
+// ---------------- Quality Gate ----------------
 export function presentQualityGate(status: string): StatusPresentation {
   switch (status) {
     case 'PASS':

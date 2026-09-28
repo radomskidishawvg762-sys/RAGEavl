@@ -63,9 +63,9 @@ export function DatasetDetailPage({ datasetId: datasetIdProp }: { datasetId?: st
 
       <Tabs
         items={[
-          { key: 'overview', label: 'Overview' },
-          { key: 'validation', label: 'Validation' },
-          { key: 'records', label: 'Records', count: ds.record_count },
+          { key: 'overview', label: '概览' },
+          { key: 'validation', label: '校验' },
+          { key: 'records', label: '记录', count: ds.record_count },
         ]}
         initial={initialTab}
         onChange={(key) => setSearchParams(key === 'overview' ? {} : { tab: key }, { replace: true })}

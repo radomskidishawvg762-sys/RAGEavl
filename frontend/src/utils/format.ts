@@ -7,6 +7,10 @@
  */
 
 import type { MetricExecutionStatus, RunStatus } from '../api/types';
+import {
+  presentMetric as presentMetricStatus,
+  presentRun as presentRunStatus,
+} from '../status/status';
 
 export type Presentation =
   | 'pass'
@@ -23,12 +27,18 @@ export interface StatusPresentation {
   label: string;
 }
 
-const METRIC_PRESENTATION: Record<MetricExecutionStatus, StatusPresentation> = {
-  completed: { presentation: 'pass', label: '已完成' },
-  undetermined: { presentation: 'undetermined', label: '无法判定' },
-  not_configured: { presentation: 'not_configured', label: '未配置' },
-  error: { presentation: 'error', label: '执行错误' },
-  not_run: { presentation: 'not_run', label: '未执行' },
+/**
+ * Which presentation BUCKET a metric status falls in (used for colour, never
+ * for text). The label is deliberately NOT re-listed here — it is read from
+ * `status/status.ts`, the single source of truth for every status family, so
+ * the two copies cannot drift apart again.
+ */
+const METRIC_BUCKET: Record<MetricExecutionStatus, Presentation> = {
+  completed: 'pass',
+  undetermined: 'undetermined',
+  not_configured: 'not_configured',
+  error: 'error',
+  not_run: 'not_run',
 };
 
 /**
@@ -40,25 +50,27 @@ export function presentMetric(
   status: MetricExecutionStatus,
   passed: boolean | null,
 ): StatusPresentation {
-  if (status === 'completed') {
-    return passed === false
-      ? { presentation: 'quality_failure', label: '质量失败' }
-      : METRIC_PRESENTATION.completed;
-  }
-  return METRIC_PRESENTATION[status] ?? { presentation: 'not_run', label: status };
+  const presentation =
+    status === 'completed' && passed === false
+      ? 'quality_failure'
+      : METRIC_BUCKET[status] ?? 'not_run';
+  return { presentation, label: presentMetricStatus(status, passed).label };
 }
 
-const RUN_PRESENTATION: Record<RunStatus, StatusPresentation> = {
-  pending: { presentation: 'active', label: '等待执行' },
-  running: { presentation: 'active', label: '运行中' },
-  completed: { presentation: 'pass', label: '已完成' },
-  completed_with_errors: { presentation: 'quality_failure', label: '部分完成' },
-  failed: { presentation: 'error', label: '执行失败' },
-  cancelled: { presentation: 'terminal', label: '已取消' },
+const RUN_BUCKET: Record<RunStatus, Presentation> = {
+  pending: 'active',
+  running: 'active',
+  completed: 'pass',
+  completed_with_errors: 'quality_failure',
+  failed: 'error',
+  cancelled: 'terminal',
 };
 
 export function presentRun(status: RunStatus): StatusPresentation {
-  return RUN_PRESENTATION[status] ?? { presentation: 'terminal', label: status };
+  return {
+    presentation: RUN_BUCKET[status] ?? 'terminal',
+    label: presentRunStatus(status).label,
+  };
 }
 
 export const NO_SCORE_LABEL = '暂无有效分数';

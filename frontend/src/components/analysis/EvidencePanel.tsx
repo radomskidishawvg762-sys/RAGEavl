@@ -12,7 +12,7 @@ import styles from './Analysis.module.css';
 export function EvidencePanel({
   contract,
   items,
-  empty = 'No evidence recorded',
+  empty = '暂无证据记录',
 }: {
   contract?: string | null;
   items: EvidenceItem[];

@@ -71,11 +71,11 @@ export function FailureAnalysisDrawer({
 
         <ChainStrip
           steps={[
-            { label: 'Metric', done: Boolean(target.relatedMetric || target.diagnosis?.related_metric) },
-            { label: 'Failure', done: Boolean(target.failureType) },
-            { label: 'Diagnosis', done: Boolean(target.diagnosis && target.diagnosis.status === 'diagnosed') },
-            { label: 'Evidence', done: (target.diagnosis?.evidence?.length ?? 0) > 0 },
-            { label: 'Recommendation', done: target.recommendations.length > 0 },
+            { label: '指标', done: Boolean(target.relatedMetric || target.diagnosis?.related_metric) },
+            { label: '失败', done: Boolean(target.failureType) },
+            { label: '诊断', done: Boolean(target.diagnosis && target.diagnosis.status === 'diagnosed') },
+            { label: '证据', done: (target.diagnosis?.evidence?.length ?? 0) > 0 },
+            { label: '建议', done: target.recommendations.length > 0 },
           ]}
         />
 
@@ -83,7 +83,7 @@ export function FailureAnalysisDrawer({
           {/* 1. 样本 Sample（完整 I/O，来自 G3 详情端点） */}
           <Section title={<BilingualLabel zh="样本" en="Sample" />}>
             {target.resultId === null ? (
-              <div className={styles.emptyNote}>Run 级诊断：无单条样本 I/O。</div>
+              <div className={styles.emptyNote}>运行级诊断：无单条样本 I/O。</div>
             ) : detail.state === 'loading' ? (
               <div className={styles.emptyNote}>正在加载样本详情…</div>
             ) : detail.state === 'error' ? (
@@ -124,7 +124,7 @@ export function FailureAnalysisDrawer({
               </div>
             ) : null}
             {detail.state !== 'ready' && target.fallbackQuestion ? (
-              <Field label="Question（列表）"><Text value={target.fallbackQuestion} /></Field>
+              <Field label="问题（列表）"><Text value={target.fallbackQuestion} /></Field>
             ) : null}
           </Section>
 
@@ -176,7 +176,7 @@ export function FailureAnalysisDrawer({
               </div>
             ) : null}
             <div className={styles.rootCause}>
-              <div className={styles.label}>Root Cause</div>
+              <div className={styles.label}>根因 Root Cause</div>
               <div className={styles.rootCauseText}>{diagnosis?.root_cause ?? '—（未判定，前端不猜测）'}</div>
             </div>
             <Field label="置信度">{diagnosis?.confidence ?? '—'}</Field>

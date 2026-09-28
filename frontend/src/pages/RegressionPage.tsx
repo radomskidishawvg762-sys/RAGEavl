@@ -16,7 +16,7 @@ import { EmptyState, LoadingState } from '../components/primitives/Feedback';
 import { ErrorState } from '../components/ErrorState';
 import { ScoreValue } from '../components/ScoreValue';
 import { RegressionBadge, SeverityBadge } from '../status/StatusBadge';
-import { presentRegression, presentCategory } from '../status/status';
+import { presentRegression, presentCategory, regressionNotCompared } from '../status/status';
 import { formatPercent } from '../utils/format';
 import styles from './RegressionPage.module.css';
 
@@ -54,7 +54,7 @@ export function RegressionPage() {
   if (!activeProject) {
     return (
       <>
-        <PageHeader title="回归分析 Regression" subtitle="在项目上下文中检测两个 Run 之间的质量回归。" />
+        <PageHeader title="回归分析 Regression" subtitle="在项目上下文中检测两个运行之间的质量回归。" />
         <EmptyState title="请选择项目" description="回归检测在项目内进行：先在右上角选择项目。" icon="circle" />
       </>
     );
@@ -68,15 +68,15 @@ export function RegressionPage() {
     <>
       <PageHeader
         title="回归分析 Regression"
-        subtitle={`项目 ${activeProject.name} · 判定全部来自后端（epsilon 与 epsilon_source 可追溯）`}
+        subtitle={`项目 ${activeProject.name} · 判定全部来自后端（判定阈值 epsilon 与来源可追溯）`}
       />
 
-      <Panel title="选择 Run" accent="info">
+      <Panel title="选择运行" accent="info">
         <div className={styles.selectors}>
           <label className={styles.field}>
-            <span>Baseline Run</span>
+            <span>基线运行 Baseline</span>
             <select value={baseline} onChange={(e) => setBaseline(e.target.value)} data-testid="regression-baseline-select">
-              <option value="">— 选择 Baseline —</option>
+              <option value="">— 选择基线运行 —</option>
               {terminal.map((r) => (
                 <option key={r.runId} value={r.runId}>{r.label}</option>
               ))}
@@ -84,9 +84,9 @@ export function RegressionPage() {
           </label>
           <span className={styles.vs}>→</span>
           <label className={styles.field}>
-            <span>Candidate Run</span>
+            <span>候选运行 Candidate</span>
             <select value={candidate} onChange={(e) => setCandidate(e.target.value)} data-testid="regression-candidate-select">
-              <option value="">— 选择 Candidate —</option>
+              <option value="">— 选择候选运行 —</option>
               {terminal.map((r) => (
                 <option key={r.runId} value={r.runId}>{r.label}</option>
               ))}
@@ -115,11 +115,11 @@ function RegressionResult({ result }: { result: RegressionResponse }) {
   return (
     <>
       {result.trade_off ? (
-        <Panel title="Trade-off 提示" accent="warning">
+        <Panel title="指标权衡提示 Trade-off" accent="warning">
           <div className={styles.tradeOff} data-testid="trade-off-banner">
             <SeverityBadge severity="WARNING" />
             <span>
-              检测到指标间权衡（后端 trade_off=true）。
+              检测到指标间存在权衡（由后端判定）。
               {result.overall.reason ? ` ${result.overall.reason}` : ''}
             </span>
           </div>
@@ -138,7 +138,7 @@ function RegressionResult({ result }: { result: RegressionResponse }) {
         </div>
       </Panel>
 
-      <Section title="分类别 Summary">
+      <Section title="分类别汇总">
         <div className={styles.categories} data-testid="regression-categories">
           {CATEGORY_ORDER.map((cat) => {
             const c = result.categories[cat];
@@ -159,7 +159,7 @@ function RegressionResult({ result }: { result: RegressionResponse }) {
                     rendering "改进 0 回归 0 稳定 0" next to that badge reads as
                     "nothing changed", which is the opposite of "nothing was
                     compared". Same hazard as showing 0 where a value is absent. */}
-                {c.verdict === 'NOT_COMPARABLE' ? (
+                {regressionNotCompared(c.verdict) ? (
                   <div className={styles.categoryCounts}>
                     <span className={styles.dim}>测量未执行</span>
                   </div>
@@ -187,11 +187,11 @@ function RegressionResult({ result }: { result: RegressionResponse }) {
                 <tr>
                   <th align="left">指标</th>
                   <th align="left">方向</th>
-                  <th align="right">Baseline</th>
-                  <th align="right">Candidate</th>
-                  <th align="right">Delta</th>
-                  <th align="right">Relative</th>
-                  <th align="left">Epsilon</th>
+                  <th align="right">基线</th>
+                  <th align="right">候选</th>
+                  <th align="right">变化量 Delta</th>
+                  <th align="right">相对变化</th>
+                  <th align="left">判定阈值 Epsilon</th>
                   <th align="left">判定</th>
                 </tr>
               </thead>

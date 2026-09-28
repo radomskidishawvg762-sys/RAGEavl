@@ -244,7 +244,7 @@ function QualitySummary({
           <ScoreValue score={summary?.overall_score ?? null} />
         </Card>
         <Card label="评估覆盖率" value={formatPercent(summary?.evaluation_coverage ?? null)} />
-        <Card label="评估错误" value={String(summary?.error_records ?? '—')} />
+        <Card label="记录错误" value={String(summary?.error_records ?? '—')} />
         <Card label="质量门禁" accent={qualityGateTone(qualityGateStatus)}>
           {qualityGateStatus ? (
             <QualityGateBadge status={qualityGateStatus} />
@@ -464,12 +464,12 @@ function TrendPanel({ evaluations }: { evaluations: RunOut[] }) {
       ) : (
         <div className={styles.trendEmpty}>
           <EmptyState
-            title="暂无足够的历史 Run"
+            title="暂无足够的历史运行"
             description="至少需要 2 次已完成评估且记录总体质量，才能生成趋势。"
             icon="minus"
             action={
               <Link className={styles.linkBtn} to="/evaluations">
-                前往 Evaluations
+                前往评估列表
               </Link>
             }
           />
