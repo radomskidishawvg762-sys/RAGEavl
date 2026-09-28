@@ -295,6 +295,11 @@ class ReportSummary(BaseModel):
     evaluation_coverage: float | None = None
     valid_metric_count: int
     total_enabled_metric_count: int
+    # RAG input mode from the run snapshot, flattened to a scalar. Declared here
+    # because the response_model filters to the declared fields — without this the
+    # service's value is silently dropped and the run detail page shows nothing.
+    # None when the snapshot predates the field.
+    input_mode: str | None = None
     created_at: datetime
     started_at: datetime | None = None
     finished_at: datetime | None = None

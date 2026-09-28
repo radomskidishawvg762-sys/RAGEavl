@@ -387,3 +387,25 @@ def test_input_mode_is_none_when_the_snapshot_has_no_rag_input() -> None:
     report = ReportService(repo).build_report(run_id)
 
     assert report["summary"]["input_mode"] is None
+
+
+def test_api_response_includes_input_mode() -> None:
+    """Guards the API layer specifically.
+
+    ReportSummary is a response_model, so any field the service computes is
+    silently dropped unless it is ALSO declared in app/api/schemas.py. That is
+    exactly how the run detail page rendered nothing: the service dict carried
+    input_mode, the response_model filtered it out, and every service-level test
+    still passed.
+    """
+    from app.api.deps import get_report_service
+
+    repo, run_id = _seed_repo()
+    app.dependency_overrides[get_report_service] = lambda: ReportService(repo)
+    try:
+        with TestClient(app) as client:
+            body = client.get(f"/api/evaluations/{run_id}/report").json()
+    finally:
+        app.dependency_overrides.clear()
+
+    assert body["summary"]["input_mode"] == "golden_replay"
