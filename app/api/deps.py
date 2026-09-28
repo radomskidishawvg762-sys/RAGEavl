@@ -9,6 +9,7 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.adapters.rag_input import build_rag_adapter
+from app.core.errors import SysError
 from app.db.session import get_session, open_session
 from app.engines.factory import build_engines
 from app.repositories.evaluation import EvaluationRepository
@@ -116,11 +117,24 @@ def _default_launcher() -> Callable[..., asyncio.Task]:
 
     async def _background(run_id: str, *, enabled_metrics, params) -> None:
         try:
-            engines, _skipped = build_engines(
+            engines, skipped = build_engines(
                 enabled_metrics,
                 alias_table=params.extra.get("alias_table"),
                 judge_config=params.extra.get("judge_config"),  # public fields only
             )
+            if skipped:
+                # build_engines documents "a metric is NEVER silently dropped".
+                # Plan time already rejects metrics the REGISTRY does not know
+                # (run_planner.resolve_profile -> 409 BIZ_CONFIG_INVALID); this is
+                # the other skip path: a registered metric whose ENGINE has no
+                # builder. Raising lands the run in `failed` with a structured
+                # error_summary via the except below, instead of completing with
+                # those metrics simply absent from the report.
+                raise SysError(
+                    f"engine assembly dropped enabled metrics: {skipped}",
+                    code="SYS_METRIC_BACKEND_UNAVAILABLE",
+                    context={"metrics": skipped},
+                )
             # T-14B formal input path: url configured -> HttpRagAdapter;
             # absent -> explicit GoldenRunMetadataAdapter (test/golden-run only)
             rag_adapter = build_rag_adapter(params.extra.get("rag_input"))
