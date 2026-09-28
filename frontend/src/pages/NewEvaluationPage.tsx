@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, endpoints, humanizeError } from '../api/client';
 import { DIRECTION_LABEL } from '../api/mappers';
+import { presentCategory } from '../status/status';
 import type {
   ConfigDetailResponse,
   ConfigSummaryView,
@@ -564,7 +565,7 @@ function MetricEditor({
               {m.name}
               {meta?.description ? <span className={styles.metricHint}>{meta.description}</span> : null}
             </span>
-            <span className={styles.metricCell}>{meta?.category ?? '—'}</span>
+            <span className={styles.metricCell}>{meta ? presentCategory(meta.category).label : '—'}</span>
             <span className={styles.metricCell}>
               {meta ? (DIRECTION_LABEL[meta.direction] ?? meta.direction) : '—'}
               {meta ? <span className={styles.metricHint}>{meta.version}</span> : null}

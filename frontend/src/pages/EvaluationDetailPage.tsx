@@ -55,6 +55,13 @@ function downloadJson(filename: string, data: unknown) {
   URL.revokeObjectURL(url);
 }
 
+/** 运行级覆盖的字段名 → 中文。未收录的键原样显示。 */
+const OVERRIDE_FIELD_LABEL: Record<string, string> = {
+  enabled: '启用',
+  threshold: '阈值',
+  weight: '权重',
+};
+
 export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
   const params = useParams<{ runId: string }>();
   const runId = runIdProp ?? params.runId ?? '';
@@ -431,7 +438,7 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
                   <div className={styles.repro}>
                     {safeReproducibility(report.reproducibility).map((entry) => (
                       <div key={entry.key} className={styles.reproRow}>
-                        <span className={styles.reproKey}>{entry.key}</span>
+                        <span className={styles.reproKey}>{entry.label}</span>
                         <span className={styles.reproVal}>{entry.value || '—'}</span>
                       </div>
                     ))}
@@ -469,8 +476,8 @@ function EffectiveMetricsPanel({ meta }: { meta: Record<string, unknown> }) {
                 Object.entries(overrides[name]).map(([field, value]) => (
                   <tr key={`${name}-${field}`}>
                     <td className="mono">{name}</td>
-                    <td className="mono">{field}</td>
-                    <td><code>{value === null ? 'null（无 PASS/FAIL）' : String(value)}</code></td>
+                    <td>{OVERRIDE_FIELD_LABEL[field] ?? field}</td>
+                    <td><code>{value === null ? '无通过/失败判定' : String(value)}</code></td>
                   </tr>
                 )),
               )}

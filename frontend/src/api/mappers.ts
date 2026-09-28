@@ -216,11 +216,34 @@ export function directionLabel(direction: string | null | undefined): string {
  */
 const SECRET_KEY_PATTERN = /(key|secret|token|password|credential|authorization)/i;
 
+/** 运行快照的键 → 中文标签。未收录的键原样显示 —— 后端加字段时不该渲染成空白。 */
+const REPRO_KEY_LABEL: Record<string, string> = {
+  profile: '评估配置',
+  profile_version: '配置版本',
+  config_version: '配置指纹',
+  dataset_version: '数据集版本',
+  metric_version: '指标版本',
+  model_version: '模型版本',
+  prompt_version: '提示词版本',
+  judge_provider: 'Judge 服务商',
+  judge_model: 'Judge 模型',
+  judge_model_version: 'Judge 模型版本',
+  judge_temperature: 'Judge 采样温度',
+  judge_max_tokens: 'Judge 最大生成长度',
+  judge_timeout: 'Judge 超时（秒）',
+  judge_retry: 'Judge 重试次数',
+  timestamp: '运行时间',
+};
+
 export function safeReproducibility(meta: Record<string, unknown> | null | undefined) {
   const entries = Object.entries(meta ?? {}).filter(
     ([key, value]) => !SECRET_KEY_PATTERN.test(key) && typeof value !== 'object',
   );
-  return entries.map(([key, value]) => ({ key, value: String(value ?? '') }));
+  return entries.map(([key, value]) => ({
+    key,
+    label: REPRO_KEY_LABEL[key] ?? key,
+    value: String(value ?? ''),
+  }));
 }
 
 // -------- Configuration Lifecycle v1 (Phase B/C) --------

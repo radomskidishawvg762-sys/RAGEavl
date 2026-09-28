@@ -317,7 +317,8 @@ describe('Evaluation detail', () => {
     fireEvent.click(screen.getByTestId('tab-configuration'));
     await waitFor(() => expect(screen.getByText('运行快照', { selector: 'h2' })).toBeInTheDocument());
     expect(screen.queryByText(/sk-SHOULD-NEVER-APPEAR/)).toBeNull();
-    expect(screen.getByText('judge_model')).toBeInTheDocument();
+    // 对照组：非敏感字段的标签与值都应出现（标签现在是中文，键名不再直接渲染）
+    expect(screen.getByText('Judge 模型')).toBeInTheDocument();
     expect(screen.getByText('gpt-4o-mini')).toBeInTheDocument();
   });
 
