@@ -56,3 +56,44 @@ def test_registered_metrics_still_resolve() -> None:
 
     plan = resolve_profile(_merged("temporal_consistency"))
     assert plan is not None
+
+
+def test_all_metrics_disabled_is_rejected_at_plan_time() -> None:
+    """A run with nothing to evaluate must not be CREATED.
+
+    Without this guard the run was created and then finished `failed` with
+    error_summary = NULL — the service counted every record as an error, but
+    error_details is only appended on the exception branch, so there was no cause
+    to read anywhere — while ADR-06 had already locked the dataset forever.
+    """
+    merged = {
+        "metrics": {
+            "temporal_consistency": {"enabled": False},
+            "numerical_consistency": {"enabled": False},
+        }
+    }
+
+    with pytest.raises(ConfigInvalidError) as ei:
+        resolve_profile(merged)
+
+    assert ei.value.code == "BIZ_CONFIG_INVALID"
+    assert ei.value.http_status == 409
+    assert ei.value.context["enabled_metrics"] == []
+
+
+def test_one_enabled_metric_is_still_enough() -> None:
+    """The guard must not reject a profile that kept at least one metric on."""
+    from app.metrics.bootstrap import bootstrap_metrics
+
+    bootstrap_metrics()
+
+    plan = resolve_profile(
+        {
+            "metrics": {
+                "temporal_consistency": {"enabled": True},
+                "numerical_consistency": {"enabled": False},
+            }
+        }
+    )
+
+    assert plan.enabled_metrics == ["temporal_consistency"]

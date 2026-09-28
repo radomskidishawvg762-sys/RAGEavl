@@ -279,6 +279,23 @@ def resolve_profile(merged: dict) -> RunPlan:
         "diagnosis_enabled": pipeline_cfg["diagnosis"]["enabled"],
     }
     enabled = [name for name in enabled if name not in pipeline_cfg["excluded_metrics"]]
+    if not enabled:
+        # Nothing left to evaluate. Without this guard the run was CREATED: the
+        # factory built no engines, every record produced no metric rows, the
+        # service counted each record as an error, and — because error_details is
+        # only appended on the exception branch — the run finished `failed` with
+        # error_summary = NULL, so there was no cause to read anywhere. ADR-06 had
+        # already locked the dataset by then, and that lock is never released.
+        # Rejecting at plan time keeps the dataset usable.
+        raise ConfigInvalidError(
+            "no metrics are enabled after applying the profile and any overrides "
+            "— a run with nothing to evaluate cannot produce a result",
+            code="BIZ_CONFIG_INVALID",
+            context={
+                "enabled_metrics": [],
+                "excluded_metrics": sorted(pipeline_cfg["excluded_metrics"]),
+            },
+        )
     return RunPlan(
         enabled_metrics=enabled,
         params=EvalParams(
