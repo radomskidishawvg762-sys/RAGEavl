@@ -70,16 +70,9 @@ def metric_status(row: dict) -> str:
     if comparison_type in _UNDETERMINED_COMPARISON_TYPES:
         return "undetermined"
     if comparison_type in DETERMINISTIC_MISMATCH_TYPES:
-        # The evaluator RAN and reached a definitive verdict; it merely has no
-        # numeric score because the two sides are not comparable as numbers
-        # (unit_mismatch). The diagnosis layer classifies these as CONFIRMED
-        # failures and the report lists them under Failures, so returning
-        # "not_run" showed 未执行 for a metric that produced a real mismatch — and
-        # left `passed` untouched in the metrics rollup.
-        #
-        # The canonical set is imported rather than re-listed so this cannot drift
-        # from the classifier (exactly the drift that made English and CJK
-        # currency units incomparable in the integrity metrics).
+        # Deterministic mismatch: the evaluator ran and reached a verdict, it just
+        # has no numeric score. Imported rather than re-listed so it cannot drift
+        # from the classifier.
         return "completed"
     return "not_run"
 

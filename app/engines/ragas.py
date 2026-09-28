@@ -106,29 +106,10 @@ class RagasScorer:
             raise ExtJudgeUnavailableError(
                 "ragas is not installed (pip install -e '.[eval]')"
             )
-        # Deprecated on ragas 0.4.3, slated for removal in ragas v1.0. Kept
-        # deliberately: `ragas==0.4.3` is hard-pinned in pyproject.toml, so this
-        # is tracked debt, not a live risk.
-        #
-        # TRIGGER: do this migration only when you actually want to move off ragas
-        # 0.4.3 (bug fix, new metric, security patch). Nothing forces it today.
-        # Migrating REPLACES the scorer, so scores for the same data can change —
-        # and this platform's core claim is telling a real improvement apart from
-        # noise. Bumping the scorer injects a "the scorer changed" factor into every
-        # old-vs-new delta. Do it as its own task, with a before/after score
-        # comparison on a fixed dataset, and a new `metric_version` recorded.
-        # (The judge now works — x-opencode-session — so that comparison is possible.)
-        #
-        # Do NOT follow the DeprecationWarning's "Example: from
-        # ragas.metrics.collections import faithfulness" — that name is a
-        # *submodule* there, not the metric. The real replacement is the
-        # class-based component API (collections.Faithfulness et al.), which is
-        # NOT a drop-in: it takes an InstructorBaseRagasLLM / BaseRagasEmbedding
-        # (different protocols than the Langchain*Wrapper classes below) and
-        # scores via ascore() instead of single_turn_ascore(sample, ...).
-        # Migrating therefore means rewriting this scorer AND both bridges in
-        # ragas_bridge.py — a scoring-path change that needs a live judge to
-        # verify, so it belongs in its own task, not a drive-by fix.
+        # Deprecated on ragas 0.4.3 (removed in v1.0) but hard-pinned, so this is
+        # tracked debt, not a live risk. Do NOT follow the DeprecationWarning's
+        # suggested import: `ragas.metrics.collections.faithfulness` is a submodule,
+        # not the metric — the real replacement is a different, non-drop-in API.
         from ragas import metrics as ragas_metrics
         from ragas.embeddings import LangchainEmbeddingsWrapper
         from ragas.llms import LangchainLLMWrapper

@@ -75,15 +75,9 @@ class DatasetService:
         records: list[DatasetRecordData] = to_dataset_records(kept) if report.valid else []
 
         status = "valid" if report.valid else "invalid"
-        # For a VALID import, record_count must describe what was PERSISTED, not
-        # what was parsed: `kept` is the deduplicated subset (duplicate_policy:
-        # skip), so len(raw_records) made the dataset list claim "100 条记录" above
-        # a table holding 95, and a run on it started with total_records=100 until
-        # the runner corrected it.
-        # An INVALID import deliberately keeps the SUBMITTED count (3 submitted,
-        # 0 stored) — that is asserted by
-        # test_import_validation_failed_400_invalid_persisted_records_not_inserted,
-        # so the two cases are not the same number.
+        # record_count describes what was PERSISTED (the deduplicated subset), not
+        # what was parsed. An INVALID import deliberately keeps the SUBMITTED count
+        # instead — asserted by test_import_validation_failed_400_….
         record_count = len(kept) if report.valid else len(raw_records)
         ds = self._datasets.create_version_with_records(
             project_id,

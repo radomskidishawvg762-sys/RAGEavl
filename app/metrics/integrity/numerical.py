@@ -49,13 +49,9 @@ _UNIT_TABLE: dict[str, tuple[str, float, str | None]] = {
     "per cent": ("percent", 1e-2, None),
 }
 
-# Comparison class per NORMALIZED unit token, derived from _UNIT_TABLE instead of
-# re-listed, so the two cannot drift apart again. They did drift: the comparison
-# layer hardcoded only the CJK currency tokens, so "thousand"/"million"/
-# "billion"/"trillion" — which _UNIT_TABLE normalizes into the SAME base-yuan
-# space as 百万元/亿元 — were classified "unitless". Any English-vs-CJK amount
-# ("5 million" vs "500万元", both 5_000_000) therefore hit the unit-class gate and
-# came back a CONFIRMED unit_mismatch failure on an answer that was correct.
+# Comparison class per NORMALIZED unit token, derived from _UNIT_TABLE so the two
+# cannot drift apart — they once did, making English and CJK amounts of the same
+# value (e.g. "5 million" vs "500万元") a confirmed unit_mismatch.
 _RATIO_UNITS = frozenset({"percent", "permille"})
 UNIT_CLASS_BY_UNIT: dict[str, str] = {
     normalized: ("ratio" if normalized in _RATIO_UNITS else "currency" if currency else "unitless")

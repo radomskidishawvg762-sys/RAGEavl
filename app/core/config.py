@@ -50,13 +50,9 @@ class Settings(BaseSettings):
     judge_extra_headers: str | None = None
 
     # --- RAG input adapter (T-14B) ---
-    # Declared here because config/*.yaml's ${VAR} substitution resolves against
-    # os.environ ONLY, and pydantic-settings reads .env.local / .env.test
-    # internally without ever populating os.environ. So a RAG_INPUT_URL written
-    # only in .env.local never reached system.yaml's ${RAG_INPUT_URL:} and every
-    # run silently fell back to golden replay — answers read from the dataset's
-    # own metadata — while the run reported success. run_planner.normalize_rag_input
-    # now consults these when the system layer leaves them unset.
+    # config/*.yaml's ${VAR} resolves against os.environ only, and pydantic-settings
+    # never populates it — so a value written only in .env.local never reached
+    # system.yaml. run_planner.normalize_rag_input consults these to fill that gap.
     rag_input_url: str | None = None
     rag_input_timeout: float | None = None
     rag_input_retry: int | None = None
