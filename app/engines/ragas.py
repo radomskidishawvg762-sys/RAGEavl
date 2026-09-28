@@ -110,6 +110,15 @@ class RagasScorer:
         # deliberately: `ragas==0.4.3` is hard-pinned in pyproject.toml, so this
         # is tracked debt, not a live risk.
         #
+        # TRIGGER: do this migration only when you actually want to move off ragas
+        # 0.4.3 (bug fix, new metric, security patch). Nothing forces it today.
+        # Migrating REPLACES the scorer, so scores for the same data can change —
+        # and this platform's core claim is telling a real improvement apart from
+        # noise. Bumping the scorer injects a "the scorer changed" factor into every
+        # old-vs-new delta. Do it as its own task, with a before/after score
+        # comparison on a fixed dataset, and a new `metric_version` recorded.
+        # (The judge now works — x-opencode-session — so that comparison is possible.)
+        #
         # Do NOT follow the DeprecationWarning's "Example: from
         # ragas.metrics.collections import faithfulness" — that name is a
         # *submodule* there, not the metric. The real replacement is the
