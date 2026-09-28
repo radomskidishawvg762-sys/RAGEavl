@@ -137,7 +137,15 @@ class ReportService:
                 # rendered — the run detail page had no way to show that a run
                 # answered from golden-replay metadata instead of a real RAG.
                 "input_mode": _rag_input_mode(meta),
-                "valid_metric_count": sum(1 for r in metric_rows if r.get("score") is not None),
+                # Both sides count METRICS, never rows. metric_rows holds one row
+                # per (record x metric), so a row-count numerator over a
+                # metric-count denominator rendered as nonsense like "235/6" on a
+                # 50-record run — the label says 有效指标, and now it is one.
+                # Pre-existing tests missed this because they all use a single-record
+                # fixture, where a row count and a metric count coincide.
+                "valid_metric_count": len(
+                    {r["metric_name"] for r in metric_rows if r.get("score") is not None}
+                ),
                 "total_enabled_metric_count": len(enabled_metrics)
                 or len({r["metric_name"] for r in metric_rows}),
                 "created_at": run.created_at,

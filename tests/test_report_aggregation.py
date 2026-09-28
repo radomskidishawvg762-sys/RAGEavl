@@ -347,3 +347,46 @@ def test_compute_overall_score_helper() -> None:
     score, valid, total = compute_overall_score(rows, {"a": 1.0, "b": 3.0})
     assert (score, valid, total) == (0.5, 2, 3)
     assert compute_overall_score([{"metric_name": "a", "score": None}])[0] is None
+
+
+# ---- valid_metric_count counts METRICS, not rows (multi-record only) ----
+
+
+def test_valid_metric_count_counts_metrics_not_rows() -> None:
+    """Regression for the run detail page showing "235/6".
+
+    metric_rows holds one row per (record x metric), while the denominator counts
+    metrics — so a row-count numerator rendered as a meaningless ratio. Every other
+    test in this file seeds a SINGLE record, where rows and metrics coincide, which
+    is exactly why this survived.
+    """
+    repo = FakeEvaluationRepo({"ds1": {"is_locked": False, "record_count": 3, "version": "v1"}}, [])
+    run_id = _make_run(repo, status="completed")
+
+    # 3 records x 2 metrics = 6 rows, but only 2 distinct metrics
+    for rec in ("r1", "r2", "r3"):
+        _seed(repo, run_id, [
+            {"metric_name": "temporal_consistency", "score": 1.0},
+            {"metric_name": "numerical_consistency", "score": 0.5},
+        ], record=rec)
+
+    rep = _report(repo, run_id)
+
+    assert rep["summary"]["valid_metric_count"] == 2  # 6 rows would be the old bug
+
+
+def test_metric_scoring_none_everywhere_is_not_valid() -> None:
+    """The other direction: rows exist, but a metric that never produced a real
+    score must not be counted as valid."""
+    repo = FakeEvaluationRepo({"ds1": {"is_locked": False, "record_count": 2, "version": "v1"}}, [])
+    run_id = _make_run(repo, status="completed")
+
+    for rec in ("r1", "r2"):
+        _seed(repo, run_id, [
+            {"metric_name": "temporal_consistency", "score": 1.0},
+            {"metric_name": "numerical_consistency", "score": None, "comparison_basis": None},
+        ], record=rec)
+
+    rep = _report(repo, run_id)
+
+    assert rep["summary"]["valid_metric_count"] == 1
