@@ -165,6 +165,24 @@ class EvaluationRepository(BaseRepository[EvaluationRun]):
             return None
         return self.get_run(run_id)
 
+    def reconcile_orphaned_runs(self, *, finished_at, error_summary: dict) -> int:
+        """Fail every run a previous process left in flight. Returns how many.
+
+        Runs execute as in-process asyncio tasks (ADR-02), so a process that dies
+        mid-run leaves its row at `pending`/`running` forever: GET /progress keeps
+        reporting "running" (the UI polls without end), the report stays non-final,
+        the dataset stays locked by ADR-06, and no endpoint can move it. Called
+        once at startup — ADR-02 already accepts that a restart loses in-flight
+        tasks, and this records that fact instead of hiding it.
+        """
+        result = self._session.execute(
+            update(EvaluationRun)
+            .where(EvaluationRun.status.in_(("pending", "running")))
+            .values(status="failed", finished_at=finished_at, error_summary=error_summary)
+        )
+        self._session.commit()
+        return result.rowcount or 0
+
     def start_run_if_pending(self, run_id: str, *, started_at) -> EvaluationRun | None:
         """Start only a pending run; a committed cancellation wins the race."""
         result = self._session.execute(
