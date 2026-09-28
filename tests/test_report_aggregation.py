@@ -390,3 +390,48 @@ def test_metric_scoring_none_everywhere_is_not_valid() -> None:
     rep = _report(repo, run_id)
 
     assert rep["summary"]["valid_metric_count"] == 1
+
+
+# ---- runtime-sweep fixes: terminal-state semantics ----
+
+
+def test_metric_status_deterministic_mismatch_is_not_not_run() -> None:
+    """`unit_mismatch` carries no numeric score (the two sides are not comparable
+    as numbers) but the evaluator DID run and the diagnosis layer classifies it a
+    CONFIRMED failure — the report lists it under Failures. It used to return
+    not_run, so the UI showed 未执行 for a metric that produced a real mismatch.
+    """
+    assert metric_status(
+        {"score": None, "comparison_basis": {"comparison_type": "unit_mismatch"}}
+    ) == "completed"
+    # An incoherent shape (a "match" with no score) must still fall back.
+    assert metric_status(
+        {"score": None, "comparison_basis": {"comparison_type": "match"}}
+    ) == "not_run"
+
+
+def test_cancelled_run_report_has_no_score_and_says_so() -> None:
+    """The write path deliberately never persists an overall_score for a cancelled
+    run. The read path used to recompute one from the partial rows, presenting a
+    fraction of the dataset as a headline number with is_final=True and no caveat.
+    """
+    repo = FakeEvaluationRepo({"ds1": {"is_locked": False, "record_count": 0, "version": "v1"}}, [])
+    run_id = _make_run(repo, status="cancelled")
+    _seed(repo, run_id, [{"metric_name": "temporal_consistency", "score": 0.9}])
+
+    rep = _report(repo, run_id)
+
+    assert rep["summary"]["overall_score"] is None
+    assert rep["summary"]["message"], "a cancelled run must carry a caveat"
+
+
+def test_completed_run_still_reports_a_score() -> None:
+    """The narrower fallback must not stop scoring runs that did finish."""
+    repo = FakeEvaluationRepo({"ds1": {"is_locked": False, "record_count": 0, "version": "v1"}}, [])
+    run_id = _make_run(repo, status="completed")
+    _seed(repo, run_id, [{"metric_name": "temporal_consistency", "score": 0.9}])
+
+    rep = _report(repo, run_id)
+
+    assert rep["summary"]["overall_score"] == pytest.approx(0.9)
+    assert rep["summary"]["message"] is None

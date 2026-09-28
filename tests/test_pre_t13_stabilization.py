@@ -268,3 +268,17 @@ def test_c3_frozen_contracts_unchanged() -> None:
         "diagnosed", "undetermined", "not_failed",
     )
     assert Failure.model_fields["source"].annotation.__args__ == ("threshold", "deterministic_mismatch")
+
+
+def test_zero_record_run_is_failed_not_completed() -> None:
+    """A run over a dataset holding no persisted records used to finish
+    "completed" with evaluated=0 and coverage 0.0 — green, while ADR-06 then
+    locked that dataset forever. Reachable via an import that FAILED validation
+    (dataset row written, zero dataset_records rows), which the New Evaluation
+    wizard does not block. An evaluation that evaluated nothing is not a success.
+    """
+    assert LocalAsyncRunner._determine_status(0, 0, 0) == "failed"
+    # The neighbouring branches must keep their meaning.
+    assert LocalAsyncRunner._determine_status(2, 0, 2) == "failed"
+    assert LocalAsyncRunner._determine_status(2, 2, 0) == "completed"
+    assert LocalAsyncRunner._determine_status(2, 1, 1) == "completed_with_errors"

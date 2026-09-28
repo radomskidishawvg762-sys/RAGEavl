@@ -93,7 +93,14 @@ class LocalAsyncRunner:
     def _determine_status(total: int, evaluated: int, errors: int) -> RunStatus:
         # No percentage thresholds (PRD Q6).
         if total == 0:
-            return "completed"
+            # An empty dataset is NOT a successful evaluation. This used to return
+            # "completed", so a run over a dataset holding no persisted records —
+            # e.g. one whose import FAILED validation and left a row with
+            # record_count=N but zero dataset_records rows — finished green with
+            # evaluated=0 and coverage 0.0, and ADR-06 then locked that dataset
+            # forever with no re-run path. (The root cause is upstream: run
+            # creation does not check the dataset's record_count.)
+            return "failed"
         if evaluated == 0:
             return "failed"
         if errors == 0 and evaluated == total:

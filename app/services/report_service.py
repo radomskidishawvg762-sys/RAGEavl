@@ -28,7 +28,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from app.core.logging import redact_text
-from app.diagnosis import DiagnosisEngine
+from app.diagnosis import DETERMINISTIC_MISMATCH_TYPES, DiagnosisEngine
 from app.repositories.evaluation import EvaluationRepository
 
 # comparison outcomes that mean "cannot judge" (never a score, never a failure)
@@ -38,6 +38,13 @@ _UNDETERMINED_COMPARISON_TYPES = {"ambiguous", "missing_reference"}
 _NOT_CONFIGURED_CODES = {"BIZ_JUDGE_NOT_CONFIGURED"}
 
 _RUN_TERMINAL_STATES = {"completed", "completed_with_errors", "failed", "cancelled"}
+
+# Terminal states whose evaluation actually FINISHED. cancelled / failed are
+# terminal (the row will not change again) but deliberately carry no persisted
+# overall_score: the write path refuses to score a partial evaluation. See the
+# read path below — recomputing one there would present a fraction of the dataset
+# as a headline number.
+_SCORABLE_STATES = {"completed", "completed_with_errors"}
 
 
 def metric_status(row: dict) -> str:
@@ -62,7 +69,33 @@ def metric_status(row: dict) -> str:
         comparison_type = basis.get("comparison_type")
     if comparison_type in _UNDETERMINED_COMPARISON_TYPES:
         return "undetermined"
+    if comparison_type in DETERMINISTIC_MISMATCH_TYPES:
+        # The evaluator RAN and reached a definitive verdict; it merely has no
+        # numeric score because the two sides are not comparable as numbers
+        # (unit_mismatch). The diagnosis layer classifies these as CONFIRMED
+        # failures and the report lists them under Failures, so returning
+        # "not_run" showed 未执行 for a metric that produced a real mismatch — and
+        # left `passed` untouched in the metrics rollup.
+        #
+        # The canonical set is imported rather than re-listed so this cannot drift
+        # from the classifier (exactly the drift that made English and CJK
+        # currency units incomparable in the integrity metrics).
+        return "completed"
     return "not_run"
+
+
+def _report_message(status: str, terminal: bool) -> str | None:
+    """Caveat for the report header, or None when there is nothing to flag.
+
+    The old `None if terminal else ...` gave a cancelled or failed run NO caveat
+    at all, even though its rows cover only part of the dataset and it carries no
+    overall score — so the page read as a finished report.
+    """
+    if not terminal:
+        return f"run is {status}: report is not final"
+    if status not in _SCORABLE_STATES:
+        return f"run is {status}: evaluation did not complete — no overall score"
+    return None
 
 
 def _rag_input_mode(meta: dict) -> str | None:
@@ -112,9 +145,15 @@ class ReportService:
         terminal = run.status in _RUN_TERMINAL_STATES
 
         # overall_score is persisted at run completion (§七); the report reads it
-        # and only falls back to a computation for legacy/uncached runs.
+        # and falls back to a computation only for legacy/uncached runs that
+        # ACTUALLY FINISHED. For cancelled/failed, `terminal` is true but the
+        # write path deliberately never persisted a score, and recomputing one
+        # here would undo that decision: a run cancelled after 2 of 10 records
+        # would show a headline score computed from 20% of the data, with
+        # is_final=True and no caveat — the exact silent-success the platform
+        # exists to prevent.
         overall_score = run.overall_score
-        if overall_score is None and terminal:
+        if overall_score is None and run.status in _SCORABLE_STATES:
             overall_score, _valid, _total = compute_overall_score(metric_rows, weights)
 
         aggregated_metrics = self._aggregate_metrics(metric_rows, weights)
@@ -151,7 +190,7 @@ class ReportService:
                 "created_at": run.created_at,
                 "started_at": run.started_at,
                 "finished_at": run.finished_at,
-                "message": None if terminal else f"run is {run.status}: report is not final",
+                "message": _report_message(run.status, terminal),
             },
             "metrics": aggregated_metrics,
             "raw_metrics": [
