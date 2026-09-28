@@ -68,7 +68,7 @@
   font-weight: var(--fw-medium);
   font-size: var(--fs-xs);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  /* 无 letter-spacing：表头是中文，字间距只会吃掉宽度、把「阈值」挤成两行。 */
   padding: var(--sp-2) var(--sp-3);
   border-bottom: 1px solid var(--color-border-muted);
 }
@@ -78,8 +78,11 @@
   border-bottom: 1px solid var(--color-border-muted);
   color: var(--color-text);
   vertical-align: middle;
-  /* 与 DashboardPage 同因：不可断行的长标识符决定 min-content 宽度，撑破卡片。
-     `anywhere` 参与 min-content 计算，`break-word` 不参与。 */
+}
+/* 只有标识符列（第一列）允许断行 —— 它的长 token 决定 min-content 宽度、撑破卡片。
+   其余列是分数等短值，绝不能断行：`0.9429` 曾被拆成 `0.942`/`9`。 */
+.metricTable td:first-child,
+.failureTable td:first-child {
   overflow-wrap: anywhere;
 }
 

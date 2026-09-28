@@ -89,7 +89,8 @@
   font-weight: var(--fw-medium);
   font-size: var(--fs-xs);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  /* 无 letter-spacing：表头是中文，字间距只会吃掉宽度、把「阈值」挤成两行
+     （1440 下实测 43.5px 可用 vs 约 46px 所需）。CJK 也不受 uppercase 影响。 */
   padding: var(--sp-2) var(--sp-3);
   border-bottom: 1px solid var(--color-border-muted);
 }
@@ -100,12 +101,17 @@
   padding: var(--sp-2) var(--sp-3);
   border-bottom: 1px solid var(--color-border-muted);
   color: var(--color-text);
-  /* 长且不可断行的标识符（numerical_consistency）决定表格的 min-content 宽度，
-     使表格在窄容器里涨过 width:100% 并溢出卡片（1280 下实测越界 43px）。
-     `anywhere` 会参与 min-content 计算，`break-word` 不会 —— 所以只有它能让表格
-     收缩回容器内。仅在放不下时才断行，宽屏下外观不变。 */
-  overflow-wrap: anywhere;
   vertical-align: middle;
+}
+
+/* 只有标识符列（第一列）允许断行：它的长 token（numerical_consistency）决定表格的
+   min-content 宽度，不收缩就撑破卡片。**其余列是分数等短值，绝不能断行** ——
+   曾经把 `anywhere` 加到所有 td，结果 `0.9429` 被拆成 `0.942`/`9`，
+   读者会误读成另一个分数，比原来的越界更糟。 */
+.metricTable td:first-child,
+.failureTable td:first-child,
+.runTable td:first-child {
+  overflow-wrap: anywhere;
 }
 
 .clickable {

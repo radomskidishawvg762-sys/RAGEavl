@@ -276,6 +276,15 @@ const RUN_STATUS_LABEL = (status: string) => presentRun(status as RunStatus).lab
 
 type ReasonRule = [RegExp, (...matched: string[]) => string];
 
+/** 后端把指标列表塞进原因串时用的是 Python 字面量：`['a', 'b']`、`[]`。
+ *  直接透传会让 `['…']` 夹在中文里像渲染 bug（且空列表显示成 `[]`），
+ *  比原来的英文更难读。解析成「a、b」，空列表留空。未识别时原样返回。 */
+function metricListText(raw: string): string {
+  const quoted = raw.match(/'[^']*'|"[^"]*"/g);
+  if (!quoted) return raw.trim() === '[]' ? '' : raw;
+  return quoted.map((q) => q.slice(1, -1)).join('、');
+}
+
 const COMPARISON_REASON_RULES: ReasonRule[] = [
   [/^run (.+) not finalized \(status=(.+)\)$/, (_m, id, st) => `运行 ${id} 尚未结束（状态：${RUN_STATUS_LABEL(st)}）`],
   [/^runs target different datasets$/, () => '两次运行的目标数据集不同'],
@@ -283,7 +292,7 @@ const COMPARISON_REASON_RULES: ReasonRule[] = [
   [/^dataset version not snapshotted$/, () => '未记录数据集版本快照'],
   [/^enabled metrics not snapshotted$/, () => '未记录启用指标快照'],
   [/^no common enabled metrics$/, () => '两次运行没有共同启用的指标'],
-  [/^enabled metrics differ \(baseline-only: (.*), candidate-only: (.*)\)$/, (_m, b, c) => `启用指标不同（仅基线：${b}；仅候选：${c}）`],
+  [/^enabled metrics differ \(baseline-only: (.*), candidate-only: (.*)\)$/, (_m, b, c) => `启用指标不同（仅基线：${metricListText(b)}；仅候选：${metricListText(c)}）`],
   [/^metric version differs \((.+)\)$/, (_m, v) => `指标版本不同（${v}）`],
   [/^metric version not snapshotted$/, () => '未记录指标版本快照'],
   [/^config version differs \(profile key semantics\)$/, () => '配置指纹不同（Profile 键语义）'],
