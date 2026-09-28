@@ -57,6 +57,9 @@ class OpenAIJudge:
             api_key=key,
             base_url=self._config.base_url or None,
             timeout=self._config.timeout,
+            # Gateways may require routing headers (opencode zen: x-opencode-session,
+            # absent -> 400 MissingSessionID). None keeps the SDK defaults.
+            default_headers=self._config.extra_headers or None,
         )
 
     async def _invoke(self, prompt: str) -> str:

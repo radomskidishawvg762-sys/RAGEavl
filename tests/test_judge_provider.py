@@ -384,3 +384,51 @@ def test_golden_smoke_single_record() -> None:
         assert result.error is not None
     else:
         assert 0.0 <= result.score <= 1.0
+
+
+# ---- extra headers: some gateways refuse calls without a routing header ----
+
+
+def test_judge_extra_headers_parsed_from_settings(monkeypatch) -> None:
+    """opencode zen answers 400 MissingSessionID unless x-opencode-session is sent,
+    which made a correctly-configured judge unusable and every RAGAS metric error
+    out on every record."""
+    from app.core.config import settings
+    from app.engines.judge import judge_config_from_settings
+
+    monkeypatch.setattr(settings, "judge_extra_headers", '{"x-opencode-session": "rageval"}', raising=False)
+
+    assert judge_config_from_settings().extra_headers == {"x-opencode-session": "rageval"}
+
+
+def test_judge_extra_headers_absent_is_none(monkeypatch) -> None:
+    from app.core.config import settings
+    from app.engines.judge import judge_config_from_settings
+
+    monkeypatch.setattr(settings, "judge_extra_headers", None, raising=False)
+
+    assert judge_config_from_settings().extra_headers is None
+
+
+def test_malformed_judge_extra_headers_is_ignored_not_fatal(monkeypatch) -> None:
+    """A typo in the env must not turn every run into an error."""
+    from app.core.config import settings
+    from app.engines.judge import judge_config_from_settings
+
+    monkeypatch.setattr(settings, "judge_extra_headers", "not json", raising=False)
+    assert judge_config_from_settings().extra_headers is None
+
+    monkeypatch.setattr(settings, "judge_extra_headers", '["a", "list"]', raising=False)
+    assert judge_config_from_settings().extra_headers is None
+
+
+def test_judge_extra_headers_never_reach_public_dump() -> None:
+    """public_dump() feeds describe() / reproducibility_meta / Machine Report.
+    A routing session id is operational noise there, and this is the one place a
+    stray header could leak into a persisted artifact."""
+    from app.engines.judge import JudgeConfig
+
+    cfg = JudgeConfig(provider="openai", model="m", extra_headers={"x-opencode-session": "s"})
+
+    assert cfg.extra_headers == {"x-opencode-session": "s"}
+    assert "extra_headers" not in cfg.public_dump()

@@ -42,6 +42,12 @@ class Settings(BaseSettings):
     judge_model_version: str | None = None
     judge_base_url: str | None = None
     judge_api_key: SecretStr | None = None
+    # Optional extra HTTP headers for the judge gateway, as a JSON object, e.g.
+    #   JUDGE_EXTRA_HEADERS={"x-opencode-session":"rageval"}
+    # Some OpenAI-compatible gateways reject calls without a routing/session
+    # header — opencode zen answers 400 MissingSessionID — which made the
+    # configured judge unusable and every RAGAS metric error out.
+    judge_extra_headers: str | None = None
 
     # --- RAG input adapter (T-14B) ---
     # Declared here because config/*.yaml's ${VAR} substitution resolves against

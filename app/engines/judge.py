@@ -18,12 +18,16 @@ never holds keys; describe() and reproducibility output NEVER include api_key.
 
 from __future__ import annotations
 
+import json
+import logging
 from typing import Any, Protocol, runtime_checkable
 
 from pydantic import BaseModel, SecretStr
 
 from app.core.config import settings
 from app.core.errors import JudgeNotConfiguredError
+
+logger = logging.getLogger(__name__)
 
 _JUDGE_DESCRIBE_FIELDS = (
     "provider", "model", "model_version", "base_url",
@@ -45,6 +49,9 @@ class JudgeConfig(BaseModel):
     timeout: int = 30
     retry: int = 3
     api_key: SecretStr | None = None
+    # Extra HTTP headers for the gateway (NOT in _JUDGE_DESCRIBE_FIELDS: a routing
+    # session id is operational noise in a snapshot, not a reproducibility fact).
+    extra_headers: dict[str, str] | None = None
 
     def public_dump(self) -> dict[str, Any]:
         """All fields EXCEPT api_key — the only shape allowed into describe() /
@@ -117,6 +124,29 @@ class PlaceholderEmbeddings:
         return {"embeddings_model": self._model}
 
 
+def judge_extra_headers() -> dict[str, str] | None:
+    """JUDGE_EXTRA_HEADERS (JSON object) -> header dict, or None.
+
+    Needed because some OpenAI-compatible gateways require a routing header:
+    opencode zen answers every call with `400 MissingSessionID` unless
+    `x-opencode-session` is present, so a correctly-configured judge was unusable
+    and all four RAGAS metrics errored out on every record.
+    """
+    raw = (settings.judge_extra_headers or "").strip()
+    if not raw:
+        return None
+    try:
+        parsed = json.loads(raw)
+    except ValueError:
+        logger.warning("JUDGE_EXTRA_HEADERS is not valid JSON — ignoring it")
+        return None
+    if not isinstance(parsed, dict):
+        logger.warning("JUDGE_EXTRA_HEADERS must be a JSON object — ignoring it")
+        return None
+    headers = {str(k): str(v) for k, v in parsed.items()}
+    return headers or None
+
+
 def judge_config_from_settings() -> JudgeConfig:
     """JUDGE_* env (Settings) is the secret-bearing source; YAML references the
     same values via ${JUDGE_*} tokens (config/system.yaml)."""
@@ -130,6 +160,7 @@ def judge_config_from_settings() -> JudgeConfig:
         timeout=30,
         retry=3,
         api_key=settings.judge_api_key,
+        extra_headers=judge_extra_headers(),
     )
 
 
