@@ -196,6 +196,21 @@ describe('Evaluation detail', () => {
     expect(screen.getByText('Run 快照 Configuration')).toBeInTheDocument();
   });
 
+  it('4b. surfaces the RAG input mode in the execution overview', async () => {
+    stubFetch(detailHandler);
+    render(
+      <MemoryRouter>
+        <EvaluationDetailPage runId="run-aaaa-1111" />
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(screen.getByText('执行概览')).toBeInTheDocument());
+    // The fixture snapshot is golden_replay. A run answering from the dataset's
+    // own metadata must say so out loud, not look like a real RAG run — the
+    // snapshot's rag_input is an object and safeReproducibility drops those, so
+    // this scalar is the only place the mode can show up on this page.
+    expect(screen.getByTestId('input-mode')).toHaveTextContent('金标回放（非生产 RAG）');
+  });
+
   it('5. polling stops once the run reaches a terminal status', async () => {
     let calls = 0;
     stubFetch((url) => {

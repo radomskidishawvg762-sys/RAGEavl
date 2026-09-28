@@ -122,6 +122,7 @@ export function report(): ReportResponse {
       evaluation_coverage: 1,
       valid_metric_count: 2,
       total_enabled_metric_count: 3,
+      input_mode: 'golden_replay',
       created_at: '2026-08-30T01:00:00Z',
       started_at: '2026-08-30T01:00:01Z',
       finished_at: '2026-08-30T01:01:00Z',

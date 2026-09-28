@@ -243,6 +243,14 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
                     <div className={styles.execItem}><span className={styles.execLabel}>评估错误</span><span className={styles.execVal}>{summary.error_records}</span></div>
                     <div className={styles.execItem}><span className={styles.execLabel}>无法判定</span><span className={styles.execVal}>{undetermined.length}</span></div>
                     <div className={styles.execItem}><span className={styles.execLabel}>有效指标</span><span className={styles.execVal}>{summary.valid_metric_count}/{summary.total_enabled_metric_count}</span></div>
+                    <div className={styles.execItem}>
+                      <span className={styles.execLabel}>RAG 输入</span>
+                      <span className={styles.execVal} data-testid="input-mode">
+                        {summary.input_mode === 'golden_replay'
+                          ? '金标回放（非生产 RAG）'
+                          : (summary.input_mode ?? '—')}
+                      </span>
+                    </div>
                     {summary.message ? <div className={styles.execNote}>{summary.message}</div> : null}
                   </div>
                 </Section>

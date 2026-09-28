@@ -201,6 +201,11 @@ export interface ReportSummary {
   evaluation_coverage: number | null;
   valid_metric_count: number;
   total_enabled_metric_count: number;
+  /** RAG input mode from the run snapshot. Scalar by design: the snapshot's
+   *  `rag_input` is an object, and safeReproducibility drops object values, so
+   *  without this the run detail page could not tell golden_replay from a real
+   *  RAG. null when the snapshot predates the field. */
+  input_mode: string | null;
   created_at: string;
   started_at: string | null;
   finished_at: string | null;
