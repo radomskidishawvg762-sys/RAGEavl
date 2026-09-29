@@ -189,13 +189,8 @@ def resolve_effective_pipeline(merged: dict, enabled_metrics: list[str]) -> dict
         try:
             engine = default_registry.get_metric(name).spec.engine
         except KeyError:
-            # NOT silently skipped. An enabled metric with no registry entry (its
-            # engine backend is not installed) produces zero rows, yet the run
-            # used to finish "completed" with a plausible overall_score while the
-            # snapshot claimed every configured metric. Collected here and raised
-            # by resolve_profile, which runs BEFORE any run row is created and
-            # before the dataset row lock is taken (ADR-06: that lock is never
-            # released, so failing later would consume the dataset version).
+            # Collected, not skipped: resolve_profile raises before any run row
+            # or dataset lock exists (ADR-06 locks are never released).
             unknown.append(name)
             continue
         if selected is not None and engine not in selected:

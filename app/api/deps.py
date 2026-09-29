@@ -123,13 +123,8 @@ def _default_launcher() -> Callable[..., asyncio.Task]:
                 judge_config=params.extra.get("judge_config"),  # public fields only
             )
             if skipped:
-                # build_engines documents "a metric is NEVER silently dropped".
-                # Plan time already rejects metrics the REGISTRY does not know
-                # (run_planner.resolve_profile -> 409 BIZ_CONFIG_INVALID); this is
-                # the other skip path: a registered metric whose ENGINE has no
-                # builder. Raising lands the run in `failed` with a structured
-                # error_summary via the except below, instead of completing with
-                # those metrics simply absent from the report.
+                # The other skip path (registry knows it, no builder): fail the
+                # run with a code rather than completing with metrics absent.
                 raise SysError(
                     f"engine assembly dropped enabled metrics: {skipped}",
                     code="SYS_METRIC_BACKEND_UNAVAILABLE",

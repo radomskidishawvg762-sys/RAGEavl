@@ -392,13 +392,8 @@ class EvaluationService:
             error_summary=({"error_records": error_records, "details": error_details}
                            if error_details else None),
         )
-        # When `finished` is None, cancellation may have committed while the
-        # runner was finishing — never let the in-memory summary replace the
-        # persisted terminal state. Read the status through get_run_status (a
-        # fresh column read), NOT get_run: the ORM-enabled UPDATE in
-        # finish_run_if_running synchronises its SET values onto the in-session
-        # object even when rowcount == 0, so get_run would report "completed" for
-        # a row that a concurrent cancel persisted as "cancelled".
+        # Fresh column read, not get_run: the ORM-enabled UPDATE above syncs its
+        # SET values onto the in-session object even when rowcount == 0.
         status = (
             finished.status if finished is not None else self._repo.get_run_status(run_id)
         )
