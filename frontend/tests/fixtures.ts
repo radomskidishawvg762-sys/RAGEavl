@@ -201,7 +201,7 @@ export function report(): ReportResponse {
         message: 'RAG adapter request failed: timeout',
       },
     ],
-    run_level_diagnoses: { status: 'not_available', items: [] },
+    run_level_diagnoses: { status: 'not_available', total_diagnoses: 0, total_failure_records: 0, undetermined_count: 0, items: [] },
     quality_dimensions: [
       { dimension: 'retrieval', metrics: ['context_precision'], score: 0.91, metric_count: 1, failure_count: 0, undetermined_count: 0, diagnosed_count: 0, diagnosis_coverage: null, evidence_count: 0, evidence_coverage: null, evaluated_rows: 50, total_rows: 50, is_weakest: false },
       { dimension: 'generation', metrics: ['faithfulness'], score: 0.65, metric_count: 1, failure_count: 0, undetermined_count: 0, diagnosed_count: 0, diagnosis_coverage: null, evidence_count: 0, evidence_coverage: null, evaluated_rows: 50, total_rows: 50, is_weakest: false },

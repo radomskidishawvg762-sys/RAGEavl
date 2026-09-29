@@ -3,7 +3,7 @@
  * Vitest + React Testing Library; fetch is stubbed so no backend is required.
  */
 
-import { fireEvent, render, screen, waitFor, act } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, act, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -356,5 +356,56 @@ describe('presentation rules', () => {
     expect(humanizeError(new ApiError(503, { detail: 'x', code: 'EXT_JUDGE_UNAVAILABLE', trace_id: 't' }))).toContain('Judge');
     expect(humanizeError(new ApiError(500, { detail: 'boom', code: 'SYS_INTERNAL', trace_id: 't' }))).toContain('内部错误');
     expect(humanizeError(new Error('network'))).toContain('网络');
+  });
+});
+
+describe('运行级诊断汇总', () => {
+  it('renders the honesty signal when diagnoses exist', async () => {
+    const report = fx.report();
+    report.run_level_diagnoses = {
+      status: 'available',
+      total_diagnoses: 80,
+      total_failure_records: 37,
+      undetermined_count: 65,
+      items: [
+        { status: 'undetermined', failure_type: null, count: 65, ratio: 0.8125, severity: 'WARNING', related_metrics: ['faithfulness'], affected_records: 27, evidence_available: false },
+        { status: 'diagnosed', failure_type: 'integrity.numerical_mismatch', count: 15, ratio: 0.1875, severity: 'CRITICAL', related_metrics: ['numerical_consistency'], affected_records: 15, evidence_available: true },
+      ],
+    };
+    stubFetch((url) => (url.includes('/report') ? { body: report } : detailHandler(url)));
+    render(
+      <MemoryRouter>
+        <EvaluationDetailPage runId="run-aaaa-1111" />
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(screen.getByText('运行级诊断汇总')).toBeInTheDocument());
+    // 三个诚实性计数
+    expect(screen.getByText('37')).toBeInTheDocument();
+    expect(screen.getByText('80')).toBeInTheDocument();
+    // 65 出现两次是设计使然：执行概览的「无法判定」计数 + 分桶表里 undetermined 桶的条数
+    expect(screen.getAllByText('65')).toHaveLength(2);
+    // 解释力提示：81% = round(65/80)
+    expect(screen.getByText(/81%/)).toBeInTheDocument();
+    expect(screen.getByText(/分数解释力有限/)).toBeInTheDocument();
+    // 分桶表
+    // 失败概览表与新的分桶表都会显示该码
+    expect(screen.getAllByText('integrity.numerical_mismatch').length).toBeGreaterThanOrEqual(2);
+    // 限定在新面板内：「无法判定」在质量维度表头也出现
+    const panel = screen.getByText('运行级诊断汇总').closest('section')!;
+    // 面板内出现两次：执行概览的「无法判定」标签 + 分桶表的 undetermined 状态
+    expect(within(panel).getAllByText('无法判定')).toHaveLength(2);
+    expect(within(panel).getByText('已诊断')).toBeInTheDocument();
+  });
+
+  it('shows the empty state when the run has no sample-level diagnoses', async () => {
+    stubFetch(detailHandler);
+    render(
+      <MemoryRouter>
+        <EvaluationDetailPage runId="run-aaaa-1111" />
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(screen.getByText('运行级诊断汇总')).toBeInTheDocument());
+    expect(screen.getByText('本次运行没有样本级诊断记录。')).toBeInTheDocument();
+    expect(screen.queryByText(/分数解释力有限/)).toBeNull();
   });
 });

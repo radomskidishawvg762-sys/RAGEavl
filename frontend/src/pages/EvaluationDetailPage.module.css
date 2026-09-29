@@ -86,6 +86,24 @@
   overflow-wrap: anywhere;
 }
 
+/* 同 DashboardPage：数值列下限，让第一列吸收挤压而非把「阈值」压成竖排。 */
+.metricTable th:nth-child(3),
+.metricTable td:nth-child(3) {
+  min-width: 3.5em;
+}
+.failureTable td:nth-child(2) {
+  overflow-wrap: anywhere;
+}
+
+/* 证据表在 1280 下「类型」列曾一个字一行（60 个单元格）：列被压到约 1em。
+   该表在 overflow-x: auto 容器内，给 CJK 标签列一个下限即可横向滚动而非竖排。 */
+.evidenceTable th:nth-child(3),
+.evidenceTable td:nth-child(3),
+.evidenceTable th:nth-child(4),
+.evidenceTable td:nth-child(4) {
+  min-width: 4.5em;
+}
+
 .num {
   font-variant-numeric: tabular-nums;
 }

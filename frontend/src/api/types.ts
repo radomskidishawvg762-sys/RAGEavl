@@ -267,7 +267,21 @@ export interface ExecutionErrorItem {
 
 export interface RunLevelDiagnoses {
   status: 'available' | 'not_available';
-  items: Array<Record<string, unknown>>;
+  total_diagnoses: number;
+  total_failure_records: number;
+  undetermined_count: number;
+  items: RunFailureBucket[];
+}
+
+export interface RunFailureBucket {
+  status: 'diagnosed' | 'undetermined';
+  failure_type: string | null;
+  count: number;
+  ratio: number;
+  severity: string;
+  related_metrics: string[];
+  affected_records: number;
+  evidence_available: boolean;
 }
 
 export interface QualityDimension {

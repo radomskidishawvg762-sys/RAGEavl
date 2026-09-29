@@ -259,6 +259,66 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
                   )}
                 </Section>
 
+                <Section
+                  title="运行级诊断汇总"
+                  actions={
+                    report.run_level_diagnoses.status === 'available' ? (
+                      <span className={styles.count}>{report.run_level_diagnoses.total_diagnoses} 条</span>
+                    ) : null
+                  }
+                >
+                  {report.run_level_diagnoses.status !== 'available' ? (
+                    <div className={styles.metricEmpty}>本次运行没有样本级诊断记录。</div>
+                  ) : (
+                    <>
+                      <div className={styles.execGrid}>
+                        <div className={styles.execItem}>
+                          <span className={styles.execLabel}>失败记录</span>
+                          <span className={styles.execVal}>{report.run_level_diagnoses.total_failure_records}</span>
+                        </div>
+                        <div className={styles.execItem}>
+                          <span className={styles.execLabel}>诊断条数</span>
+                          <span className={styles.execVal}>{report.run_level_diagnoses.total_diagnoses}</span>
+                        </div>
+                        <div className={styles.execItem}>
+                          <span className={styles.execLabel}>无法判定</span>
+                          <span className={styles.execVal}>{report.run_level_diagnoses.undetermined_count}</span>
+                        </div>
+                      </div>
+                      {report.run_level_diagnoses.total_diagnoses > 0 && report.run_level_diagnoses.undetermined_count > 0 ? (
+                        <div className={styles.execNote}>
+                          {Math.round((report.run_level_diagnoses.undetermined_count / report.run_level_diagnoses.total_diagnoses) * 100)}%
+                          的诊断无法归因 —— 证据不足，本次运行的分数解释力有限。
+                        </div>
+                      ) : null}
+                      {report.run_level_diagnoses.items.length > 0 ? (
+                        <table className={styles.failureTable}>
+                          <thead>
+                            <tr>
+                              <th align="left">状态</th>
+                              <th align="left">失败类型</th>
+                              <th align="right">条数</th>
+                              <th align="right">受影响记录</th>
+                              <th align="left">证据</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {report.run_level_diagnoses.items.map((b, i) => (
+                              <tr key={`${b.status}-${b.failure_type ?? i}`}>
+                                <td>{b.status === 'diagnosed' ? '已诊断' : '无法判定'}</td>
+                                <td className="mono">{b.failure_type ?? '—'}</td>
+                                <td align="right" className={styles.num}>{b.count}</td>
+                                <td align="right" className={styles.num}>{b.affected_records}</td>
+                                <td>{b.status === 'diagnosed' ? (b.evidence_available ? '有' : '无') : '—'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      ) : null}
+                    </>
+                  )}
+                </Section>
+
                 <Section title="执行概览">
                   <div className={styles.execGrid}>
                     <div className={styles.execItem}><span className={styles.execLabel}>记录</span><span className={styles.execVal}>{summary.evaluated_records}/{summary.total_records}</span></div>

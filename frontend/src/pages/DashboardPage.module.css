@@ -113,6 +113,22 @@
   overflow-wrap: anywhere;
 }
 
+/* 数值列给一个下限：表格收缩时由第一列（标识符列，已允许断行）吸收挤压，
+   而不是把「阈值」这类两字表头压成竖排。实测成因：一致性卡片里
+   numerical_consistency 把指标列撑到 173px，阈值列只剩约 22px 内容盒。 */
+.metricTable th:nth-child(3),
+.metricTable td:nth-child(3) {
+  min-width: 3.5em;
+}
+
+/* 失败/运行表的长 token 在第二列（integrity.numerical_mismatch 等）：
+   首列断行机制管不到它们，给第二列同样的收缩许可，避免将来更长的无空格
+   token 把表格重新撑破卡片。 */
+.failureTable td:nth-child(2),
+.runTable td:nth-child(2) {
+  overflow-wrap: anywhere;
+}
+
 .clickable {
   cursor: pointer;
 }
