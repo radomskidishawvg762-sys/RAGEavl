@@ -89,7 +89,7 @@
 /* 同 DashboardPage：数值列下限，让第一列吸收挤压而非把「阈值」压成竖排。 */
 .metricTable th:nth-child(3),
 .metricTable td:nth-child(3) {
-  min-width: 3.5em;
+  min-width: 4.5em;  /* 同 DashboardPage：3.5em 实测不生效，需 ≥4.4em */
 }
 .failureTable td:nth-child(2) {
   overflow-wrap: anywhere;
@@ -101,7 +101,9 @@
 .evidenceTable td:nth-child(3),
 .evidenceTable th:nth-child(4),
 .evidenceTable td:nth-child(4) {
-  min-width: 4.5em;
+  /* 该表本就横向滚动（overflow-x: auto），所以 CJK 标签列用 nowrap 是安全且正确的：
+     4.5em 下限实测只把「参考上下文」从 5 行压到 3 行，仍竖排；nowrap 直接归零。 */
+  white-space: nowrap;
 }
 
 .num {
@@ -162,6 +164,21 @@
   padding: 0;
 }
 .undeterminedItem,
+.errorDetail {
+  margin-left: auto;
+}
+.errorDetail summary {
+  cursor: pointer;
+  color: var(--color-text-subtle);
+  font-size: var(--fs-xs);
+}
+.errorDetail > span {
+  display: block;
+  margin-top: var(--sp-1);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
 .unlexecItem {
   display: flex;
   gap: var(--sp-3);

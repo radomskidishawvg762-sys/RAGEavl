@@ -73,12 +73,8 @@ export function FailureExplorerPage() {
           },
         ),
         fetchAllPages<ResultsPageResponse['items'][number]>(
-          // NOT filtered to is_failure=true: the table shows every diagnosis, and
-          // an `undetermined` one points at a result with is_failure=false. The
-          // filter therefore left 65 of 80 rows with a blank Question cell even
-          // though the question exists. Results are one row per RECORD (not per
-          // metric), so the full list is the same order of magnitude as the
-          // diagnoses already fetched above.
+          // 不按 is_failure 过滤：undetermined 诊断指向 is_failure=false 的结果，
+          // 过滤会让它们的题面空白。results 每记录一行，量级与 diagnoses 相当。
           (p, ps) => `/api/evaluations/${runId}/results?page=${p}&page_size=${ps}`,
         ),
       ]);

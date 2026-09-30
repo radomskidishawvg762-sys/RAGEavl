@@ -32,6 +32,7 @@ import {
   evidenceSourceLabel,
   evidenceTypeLabel,
   safeReproducibility,
+  scrubProviderText,
 } from '../api/mappers';
 import styles from './EvaluationDetailPage.module.css';
 
@@ -58,6 +59,14 @@ function downloadJson(filename: string, data: unknown) {
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+/** 错误码前缀 → 一句干净的中文摘要（主行用；原始句子折进详情）。 */
+function errorKindLabel(code: string): string {
+  if (code.startsWith('EXT_')) return '外部依赖异常';
+  if (code.startsWith('SYS_')) return '系统异常';
+  if (code.startsWith('BIZ_')) return '业务限制';
+  return '执行异常';
 }
 
 /** 运行级覆盖的字段名 → 中文。未收录的键原样显示。 */
@@ -443,7 +452,13 @@ export function EvaluationDetailPage({ runId: runIdProp }: { runId?: string }) {
                         <li key={`${e.error_code}-${i}`} className={styles.unlexecItem} data-testid="error-item">
                           <code>{e.error_code}</code>
                           <span className="mono">{e.metric ?? '(记录级)'}</span>
-                          <span className={styles.dim}>{e.message}</span>
+                          {/* 主行只留干净的中文摘要；provider 原始句子（可能带 key、
+                              账号 ID、内网 URL）折进详情并脱敏 —— 排障能力不丢。 */}
+                          <span className={styles.dim}>{errorKindLabel(e.error_code ?? '')}</span>
+                          <details className={styles.errorDetail}>
+                            <summary>详情</summary>
+                            <span className={styles.dim}>{scrubProviderText(e.message ?? '')}</span>
+                          </details>
                         </li>
                       ))}
                     </ul>

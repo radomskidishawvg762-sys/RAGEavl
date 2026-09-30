@@ -400,17 +400,47 @@ function rootCauseLabel(text: string): string {
  *  只做两件事：把内部标记前缀（`comparison_type=ambiguous:`、`metric error (X):`）
  *  换成中文，以及把已知的根因标签（`Numerical Mismatch`）换成中文。其余散文原样
  *  保留 —— 「不要机器翻译后端生成的自然语言」是硬规则。 */
+/** 后端**固定**诊断短语的人工白名单。
+ *
+ *  政策：动态生成的 provider/后端散文保留原文（机器翻译会翻出错意思）；
+ *  但已知、固定、可枚举的短语是人工译一次进这张表 —— 那不属于机器翻译。
+ *  未收录的串原样返回。 */
+const UNDETERMINED_REASON_LABEL: Record<string, string> = {
+  'cannot reliably judge (no forced diagnosis)': '无法可靠判定（不做强制诊断）',
+  'insufficient basis to judge': '判定依据不足',
+  'no reference evidence (gold) on record — attribution forbidden':
+    '记录上没有参考证据（gold）—— 禁止归因',
+  'no retrieved evidence (contexts) on record — attribution forbidden':
+    '记录上没有检索证据（contexts）—— 禁止归因',
+  'gold evidence not reliably comparable after deterministic normalization':
+    'gold 证据在确定性归一化后不可可靠比较',
+  'no retrieved evidence (contexts) on record — grounding cannot be checked':
+    '记录上没有检索证据（contexts）—— 无法检查有据性',
+  'no reliably extractable numeric claims in answer; grounding/relevance cannot be checked deterministically (semantic matching unavailable this phase)':
+    '答案中没有可可靠抽取的数值声明；有据性/相关性无法确定性检查（本阶段无语义匹配）',
+};
+
+/** provider 报错里的敏感/拓扑信息脱敏：URL、疑似 key、账号 ID。
+ *  排障信息折进详情折叠区后仍可见，但主行与日志面不裸奔。 */
+export function scrubProviderText(text: string): string {
+  return text
+    .replace(/https?:\/\/[^\s)'"]+/g, '<url>')
+    .replace(/(sk|key|token)-[A-Za-z0-9_-]{8,}/gi, '<redacted>')
+    .replace(/(acc|acct|account|workspace|org|project)[_-]?[iI][dD]?[=:]?\s*[A-Za-z0-9_-]{6,}/g, '$1=<redacted>');
+}
+
 export function diagnosisTextLabel(text: string): string {
   const comparisonType = /^comparison_type=([a-z_]+):\s*([\s\S]*)$/.exec(text);
   if (comparisonType) {
     const [, token, rest] = comparisonType;
-    return `比较类型「${COMPARISON_TYPE_LABEL[token] ?? token}」：${rest}`;
+    return `比较类型「${COMPARISON_TYPE_LABEL[token] ?? token}」：${UNDETERMINED_REASON_LABEL[rest.trim()] ?? rest}`;
   }
   const metricError = /^metric error \(([^)]+)\):\s*([\s\S]*)$/.exec(text);
   if (metricError) {
     const [, code, rest] = metricError;
-    return `指标执行错误（${code}）：${rest}`;
+    return `指标执行错误（${code}）：${UNDETERMINED_REASON_LABEL[rest.trim()] ?? rest}`;
   }
+  if (UNDETERMINED_REASON_LABEL[text.trim()]) return UNDETERMINED_REASON_LABEL[text.trim()];
   return rootCauseLabel(text);
 }
 

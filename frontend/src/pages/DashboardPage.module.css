@@ -118,7 +118,9 @@
    numerical_consistency 把指标列撑到 173px，阈值列只剩约 22px 内容盒。 */
 .metricTable th:nth-child(3),
 .metricTable td:nth-child(3) {
-  min-width: 3.5em;
+  /* 实测：阈值两字 + 字距需约 47.1px（border-box），1280 下列宽 46.5px —— 差 0.5px。
+     3.5em(38.5px) 低于列的自然宽度因此从不生效（复验对照实验证实）。4.5em=49.5px 越线。 */
+  min-width: 4.5em;
 }
 
 /* 失败/运行表的长 token 在第二列（integrity.numerical_mismatch 等）：

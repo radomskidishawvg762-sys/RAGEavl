@@ -180,11 +180,7 @@ def test_import_duplicate_skip_policy_dedupes() -> None:
     assert resp.status_code == 201
     ds_id = resp.json()["id"]
     assert fd.inserted_records[ds_id] == 2  # later duplicate dropped
-    # …and the recorded COUNT must describe what was stored, not what was parsed.
-    # This assertion was the gap: the rows were deduplicated correctly while
-    # record_count still said 3, so the dataset list showed "3 条记录" above a
-    # 2-row table, and a run created on it started with total_records=3 until the
-    # runner corrected it.
+    # record_count 必须描述存储数而非解析数 —— 这条断言正是当初缺失的那一环。
     recorded = next(d for d in fd.datasets if d.id == ds_id)
     assert recorded.record_count == 2
 
