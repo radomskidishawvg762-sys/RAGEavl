@@ -15,7 +15,6 @@ Locks:
 from __future__ import annotations
 
 import json
-from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -65,19 +64,7 @@ def _fake_list_metric_basis_rows_for_run(self, run_id: str) -> list[dict]:
     ]
 
 
-def _fake_get_dataset_with_name(self, dataset_id: str):
-    ds = self.datasets.get(dataset_id)
-    if ds is None:
-        from app.core.errors import NotFoundError
-
-        raise NotFoundError(f"dataset {dataset_id} not found")
-    return SimpleNamespace(id=dataset_id, name=ds.get("name", "it-ds"),
-                           version=ds.get("version", "v1"))
-
-
 FakeEvaluationRepo.list_metric_basis_rows_for_run = _fake_list_metric_basis_rows_for_run
-FakeEvaluationRepo.get_dataset = _fake_get_dataset_with_name
-
 
 class _ReadOnlyRepo(FakeEvaluationRepo):
     """Any mutation attempt breaks the test — export must be pure read."""

@@ -50,6 +50,12 @@ export interface JudgeSettings {
   source: string;
   reachable?: boolean | null;
   message?: string | null;
+  test_status?: 'success' | 'failed' | 'not_configured' | null;
+  error_code?: string | null;
+  error_category?: string | null;
+  upstream_status?: number | null;
+  retryable?: boolean | null;
+  latency_ms?: number | null;
 }
 
 // ---------------- Evaluation list / detail ----------------

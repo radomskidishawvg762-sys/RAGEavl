@@ -330,7 +330,7 @@ def test_provider_retries_then_succeeds() -> None:
 
     judge = OpenAIJudge(_configured_cfg())
     completions = _FakeCompletions(
-        [RuntimeError("429 GoUsageLimitError: weekly limit"), _ok_response()]
+        [RuntimeError("429 rate limit exceeded"), _ok_response()]
     )
     _wire(judge, completions)
     assert asyncio.run(judge.ainvoke("p")) == "ok"
@@ -341,7 +341,7 @@ def test_provider_exhausts_retries_into_ext_judge_unavailable() -> None:
     import asyncio
 
     judge = OpenAIJudge(_configured_cfg())
-    completions = _FakeCompletions([RuntimeError("429 GoUsageLimitError")])
+    completions = _FakeCompletions([RuntimeError("429 rate limit exceeded")])
     _wire(judge, completions)
     with pytest.raises(ExtJudgeUnavailableError) as ei:
         asyncio.run(judge.ainvoke("p"))

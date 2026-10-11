@@ -53,6 +53,11 @@ interface MetricOverrideState {
 type Overrides = Record<string, MetricOverrideState>;
 
 export function NewEvaluationPage() {
+  const { activeProjectId } = useProject();
+  return <NewEvaluationWizard key={activeProjectId ?? 'none'} />;
+}
+
+function NewEvaluationWizard() {
   const navigate = useNavigate();
   const { activeProject, loading: projectLoading, error: projectError } = useProject();
   const datasets = useDatasets(activeProject?.id ?? null);
@@ -92,10 +97,11 @@ export function NewEvaluationPage() {
     return <EmptyState title="请选择项目" description="新建评估需要指定项目。请先选择项目。" icon="circle" />;
   }
 
-  const canStart = Boolean(dataset) && Boolean(profile) && !dataset?.is_locked && !invalidWeight;
+  const datasetReady = Boolean(dataset && dataset.validation_status === 'valid' && dataset.record_count > 0);
+  const canStart = datasetReady && Boolean(profile) && !invalidWeight;
 
   async function handleStart() {
-    if (!dataset || !profile || !activeProject) return;
+    if (!canStart || !dataset || !profile || !activeProject || submitting) return;
     setSubmitting(true);
     setLaunchError(null);
     try {
@@ -156,27 +162,48 @@ export function NewEvaluationPage() {
             ) : (
               <div className={styles.datasetList}>
                 {selectableDatasets.map((d) => (
-                  <button
-                    key={d.id}
-                    type="button"
-                    className={[styles.datasetCard, dataset?.id === d.id ? styles.selected : ''].join(' ')}
-                    onClick={() => setDataset(d)}
-                    data-testid="select-dataset"
-                  >
-                    <div className={styles.datasetName}>{d.name} <span className="mono">{d.version}</span></div>
-                    <div className={styles.datasetMeta}>
-                      <span>记录数 {d.record_count}</span>
-                      <Tag tone={d.validation_status === 'valid' ? 'pass' : 'error'}>
-                        {d.validation_status === 'valid' ? '有效' : '无效'}
-                      </Tag>
-                      {d.is_locked ? <Tag tone="warning">已锁定</Tag> : null}
-                    </div>
-                  </button>
+                  <div key={d.id} className={styles.datasetOption}>
+                    <button
+                      type="button"
+                      className={[styles.datasetCard, dataset?.id === d.id ? styles.selected : ''].join(' ')}
+                      disabled={d.validation_status !== 'valid' || d.record_count <= 0}
+                      onClick={() => setDataset(d)}
+                      data-testid="select-dataset"
+                    >
+                      <div className={styles.datasetName}>{d.name} <span className="mono">{d.version}</span></div>
+                      <div className={styles.datasetMeta}>
+                        <span>记录数 {d.record_count}</span>
+                        <Tag tone={d.validation_status === 'valid' ? 'pass' : 'error'}>
+                          {d.validation_status === 'valid' ? '有效' : '无效'}
+                        </Tag>
+                        {d.is_locked ? <Tag tone="warning">已锁定</Tag> : null}
+                      </div>
+                      {d.record_count <= 0 ? <span>没有可评估记录</span> : null}
+                    </button>
+                    {d.validation_status !== 'valid' || d.record_count <= 0 ? (
+                      <Link to={'/datasets/' + d.id}>查看校验报告</Link>
+                    ) : null}
+                  </div>
                 ))}
               </div>
             )}
+            {datasets.total > datasets.pageSize ? (
+              <div className={styles.actions} aria-label="数据集分页">
+                <button type="button" className={styles.btn}
+                  disabled={datasets.loading || datasets.page <= 1}
+                  onClick={() => { setDataset(null); datasets.setPage(datasets.page - 1); }}>
+                  上一页
+                </button>
+                <span>第 {datasets.page} / {Math.ceil(datasets.total / datasets.pageSize)} 页 · 共 {datasets.total} 个</span>
+                <button type="button" className={styles.btn}
+                  disabled={datasets.loading || datasets.page >= Math.ceil(datasets.total / datasets.pageSize)}
+                  onClick={() => { setDataset(null); datasets.setPage(datasets.page + 1); }}>
+                  下一页
+                </button>
+              </div>
+            ) : null}
             <div className={styles.actions}>
-              <button type="button" className={styles.btn} disabled={!dataset} onClick={() => setStep(2)}>
+              <button type="button" className={styles.btn} disabled={!datasetReady} onClick={() => setStep(2)}>
                 下一步
               </button>
             </div>
@@ -300,7 +327,7 @@ export function NewEvaluationPage() {
 
             {dataset.is_locked ? (
               <div className={styles.gapHint} data-testid="locked-hint">
-                该数据集已被某个评估运行锁定（版本不可变）。请创建新版本后再启动评估。
+                该数据集内容已锁定，不可修改；可复用此版本再次评估，每次运行保存独立配置快照。
               </div>
             ) : null}
 

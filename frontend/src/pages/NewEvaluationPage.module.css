@@ -245,3 +245,8 @@
   color: var(--color-warning);
   font-weight: var(--fw-medium);
 }
+
+.datasetOption { display: grid; gap: var(--sp-2); }
+.datasetOption > a { font-size: var(--fs-sm); }
+.datasetCard:disabled { cursor: not-allowed; color: var(--color-text-muted); }
+.datasetCard:disabled:hover { background: var(--color-bg-inset); }

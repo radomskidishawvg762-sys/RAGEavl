@@ -569,9 +569,12 @@ def main() -> int:
         locked = httpx.post(f"{_BASE}/api/evaluations",
                             json={"project_id": ctx["project_id"], "dataset_id": ctx["dataset_id"],
                                   "config_id": ctx["configs"]["e2e"]}, timeout=60)
-        checks.add("re-run on locked dataset -> 409 BIZ_DATASET_LOCKED",
-                   locked.status_code == 409 and locked.json().get("code") == "BIZ_DATASET_LOCKED",
-                   f"{locked.status_code} {locked.text[:120]}")
+        checks.add("re-run reuses immutable locked dataset -> 202",
+                   locked.status_code == 202 and locked.json().get("run_id") != run_a,
+                   f"status={locked.status_code}")
+        if locked.status_code == 202:
+            # Creation suffices here; avoid a second full Judge evaluation.
+            httpx.post(f"{_BASE}/api/evaluations/{locked.json()['run_id']}/cancel", timeout=60)
 
         report = httpx.get(f"{_BASE}/api/evaluations/{run_a}/report", timeout=60).json()
         record_id = _first_record_id(ctx["dataset_id"])

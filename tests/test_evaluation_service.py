@@ -15,7 +15,7 @@ from types import SimpleNamespace
 import pytest
 from sqlalchemy.dialects import postgresql
 
-from app.core.errors import BizError, DatasetLockedError, NotFoundError, RunNotCancellableError
+from app.core.errors import BizError, NotFoundError, RunNotCancellableError
 from app.diagnosis import DiagnosisEngine
 from app.domain.schemas import MetricResult
 from app.engines.base import EvalParams
@@ -51,8 +51,6 @@ class FakeEvaluationRepo:
     def create_run_with_lock(self, *, project_id, dataset_id, config_id, reproducibility_meta):
         self.for_update_reads += 1  # fake of SELECT ... FOR UPDATE
         ds = self.datasets[dataset_id]
-        if ds["is_locked"]:
-            raise DatasetLockedError("locked")
         run_id = self._next_id()
         self.runs[run_id] = {
             "id": run_id, "project_id": project_id, "dataset_id": dataset_id,
@@ -124,7 +122,10 @@ class FakeEvaluationRepo:
         ds = self.datasets.get(dataset_id)
         if ds is None:
             raise NotFoundError(f"dataset {dataset_id} not found")
-        return SimpleNamespace(id=dataset_id, version=ds.get("version", "v1"))
+        return SimpleNamespace(
+            **{"project_id": "p1", "validation_status": "valid", "version": "v1", "name": "it-ds", **ds},
+            id=dataset_id,
+        )
 
     def list_runs(self, *, page, page_size, project_id=None, status=None):
         rows = sorted(self.runs.values(), key=lambda r: r["created_at"], reverse=True)
@@ -475,20 +476,24 @@ def test_12_lock_uses_row_level_for_update() -> None:
     assert "with_for_update" in src
 
 
-def test_12b_locked_dataset_rejects_run_and_persists_nothing() -> None:
+def test_12b_locked_dataset_allows_run_and_remains_immutable() -> None:
     svc, repo = _make_service([_record_row("r1", "q", "a", "b")], locked=True)
-    with pytest.raises(DatasetLockedError):
-        svc.create_run(project_id="p1", dataset_id="ds1", config_id="c1",
-                       reproducibility_meta={})
-    assert repo.runs == {}  # nothing persisted
+    run = svc.create_run(project_id="p1", dataset_id="ds1", config_id="c1",
+                         reproducibility_meta={"config_version": "first"})
+    assert run.dataset_id == "ds1"
+    assert repo.datasets["ds1"]["is_locked"] is True
 
 
-def test_12c_second_run_on_same_dataset_blocked() -> None:
+def test_12c_second_run_keeps_separate_snapshot_on_same_dataset() -> None:
     svc, repo = _make_service([_record_row("r1", "q", "a", "b")])
-    svc.create_run(project_id="p1", dataset_id="ds1", config_id="c1", reproducibility_meta={})
-    with pytest.raises(DatasetLockedError):
-        svc.create_run(project_id="p1", dataset_id="ds1", config_id="c1", reproducibility_meta={})
-    assert len(repo.runs) == 1
+    first = svc.create_run(project_id="p1", dataset_id="ds1", config_id="c1",
+                           reproducibility_meta={"config_version": "first"})
+    second = svc.create_run(project_id="p1", dataset_id="ds1", config_id="c1",
+                            reproducibility_meta={"config_version": "second"})
+    assert first.id != second.id
+    assert repo.runs[first.id]["reproducibility_meta"] == {"config_version": "first"}
+    assert repo.runs[second.id]["reproducibility_meta"] == {"config_version": "second"}
+    assert len(repo.records) == 1 and repo.datasets["ds1"]["is_locked"] is True
 
 
 # ---------------- §1 invariant: error must never leak from judged outcomes ----------------

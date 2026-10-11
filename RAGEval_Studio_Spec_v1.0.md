@@ -758,12 +758,12 @@ draft ──校验通过──> valid ──被 Run 引用──> locked
   └──校验失败──> invalid                      └──拒绝一切写操作；修正须新建 version
 ```
 
-**不能只靠 Service 层判断**（并发下两个请求可能同时读到 `is_locked = false`）。必须在 **Repository / Transaction 层**加保障：
+**2026-10-11 用户确认**：同一数据集版本可以多次评估；`is_locked` 仅保护内容不可修改。创建事务必须在 **Repository / Transaction 层**行锁内重新校验数据集有效性、非空和项目归属：
 
 ```text
 Transaction
   ↓ SELECT ... FOR UPDATE（或等价的行级锁）锁定 dataset 行
-  ↓ Verify: is_locked == false，否则中止
+  ↓ Verify: 数据集有效且非空，数据集和配置属于当前项目；已锁定版本可复用
   ↓ Create Run（写入 8 项元信息）
   ↓ Set datasets.is_locked = true
   ↓ COMMIT
@@ -964,7 +964,7 @@ post:
     '404':
       description: 资源不存在，错误码 BIZ_NOT_FOUND
     '409':
-      description: 状态冲突，错误码 BIZ_DATASET_LOCKED / BIZ_CONFIG_INVALID
+      description: 状态冲突，错误码 BIZ_DATASET_NOT_EVALUABLE / BIZ_PROJECT_MISMATCH / BIZ_CONFIG_INVALID
 ```
 
 ### 6.4 请求 / 响应示例（API-03 / API-04）
@@ -1083,7 +1083,7 @@ sequenceDiagram
 
   U->>API: POST /api/evaluations
   API->>ES: create_run()
-  Note over ES,RP: 单事务：行级锁 dataset → 校验未锁定 → 建 Run → 置 is_locked → COMMIT
+  Note over ES,RP: 单事务：行级锁 dataset → 校验有效性和归属（可复用已锁定版本）→ 建 Run → 置 is_locked → COMMIT
   ES->>RP: BEGIN + SELECT dataset FOR UPDATE
   RP->>DB: 加锁读取
   ES->>RP: insert run(status=pending) + 8 项元信息
@@ -1171,7 +1171,7 @@ sequenceDiagram
 | 报告页首屏 P95 ≤ 2s | B | `(run_id, is_failure)` 索引 + 分页 + 报告聚合结果落 `evaluation_runs` 避免实时聚合 |
 | 失败样本查询 P95 ≤ 500ms | B | 复合索引 + 游标分页 + 列表页不返回 contexts 正文 |
 | 版本对比 ≤ 5s | B | 仅读两个 Run 的聚合指标，不扫描明细 |
-| 并发 Run ≥ 1 | B | 同一数据集由 `datasets.is_locked` 行锁互斥；不同数据集可并发；记录级并发为 `LocalAsyncRunner` 的 `asyncio.Semaphore`；P1 再引入队列 |
+| 并发 Run ≥ 1 | B | 同一数据集的创建事务由行锁串行；同一或不同数据集的 Run 均可并发执行；记录级并发为 `LocalAsyncRunner` 的 `asyncio.Semaphore`；P1 再引入队列 |
 | Judge 方差 / 稳定性 | C | 固定 `temperature=0` + 固定 prompt/model 版本 + 提供 Benchmark 脚本统计方差 |
 | **云端数据库往返开销** | C | 连接池 `pool_pre_ping` + 合理 `pool_size`（默认 5/10）；批量写入减少往返；实测后定基线 |
 | 浏览器兼容 Chrome/Edge | B | Vite 构建目标 `es2020`；Ant Design 5 官方支持矩阵 |
@@ -2028,7 +2028,7 @@ quality_gate: null   # P1
 | 不变量 | 测试用例 |
 |--------|---------|
 | I-1 Dataset Immutable | 对 locked dataset 写入，断言 409 `BIZ_DATASET_LOCKED` |
-| **I-1b Dataset 锁定竞态** | **并发发起两个针对同一 Dataset 的 Run，断言只有一个成功、另一个 409**（验证事务内行级锁） |
+| **I-1b Dataset 锁定竞态** | **并发创建同一 Dataset 的两个 Run，断言均成功、ID 与快照独立，数据内容和 is_locked=true 保持不变**；校验失效或跨项目引用时断言不落库、不锁定 |
 | I-2 逐条逐指标落库 | 断言 metric_results 行数 = 记录数 × 启用指标数 |
 | I-3 诊断必带证据 | 构造缺证据场景，断言 `InsufficientEvidenceError` |
 | I-4 禁止凭 Score 归因 | 仅传 score 调用诊断，断言拒绝 |

@@ -18,6 +18,7 @@ Evaluation → Failure Detection → Diagnosis → Evidence → Root Cause
 | [`RAGEval_Studio_Spec_v1.0.md`](RAGEval_Studio_Spec_v1.0.md) | 技术设计规格说明书（v2.1，设计事实来源） |
 | [`docs/deployment/SUPABASE_CLOUD.md`](docs/deployment/SUPABASE_CLOUD.md) | 数据库部署：本地栈（主）/ Supabase Cloud（可选切换） |
 | [`docs/releases/MVP_FINAL_ACCEPTANCE.md`](docs/releases/MVP_FINAL_ACCEPTANCE.md) | MVP Freeze Gate 验收报告（含 2026-09-28 状态复审） |
+| [`docs/reviews/2026-10-11-judge-connectivity.md`](docs/reviews/2026-10-11-judge-connectivity.md) | 最新 Judge 连接修复、611 项后端检查及 20 案例实测；含评分误报分析 |
 
 ---
 
@@ -169,6 +170,24 @@ curl http://localhost:8000/api/health
 完整说明见 [`.env.example`](.env.example) 与 Spec 附录 B.1.1。
 
 配置来源优先级：环境变量 > `.env.test` > `.env.local`。
+
+### Judge 连接测试与重试
+
+系统设置中的「测试连接」会对当前表单发起一次最小模型请求（最多 64 输出 token，最长 10 秒），可能产生少量调用费用。测试不保存表单；空 API Key 沿用已有密钥。只有「保存」才更新当前后端进程的配置，重启后恢复环境变量配置。密钥与额外路由请求头不会回显或写入报告。
+
+`POST /api/settings/judge/test` 可不带请求体，也可提交待测试的配置字段。响应包括 `test_status`（`success` / `failed` / `not_configured`）、`latency_ms`，失败时包括 `error_code`、`error_category`、`upstream_status` 与 `retryable`。`configured` 仅代表配置完整；`reachable` 才表示本次实际请求成功。此测试只验证接口返回文本，结构化评分仍需实际评估验证。
+
+| 错误类别 | 错误码 | 自动重试 |
+|---|---|---|
+| 密钥无效 / 模型权限不足 | `EXT_JUDGE_AUTHENTICATION` / `EXT_JUDGE_PERMISSION_DENIED` | 否 |
+| 请求参数或协议错误 / 返回格式错误 | `EXT_JUDGE_REQUEST_INVALID` / `EXT_JUDGE_RESPONSE_INVALID` | 否 |
+| 套餐额度耗尽 | `EXT_JUDGE_QUOTA_EXHAUSTED` | 否 |
+| 临时限流 / 超时 / 网络故障 | `EXT_JUDGE_RATE_LIMITED` / `EXT_JUDGE_TIMEOUT` / `EXT_JUDGE_NETWORK` | 是 |
+| 上游 5xx 服务故障 | `EXT_JUDGE_UNAVAILABLE` | 是 |
+
+`retry` 表示包含第一次请求在内的最大尝试次数。Provider 统一负责重试，SDK 和 RAGAS 不再叠加请求；服务端要求等待超过 5 秒时直接返回限流信息。评估失败保留 `score: null` 与分类原因。
+
+Judge 的 `localhost` / 回环 IP 地址直接连接，避免本机代理将本地模型请求转发成 502；远程模型地址继续沿用用户的代理设置。
 
 ---
 

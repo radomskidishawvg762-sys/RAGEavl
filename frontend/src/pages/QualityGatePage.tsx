@@ -22,8 +22,13 @@ import { formatTimestamp } from '../utils/format';
 import styles from './QualityGatePage.module.css';
 
 export function QualityGatePage() {
+  const { activeProjectId } = useProject();
+  return <ProjectQualityGatePage key={activeProjectId ?? 'none'} />;
+}
+
+function ProjectQualityGatePage() {
   const { activeProject } = useProject();
-  const { state, error, runs } = useRunOptions(activeProject?.id ?? null);
+  const { state, error, runs, reload } = useRunOptions(activeProject?.id ?? null);
   const [runId, setRunId] = useState('');
   const [gate, setGate] = useState<QualityGateResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -58,7 +63,7 @@ export function QualityGatePage() {
     );
   }
   if (state === 'loading') return <LoadingState label="正在加载运行列表…" />;
-  if (state === 'error') return <ErrorState error={error} onRetry={() => void 0} />;
+  if (state === 'error') return <ErrorState error={error} onRetry={() => void reload()} />;
 
   const terminal = runs.filter((r) => !['pending', 'running'].includes(r.status));
 

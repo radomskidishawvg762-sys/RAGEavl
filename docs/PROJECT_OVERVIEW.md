@@ -101,7 +101,7 @@ evaluation_results · metric_results · diagnoses · recommendations · metric_d
 
 ```text
 SELECT ... FOR UPDATE（锁定 dataset 行）
-  → 校验 is_locked == false
+  → 校验数据集有效且非空、数据集/配置归属当前项目（已锁定版本可复用）
   → 插入 run（status=pending + 8 个复现字段）
   → 置 datasets.is_locked = true
   → COMMIT → 202 {run_id, status, reproducibility_meta}
@@ -188,7 +188,7 @@ config/system.yaml  <  config/domains/<domain>.yaml  <  config/evaluations/<prof
 - 不引入 `supabase-py` / `supabase-js` / Auth / Storage / Realtime / Self-Hosted。
 - **Alembic 是唯一建表途径**，禁止在 Dashboard/Studio 手工建表、禁止 `supabase db push`。
 - 不碰 Supabase 平台 schema（`auth` / `storage` / `realtime` / `supabase_*`）。
-- 不引入 Redis / Celery / ARQ / Kafka / Kubernetes / OpenTelemetry SDK；异步用 `BackgroundTasks` + asyncio。**同一数据集**由 `datasets.is_locked` 行锁互斥（ADR-06：锁上后不可重跑，需新版本），**不同数据集可并发**，记录级并发是 `LocalAsyncRunner` 的 `asyncio.Semaphore`。**没有进程级的 Run 锁** —— 因此 per-run 状态绝不可挂在模块级共享对象上。
+- 不引入 Redis / Celery / ARQ / Kafka / Kubernetes / OpenTelemetry SDK；异步用 `BackgroundTasks` + asyncio。数据集行锁仅串行创建事务；**同一或不同数据集的 Run 均可并发执行**（2026-10-11：锁定保护内容，不阻止再次评估），记录级并发是 `LocalAsyncRunner` 的 `asyncio.Semaphore`。**没有进程级的 Run 锁** —— 因此 per-run 状态绝不可挂在模块级共享对象上。
 
 `docker/docker-compose.yml` 只有一个 `app` service，没有 db service、没有 `depends_on: db`、没有 pgdata 卷。
 
@@ -304,9 +304,9 @@ pytest
 2. **没有 CI pipeline**。ADR-03（业务层不许按引擎名分支）、I-8（`api/`/`services/`/`domain/` 下不许 import supabase）这类 spec 静态检查，在本仓库是 **review 时人工保证**，不是自动化门禁。
 3. **引擎级 Pipeline 选择 UI 缺失**（FR-12 剩余项）。指标级的启用/阈值/权重覆盖是全链生效的；引擎级选择只有后端能力，没有 UI。
 4. **Run 级 RAG Input 配置无后端 API**，当前由 `system.yaml` 决定，UI 如实标注为 Backend Gap。
-5. **Settings 页的 Judge / RAG / Evaluation 参数是只读声明**（「由环境变量管理」），没有对应的写入端点。
-6. **PDF 导出、ARGUS 引擎、LLM 诊断展示** 属于 P1/P2，未实现。
-7. **YAML 运行时持久化 by design 不做**（ADR-05），Profiles 页只读。
+5. **Settings 页 Judge 支持当前进程内修改与真实连接测试**；测试当前草稿且不保存，重启恢复环境变量配置。RAG / Evaluation 的系统默认参数仍只读。详见 README「Judge 连接测试与重试」。
+6. **PDF/JSON 报告导出已实现**（2026-10-11 真实浏览器下载复验通过）；ARGUS 引擎、LLM 诊断展示仍待后续实现。
+7. **部署 YAML 不由网页回写**（ADR-05）；Profiles 可导入 YAML 创建数据库中的配置版本，长期部署文件仍需本地编辑。
 8. 本机代理会拦截 `127.0.0.1` 回环，跑 `test_14_api_chain_uses_real_http_rag_adapter` 需要先清空代理环境变量（环境问题，非代码缺陷）。
 
 更完整的验收矩阵与历史判定见 `docs/releases/MVP_FINAL_ACCEPTANCE.md`。

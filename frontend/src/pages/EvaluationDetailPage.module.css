@@ -97,6 +97,14 @@
 
 /* 证据表在 1280 下「类型」列曾一个字一行（60 个单元格）：列被压到约 1em。
    该表在 overflow-x: auto 容器内，给 CJK 标签列一个下限即可横向滚动而非竖排。 */
+/* Bound long metric identifiers inside the scrollable evidence table. */
+.evidenceTable th:nth-child(2),
+.evidenceTable td:nth-child(2) {
+  min-width: 12em;
+  max-width: 20em;
+  overflow-wrap: anywhere;
+}
+
 .evidenceTable th:nth-child(3),
 .evidenceTable td:nth-child(3),
 .evidenceTable th:nth-child(4),

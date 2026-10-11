@@ -46,9 +46,10 @@ class _SpyAdapter:
 
 
 def _make_run(repo: FakeEvaluationRepo, *, status: str = "pending", meta: dict | None = None):
-    svc = EvaluationService(repo)
-    run = svc.create_run(project_id="p1", dataset_id="ds1", config_id="c1",
-                         reproducibility_meta=meta or META)
+    # Seed persisted historical runs for read-only report tests, including
+    # legacy empty datasets. New-run eligibility is tested at creation entry.
+    run = repo.create_run_with_lock(project_id="p1", dataset_id="ds1", config_id="c1",
+                                    reproducibility_meta=meta or META)
     repo.runs[run.id]["status"] = status
     return run.id
 

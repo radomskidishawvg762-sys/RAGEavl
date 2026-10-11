@@ -82,7 +82,7 @@ export function SettingsPage() {
                   </tr>
                   <tr>
                     <td>密钥管理</td>
-                    <td>数据库连接串与 Judge API Key 仅存在于环境变量；日志写入前已脱敏；前端永不展示密钥值。</td>
+                    <td>数据库连接串由环境变量管理；Judge API Key 可在当前进程内临时设置，不落盘，接口不回显。</td>
                   </tr>
                 </tbody>
               </table>
@@ -132,7 +132,7 @@ export function SettingsPage() {
                 value={judgeForm}
                 busy={judgeBusy}
                 message={judgeMessage}
-                onChange={setJudgeForm}
+                onChange={(value) => { setJudgeForm(value); setJudgeMessage(null); }}
                 onSave={async () => {
                   setJudgeBusy(true);
                   setJudgeMessage(null);
@@ -163,9 +163,12 @@ export function SettingsPage() {
                   setJudgeBusy(true);
                   setJudgeMessage(null);
                   try {
-                    const result = await api.post<JudgeSettings>(endpoints.judgeSettingsTest());
-                    setJudge(result);
-                    setJudgeMessage(result.message ?? (result.configured ? '本地配置有效。' : 'Judge 尚未配置完整。'));
+                    const { provider, model, model_version, base_url, temperature, max_tokens, timeout, retry } = judgeForm;
+                    const payload: Record<string, unknown> = { provider, model, model_version, base_url, temperature, max_tokens, timeout, retry };
+                    if (apiKeyDraft.trim()) payload.api_key = apiKeyDraft.trim();
+                    const result = await api.post<JudgeSettings>(endpoints.judgeSettingsTest(), payload);
+                    const duration = result.latency_ms != null ? `（${result.latency_ms} ms）` : '';
+                    setJudgeMessage((result.message ?? '未收到连接测试结果。') + duration);
                   } catch (e) {
                     setJudgeMessage(e instanceof Error ? e.message : '测试失败');
                   } finally {
@@ -173,7 +176,7 @@ export function SettingsPage() {
                   }
                 }}
                 apiKeyDraft={apiKeyDraft}
-                onApiKeyChange={setApiKeyDraft}
+                onApiKeyChange={(value) => { setApiKeyDraft(value); setJudgeMessage(null); }}
               />
             ) : (
               <Panel padded={false}>
@@ -232,7 +235,7 @@ export function SettingsPage() {
             <div className={styles.healthGrid} data-testid="settings-health">
               <HealthItem id="database" name="数据库" ok={health?.database === 'healthy'} detail={health?.database === 'healthy' ? `${health.detail?.db_latency_ms ?? '—'} ms` : health ? '不可用' : '—'} />
               <HealthItem id="api" name="API" ok={Boolean(health)} detail={health ? '正常' : '不可达'} />
-              <HealthItem id="judge" name="Judge" ok={judge?.configured ?? null} detail={judge ? (judge.configured ? `${judge.provider} / ${judge.model}` : '配置不完整') : '—'} />
+              <HealthItem id="judge" name="Judge 配置" ok={judge?.configured ?? null} detail={judge ? (judge.configured ? `${judge.provider} / ${judge.model}` : '配置不完整') : '—'} />
               <HealthItem id="rag input" name="RAG 输入" ok={null} detail="由运行执行时的适配器调用验证" />
             </div>
           </Section>
@@ -288,7 +291,8 @@ function JudgeSettingsPanel({
   return (
     <Panel>
       <div className={styles.settingsNote}>
-        仅公共配置会被保存到当前进程。API Key 只保留现有环境变量状态，不在页面回显，也不会写入 YAML、数据库或报告。
+        保存仅对当前进程生效，重启后恢复部署配置。临时 API Key 不回显，不写入文件、数据库或报告。
+        测试连接会向当前表单中的模型发送一次最小请求，可能产生少量费用；不会保存表单。
       </div>
       <div className={styles.formGrid} data-testid="judge-settings-form">
         {([
@@ -330,9 +334,9 @@ function JudgeSettingsPanel({
         <span>API Key：{value.api_key_configured ? '已配置' : '未配置'}</span>
         <span>来源：{judgeSourceLabel(value.source)}</span>
       </div>
-      {message ? <div className={styles.formMessage}>{message}</div> : null}
+      {message ? <div className={styles.formMessage} role="status">{message}</div> : null}
       <div className={styles.formActions}>
-        <button type="button" className={styles.refreshBtn} onClick={onTest} disabled={busy}>本地校验</button>
+        <button type="button" className={styles.refreshBtn} onClick={onTest} disabled={busy}>测试连接</button>
         <button type="button" className={styles.saveBtn} onClick={onSave} disabled={busy}>保存 Judge 配置</button>
         <a
           className={styles.persistentBtn}

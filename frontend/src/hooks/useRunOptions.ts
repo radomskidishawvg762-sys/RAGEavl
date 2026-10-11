@@ -1,11 +1,11 @@
 /**
  * useRunOptions — 供 Compare / Regression / Quality Gate / Failure Explorer
- * 使用的 Run 选择数据。仅消费 GET /api/evaluations（项目过滤 + 分页第一页），
+ * 使用的 Run 选择数据。仅消费 GET /api/evaluations（项目过滤 + 完整分页），
  * 不做任何业务聚合；label 由后端字段拼接（展示层格式化）。
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { api, endpoints } from '../api/client';
+import { fetchAllPages, endpoints } from '../api/client';
 import type { RunListResponse } from '../api/types';
 import { presentRun } from '../status/status';
 
@@ -26,7 +26,7 @@ export function useRunOptions(projectId: string | null): {
   runs: RunOption[];
   reload: () => Promise<void>;
 } {
-  const [state, setState] = useState<State>('idle');
+  const [state, setState] = useState<State>(projectId ? 'loading' : 'ready');
   const [error, setError] = useState<unknown>(null);
   const [runs, setRuns] = useState<RunOption[]>([]);
 
@@ -38,11 +38,11 @@ export function useRunOptions(projectId: string | null): {
     }
     setState('loading');
     try {
-      const page = await api.get<RunListResponse>(
-        endpoints.evaluations(1, 100, projectId),
+      const rows = await fetchAllPages<RunListResponse['items'][number]>(
+        (page, pageSize) => endpoints.evaluations(page, pageSize, projectId),
       );
       setRuns(
-        page.items.map((r) => {
+        rows.map((r) => {
           const meta = (r.reproducibility_meta ?? {}) as Record<string, unknown>;
           const version = String(meta.dataset_version ?? '—');
           const short = r.run_id.slice(0, 8);

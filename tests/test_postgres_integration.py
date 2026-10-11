@@ -19,7 +19,7 @@ import pytest
 from sqlalchemy import func, inspect, select
 from sqlalchemy.exc import OperationalError
 
-from app.core.errors import DatasetLockedError, RunNotCancellableError
+from app.core.errors import AppError, RunNotCancellableError
 from app.models import (
     Dataset,
     DatasetRecord,
@@ -98,19 +98,22 @@ def test_migration_creates_all_ten_business_tables(pg_engine) -> None:
 # ---------------- transaction ----------------
 
 
-def test_create_run_on_locked_dataset_persists_nothing(pg_db) -> None:
+def test_create_run_on_locked_dataset_reuses_immutable_version(pg_db) -> None:
     pid, cid, dsid = _seed(pg_db, locked=True)
-    with pytest.raises(DatasetLockedError), pg_db() as s:
-        EvaluationRepository(s).create_run_with_lock(
-            project_id=pid, dataset_id=dsid, config_id=cid, reproducibility_meta={}
-        )
+    record_id = _add_record(pg_db, dsid)
     with pg_db() as s:
-        count = s.scalar(
-            select(func.count()).select_from(EvaluationRun)
-            .where(EvaluationRun.dataset_id == dsid)
-        )
-        assert count == 0  # rolled back — nothing persisted
+        repo = EvaluationRepository(s)
+        first = repo.create_run_with_lock(project_id=pid, dataset_id=dsid, config_id=cid,
+                                          reproducibility_meta={"revision": "first"})
+        second = repo.create_run_with_lock(project_id=pid, dataset_id=dsid, config_id=cid,
+                                           reproducibility_meta={"revision": "second"})
+        assert first.id != second.id
+    with pg_db() as s:
+        assert s.scalar(select(func.count()).select_from(EvaluationRun)) == 2
+        assert s.get(EvaluationRun, first.id).reproducibility_meta == {"revision": "first"}
+        assert s.get(EvaluationRun, second.id).reproducibility_meta == {"revision": "second"}
         assert s.get(Dataset, dsid).is_locked is True
+        assert s.get(DatasetRecord, record_id).reference_answer == "1亿元"
 
 
 def test_create_run_and_dataset_lock_commit_atomically(pg_db) -> None:
@@ -127,6 +130,84 @@ def test_create_run_and_dataset_lock_commit_atomically(pg_db) -> None:
         assert row.status == "pending" and row.total_records == 2
         assert row.reproducibility_meta == {"dataset_version": "v1"}
         assert s.get(Dataset, dsid).is_locked is True
+
+
+@pytest.mark.parametrize(
+    ("status", "count", "foreign_resource", "expected_code"),
+    [
+        ("invalid", 2, None, "BIZ_DATASET_NOT_EVALUABLE"),
+        ("valid", 0, None, "BIZ_DATASET_NOT_EVALUABLE"),
+        ("valid", 2, "dataset", "BIZ_PROJECT_MISMATCH"),
+        ("valid", 2, "config", "BIZ_PROJECT_MISMATCH"),
+    ],
+)
+def test_rejected_creation_never_locks_or_persists(
+    pg_db, status, count, foreign_resource, expected_code,
+) -> None:
+    pid, cid, dsid = _seed(pg_db)
+    with pg_db() as s:
+        dataset = s.get(Dataset, dsid)
+        dataset.validation_status = status
+        dataset.record_count = count
+        if foreign_resource:
+            other_pid = str(uuid.uuid4())
+            s.add(Project(id=other_pid, name="other-project"))
+            s.flush()
+            if foreign_resource == "dataset":
+                dataset.project_id = other_pid
+            else:
+                s.get(EvaluationConfig, cid).project_id = other_pid
+        s.commit()
+    with pg_db() as s, pytest.raises(AppError) as exc:
+        EvaluationService(EvaluationRepository(s)).create_run(
+            project_id=pid, dataset_id=dsid, config_id=cid, reproducibility_meta={},
+        )
+    assert exc.value.code == expected_code
+    with pg_db() as s:
+        assert s.scalar(select(func.count()).select_from(EvaluationRun)) == 0
+        assert s.get(Dataset, dsid).is_locked is False
+
+
+def test_creation_refreshes_validation_changed_after_preload(pg_db) -> None:
+    pid, cid, dsid = _seed(pg_db)
+    with pg_db() as stale_session:
+        repo = EvaluationRepository(stale_session)
+        previously_loaded = repo.get_dataset(dsid)
+        assert previously_loaded.validation_status == "valid"
+        with pg_db() as writer:
+            writer.get(Dataset, dsid).validation_status = "invalid"
+            writer.commit()
+        with pytest.raises(AppError) as exc:
+            repo.create_run_with_lock(project_id=pid, dataset_id=dsid, config_id=cid,
+                                      reproducibility_meta={})
+        assert exc.value.code == "BIZ_DATASET_NOT_EVALUABLE"
+    with pg_db() as s:
+        assert s.scalar(select(func.count()).select_from(EvaluationRun)) == 0
+        assert s.get(Dataset, dsid).is_locked is False
+
+
+def test_concurrent_creators_both_reuse_dataset_with_separate_runs(pg_db) -> None:
+    from concurrent.futures import ThreadPoolExecutor
+
+    pid, cid, dsid = _seed(pg_db)
+    ready = threading.Barrier(2)
+
+    def create(index):
+        with pg_db() as s:
+            repo = EvaluationRepository(s)
+            dataset = repo.get_dataset(dsid)
+            ready.wait(timeout=10)
+            run = repo.create_run_with_lock(project_id=pid, dataset_id=dataset.id,
+                                            config_id=cid, reproducibility_meta={"index": index})
+            return run.id
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        ids = list(pool.map(create, [0, 1]))
+    assert len(set(ids)) == 2
+    with pg_db() as s:
+        assert s.scalar(select(func.count()).select_from(EvaluationRun)) == 2
+        assert s.get(Dataset, dsid).is_locked is True
+        assert {s.get(EvaluationRun, rid).reproducibility_meta["index"] for rid in ids} == {0, 1}
 
 
 # ---------------- JSONB roundtrip ----------------

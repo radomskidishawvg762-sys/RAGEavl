@@ -3,13 +3,13 @@
 Transaction-safety contract (Spec 7.1, user decision §6):
   create_run_with_lock runs in ONE transaction:
     SELECT ... FOR UPDATE on the datasets row
-      -> is_locked check (DatasetLockedError -> rollback, nothing persisted)
+      -> validate dataset usability and project ownership
       -> INSERT evaluation_runs (status=pending, reproducibility snapshot)
       -> datasets.is_locked = True
       -> COMMIT
-  The row lock closes the check-then-insert race: a concurrent creator blocks
-  on FOR UPDATE and re-reads is_locked AFTER the first transaction commits,
-  so two runs can never both pass the is_locked=false check.
+  is_locked protects dataset CONTENT, not run creation (user decision 2026-10-11).
+  Repeated and concurrent runs reuse this immutable version with independent
+  snapshots. The row lock serializes creation transactions, not execution.
 
 Services never touch Session/ORM directly (P-8) — everything goes through
 this repository.
@@ -20,7 +20,8 @@ from __future__ import annotations
 from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
-from app.core.errors import DatasetLockedError, NotFoundError
+from app.core.errors import BizError, NotFoundError
+from app.domain.invariants import assert_dataset_evaluable
 from app.models import (
     Dataset,
     DatasetRecord,
@@ -53,20 +54,32 @@ class EvaluationRepository(BaseRepository[EvaluationRun]):
         """Pending run + dataset lock, atomically (Spec 7.1).
 
         Runs in the caller's (request-scoped) transaction: SELECT ... FOR UPDATE
-        -> lock check -> INSERT run -> set is_locked. The commit is explicit;
+        -> usability/ownership checks -> INSERT run -> set is_locked. The commit is explicit;
         on exception the session context rolls back, so nothing persists
         partially. (T-19: previously `with session.begin()` which conflicts
         with the autobegun request transaction.)"""
         dataset = self._session.execute(
             select(Dataset).where(Dataset.id == dataset_id).with_for_update()
+            # Earlier API/service reads may have cached this dataset. Refresh
+            # validation and ownership under the row lock before creating a run.
+            .execution_options(populate_existing=True)
         ).scalar_one_or_none()
         if dataset is None:
             raise NotFoundError(f"dataset {dataset_id} not found")
-        if dataset.is_locked:
-            raise DatasetLockedError(
-                f"dataset {dataset_id} is locked by an existing run; "
-                "create a new version to re-evaluate"
-            )
+        assert_dataset_evaluable(
+            dataset_id=dataset.id,
+            validation_status=dataset.validation_status,
+            record_count=dataset.record_count,
+        )
+        config = self.get_config(config_id)
+        for resource, row in (("dataset", dataset), ("config", config)):
+            if row.project_id != project_id:
+                raise BizError(
+                    "数据集和评估配置必须属于当前项目，请重新选择。",
+                    code="BIZ_PROJECT_MISMATCH",
+                    http_status=409,
+                    context={"resource": resource, "project_id": project_id},
+                )
         run = EvaluationRun(
             project_id=project_id,
             dataset_id=dataset_id,

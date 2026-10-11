@@ -249,7 +249,7 @@ describe('新建评估向导', () => {
     expect(await screen.findByTestId('workbench')).toBeInTheDocument();
   });
 
-  it('已锁定数据集在 Step5 阻止启动并提示', async () => {
+  it('已锁定数据集可再次评估，提示内容保持不可变', async () => {
     stubFetch((url) => {
       if (url.includes('/api/projects')) return { body: fx.projectList(1) };
       if (url.includes('/api/datasets')) {
@@ -271,7 +271,7 @@ describe('新建评估向导', () => {
     await waitFor(() =>
       expect(screen.getByTestId('locked-hint')).toBeInTheDocument(),
     );
-    expect(screen.getByTestId('start-evaluation')).toBeDisabled();
+    expect(screen.getByTestId('start-evaluation')).toBeEnabled();
   });
 
   it('修改阈值 → metric_overrides 进入 POST 请求体（G4 Run Configuration）', async () => {

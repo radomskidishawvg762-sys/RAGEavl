@@ -38,6 +38,7 @@ from app.adapters.rag_input import GoldenRunMetadataAdapter, GoldenSample, RagIn
 from app.core.errors import BizError, RunNotCancellableError
 from app.diagnosis import DiagnosisEngine
 from app.diagnosis.classifier import FailureClassifier
+from app.domain.invariants import assert_dataset_evaluable
 from app.domain.schemas import DiagnosisResult, EvaluationRecord, MetricResult
 from app.engines.base import EvalParams, EvaluationEngine
 from app.models import (
@@ -106,6 +107,12 @@ class EvaluationService:
         reproducibility_meta: dict,
     ):
         """Pending run + dataset lock in ONE transaction (Spec 7.1)."""
+        dataset = self._repo.get_dataset(dataset_id)
+        assert_dataset_evaluable(
+            dataset_id=dataset.id,
+            validation_status=dataset.validation_status,
+            record_count=dataset.record_count,
+        )
         return self._repo.create_run_with_lock(
             project_id=project_id,
             dataset_id=dataset_id,

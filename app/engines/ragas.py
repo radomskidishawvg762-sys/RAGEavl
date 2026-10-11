@@ -113,12 +113,15 @@ class RagasScorer:
         from ragas import metrics as ragas_metrics
         from ragas.embeddings import LangchainEmbeddingsWrapper
         from ragas.llms import LangchainLLMWrapper
+        from ragas.run_config import RunConfig
 
         from app.engines.ragas_bridge import RagasEmbeddingsBridge, RagasLLMBridge
 
         self._judge = judge
         self._metrics: dict[str, Any] = {}
-        llm_wrapper = LangchainLLMWrapper(RagasLLMBridge(judge))
+        # Provider adapters own transport retries. RAGAS defaults to ten retries,
+        # which would repeat permanent permission/quota failures and multiply costs.
+        llm_wrapper = LangchainLLMWrapper(RagasLLMBridge(judge), run_config=RunConfig(max_retries=1))
         emb_client = embeddings  # None -> bridge builds placeholder from judge config
         emb_wrapper = None
         for name, ragas_name in _RAGAS_NAME_MAP.items():
@@ -164,21 +167,28 @@ _RAGAS_NAME_MAP = {
 }
 
 
-def _judge_error_code_in_chain(exc: BaseException, max_depth: int = 10) -> str | None:
+def _judge_error_in_chain(exc: BaseException, max_depth: int = 10) -> JudgeNotConfiguredError | ExtJudgeUnavailableError | None:
     """ragas/langchain wrap upstream judge errors in their own exception types;
-    walk __cause__/__context__ to recover the original error code. Returns the
-    error code or None when no judge error is buried in the chain (T-14A §六:
+    walk __cause__/__context__ to recover the safe original error and context.
+    Returns the original error or None when no judge error is buried in the chain (T-14A §六:
     not_configured / unavailable / internal stay distinguishable)."""
     current: BaseException | None = exc
     depth = 0
     while current is not None and depth < max_depth:
-        if isinstance(current, JudgeNotConfiguredError):
-            return "BIZ_JUDGE_NOT_CONFIGURED"
-        if isinstance(current, ExtJudgeUnavailableError):
-            return "EXT_JUDGE_UNAVAILABLE"
+        if isinstance(current, (JudgeNotConfiguredError, ExtJudgeUnavailableError)):
+            return current
         current = current.__cause__ or current.__context__
         depth += 1
     return None
+
+
+def _ragas_output_error(exc: Exception) -> bool:
+    if not ragas_available():
+        return False
+    from langchain_core.exceptions import OutputParserException
+    from ragas.exceptions import LLMDidNotFinishException, RagasOutputParserException
+
+    return isinstance(exc, (OutputParserException, RagasOutputParserException, LLMDidNotFinishException))
 
 
 class RagasEngine:
@@ -297,19 +307,31 @@ class RagasEngine:
             except ExtJudgeUnavailableError as e:
                 results.append(
                     self._error_result(
-                        record.id, metric_name, d.category, code="EXT_JUDGE_UNAVAILABLE",
-                        message=str(e),
+                        record.id, metric_name, d.category, code=e.code,
+                        message=e.detail, context=e.context,
                     )
                 )
             except Exception as e:  # noqa: BLE001 — RAGAS original error -> structured error
-                code = _judge_error_code_in_chain(e) or "SYS_METRIC_ERROR"
+                cause = _judge_error_in_chain(e)
+                if cause is None and isinstance(e, TimeoutError):
+                    cause = ExtJudgeUnavailableError(
+                        "指标计算超过时限，请检查模型响应速度或调整超时设置。", code="EXT_JUDGE_TIMEOUT",
+                        context={"category": "timeout", "retryable": True, "scope": "metric"},
+                    )
+                elif cause is None and _ragas_output_error(e):
+                    cause = ExtJudgeUnavailableError(
+                        "模型输出无法解析为评分所需格式，请检查模型和最大生成长度。", code="EXT_JUDGE_RESPONSE_INVALID",
+                        context={"category": "response_invalid", "retryable": False, "scope": "metric"},
+                    )
+                code = cause.code if cause is not None else "SYS_METRIC_ERROR"
                 results.append(
                     self._error_result(
                         record.id,
                         metric_name,
                         d.category,
                         code=code,
-                        message=f"{type(e).__name__}: {e}"[:500],
+                        message=cause.detail if cause is not None else f"{type(e).__name__}: {e}"[:500],
+                        context=cause.context if cause is not None else None,
                         reason="judge_not_configured" if code == "BIZ_JUDGE_NOT_CONFIGURED" else None,
                     )
                 )
@@ -323,10 +345,13 @@ class RagasEngine:
         *,
         code: str,
         message: str,
+        context: dict[str, Any] | None = None,
         missing: list[str] | None = None,
         reason: str | None = None,
     ) -> MetricResult:
         error: dict[str, Any] = {"code": code, "message": message}
+        if context:
+            error["context"] = context
         if reason:
             error["reason"] = reason
         if missing:

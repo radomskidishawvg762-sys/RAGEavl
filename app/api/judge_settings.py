@@ -6,7 +6,7 @@ the current process but is never echoed or persisted.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import PlainTextResponse
@@ -45,6 +45,12 @@ class JudgeSettingsResponse(BaseModel):
     source: str
     reachable: bool | None = None
     message: str | None = None
+    test_status: Literal["success", "failed", "not_configured"] | None = None
+    error_code: str | None = None
+    error_category: str | None = None
+    retryable: bool | None = None
+    upstream_status: int | None = None
+    latency_ms: int | None = None
 
 
 @router.get("/settings/judge/persistent", response_class=PlainTextResponse)
@@ -78,12 +84,14 @@ def update_judge_settings(
     body: JudgeSettingsRequest,
     service: JudgeSettingsService = Depends(get_judge_settings_service),
 ) -> JudgeSettingsResponse:
-    values: dict[str, Any] = body.model_dump(exclude_none=True)
+    values: dict[str, Any] = body.model_dump(exclude_unset=True, exclude_none=True)
     return JudgeSettingsResponse(**service.update(values))
 
 
 @router.post("/settings/judge/test", response_model=JudgeSettingsResponse)
-def test_judge_settings(
+async def test_judge_settings(
+    body: JudgeSettingsRequest | None = None,
     service: JudgeSettingsService = Depends(get_judge_settings_service),
 ) -> JudgeSettingsResponse:
-    return JudgeSettingsResponse(**service.test())
+    values = body.model_dump(exclude_unset=True, exclude_none=True) if body is not None else None
+    return JudgeSettingsResponse(**await service.test(values))

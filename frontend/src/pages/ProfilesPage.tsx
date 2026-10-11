@@ -44,6 +44,11 @@ import styles from './ProfilesPage.module.css';
 type TabKey = 'profiles' | 'metrics' | 'import';
 
 export function ProfilesPage() {
+  const { activeProjectId } = useProject();
+  return <ProjectProfilesPage key={activeProjectId ?? 'none'} />;
+}
+
+function ProjectProfilesPage() {
   const { activeProject, loading: projectLoading, error: projectError } = useProject();
   const catalog = useEvaluationCatalog();
   const configs = useProjectConfigs(activeProject?.id ?? null);

@@ -85,6 +85,20 @@ def test_numeric_base_equivalence_grounded() -> None:
     assert out.code is not CODE_UNSUPPORTED
 
 
+@pytest.mark.parametrize("answer,contexts,reference,missing", [
+    ("金额100元", ["金额100美元"], "金额100美元", "retrieved_evidence.parseable"),
+    ("营收2亿元，载重100吨", ["营收1亿元"], None, "answer_claim.parseable"),
+    ("收入100元", ["收入100元"], "收入100元，成本50元，外汇100美元", "reference_evidence.parseable"),
+])
+def test_unparseable_numeric_evidence_cannot_support_a_confident_cause(answer, contexts, reference, missing):
+    record = _record(answer=answer, contexts=contexts, reference_answer=reference)
+    result = MetricResult(record_id=record.id, metric_name="faithfulness", category="generation",
+                          score=0, threshold=0.9, passed=False, metric_version="frozen-live-review")
+    outcome = DiagnosisEngine().diagnose(record, result)
+    assert outcome.status == "undetermined" and outcome.diagnosis is None
+    assert missing in outcome.missing_evidence
+
+
 def test_partial_grounding_is_undetermined() -> None:
     """Only SOME claims ungrounded -> conservative undetermined (extraction/
     paraphrase noise must not fabricate a grounding diagnosis)."""

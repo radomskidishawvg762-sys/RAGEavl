@@ -182,6 +182,18 @@ def evaluate_generation(record: EvaluationRecord) -> GenerationCheckOutcome:
             ["retrieved_evidence"],
         )
 
+    # Dropping unsupported units can turn incomplete extraction into a confident
+    # "absent claim" or "partial answer". Every source used below must be reliable.
+    reference_text = record.reference_answer if record.reference_answer and record.reference_answer.strip() else " ".join(record.reference_contexts or [])
+    for source, text in (("answer_claim", record.answer or ""),
+                         ("retrieved_evidence", " ".join(contexts)),
+                         ("reference_evidence", reference_text)):
+        if any(n.parse_status != "ok" for n in extract_numerical(text)):
+            return _undetermined(
+                "数值证据包含不支持的单位或无法解析的表达，无法可靠归因。",
+                [f"{source}.parseable"],
+            )
+
     answer_claims = _claims_of(record.answer or "")
     context_claims = _claims_of(" ".join(contexts))
 

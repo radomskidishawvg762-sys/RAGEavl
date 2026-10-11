@@ -23,6 +23,11 @@ const SORT_OPTIONS = [
 ];
 
 export function DatasetsPage() {
+  const { activeProjectId } = useProject();
+  return <ProjectDatasetsPage key={activeProjectId ?? 'none'} />;
+}
+
+function ProjectDatasetsPage() {
   const { activeProject, loading: projectLoading, error: projectError } = useProject();
   const list = useDatasets(activeProject?.id ?? null);
   const [nameQuery, setNameQuery] = useState('');

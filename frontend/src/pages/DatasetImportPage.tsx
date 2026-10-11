@@ -41,6 +41,11 @@ const STEPS: Array<[number, string]> = [
 ];
 
 export function DatasetImportPage() {
+  const { activeProjectId } = useProject();
+  return <ProjectDatasetImportPage key={activeProjectId ?? 'none'} />;
+}
+
+function ProjectDatasetImportPage() {
   const { activeProject, error: projectError } = useProject();
   const [step, setStep] = useState<Step>(1);
   const [fileName, setFileName] = useState('');

@@ -50,6 +50,11 @@ class DatasetLockedError(AppError):
     http_status = 409
 
 
+class DatasetNotEvaluableError(AppError):
+    code = "BIZ_DATASET_NOT_EVALUABLE"
+    http_status = 409
+
+
 class ProjectNameExistsError(AppError):
     """Project names are unique across active AND archived rows (FR-01):
     creation with an existing name is refused with an explicit code instead of

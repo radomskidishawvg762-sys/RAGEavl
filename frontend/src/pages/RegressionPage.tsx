@@ -24,8 +24,13 @@ import styles from './RegressionPage.module.css';
 const CATEGORY_ORDER = ['retrieval', 'generation', 'integrity'] as const;
 
 export function RegressionPage() {
+  const { activeProjectId } = useProject();
+  return <ProjectRegressionPage key={activeProjectId ?? 'none'} />;
+}
+
+function ProjectRegressionPage() {
   const { activeProject } = useProject();
-  const { state, error, runs } = useRunOptions(activeProject?.id ?? null);
+  const { state, error, runs, reload } = useRunOptions(activeProject?.id ?? null);
   const [baseline, setBaseline] = useState('');
   const [candidate, setCandidate] = useState('');
   const [result, setResult] = useState<RegressionResponse | null>(null);
@@ -61,7 +66,7 @@ export function RegressionPage() {
     );
   }
   if (state === 'loading') return <LoadingState label="正在加载运行列表…" />;
-  if (state === 'error') return <ErrorState error={error} onRetry={() => void 0} />;
+  if (state === 'error') return <ErrorState error={error} onRetry={() => void reload()} />;
 
   const terminal = runs.filter((r) => !['pending', 'running'].includes(r.status));
 

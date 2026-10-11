@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import logging
+
+from app.core.errors import DatasetNotEvaluableError
 from app.domain.schemas import EvidenceBundle
+
+logger = logging.getLogger(__name__)
 
 
 class InsufficientEvidenceError(Exception):
@@ -27,3 +32,21 @@ def assert_evidence_present(bundle: EvidenceBundle) -> None:
     """
     if not bundle.items:
         raise InsufficientEvidenceError(bundle.contract, missing=["items"])
+
+
+def assert_dataset_evaluable(*, dataset_id: str, validation_status: str, record_count: int) -> None:
+    """Reject unusable imports before creating a run or locking the version."""
+    if validation_status == "valid" and record_count > 0:
+        return
+    logger.warning(
+        "evaluation dataset rejected: dataset_id=%s validation_status=%s record_count=%s",
+        dataset_id, validation_status, record_count,
+    )
+    raise DatasetNotEvaluableError(
+        "数据集未通过校验或没有可评估记录，请查看校验报告，修正后重新导入。",
+        context={
+            "dataset_id": dataset_id,
+            "validation_status": validation_status,
+            "record_count": record_count,
+        },
+    )

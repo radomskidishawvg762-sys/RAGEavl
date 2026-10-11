@@ -12,13 +12,14 @@ SecretStr, never logged/described.
 
 from __future__ import annotations
 
-import asyncio
 from typing import Any
 
 import httpx
 
 from app.core.errors import ExtJudgeUnavailableError
 from app.engines.judge import JudgeConfig
+from app.engines.providers.failures import InvalidJudgeResponse, invoke_with_retry, provider_failure
+from app.engines.providers.transport import uses_environment_proxy
 
 _ANTHROPIC_VERSION = "2023-06-01"
 
@@ -34,11 +35,8 @@ class AnthropicMessagesJudge:
             return await self._invoke(prompt)
         except ExtJudgeUnavailableError:
             raise
-        except Exception as e:  # noqa: BLE001 — any transport failure -> EXT
-            raise ExtJudgeUnavailableError(
-                f"judge provider call failed: {type(e).__name__}: {e}",
-                context={"provider": self._config.provider, "model": self._config.model},
-            ) from e
+        except Exception as error:  # noqa: BLE001 -- client construction/configuration boundary
+            raise provider_failure(error, self._config) from None
 
     def describe(self) -> dict[str, Any]:
         return {**self._config.public_dump(), "configured": True}
@@ -53,6 +51,7 @@ class AnthropicMessagesJudge:
             "anthropic-version": _ANTHROPIC_VERSION,
             "content-type": "application/json",
         }
+        headers.update(self._config.extra_headers or {})
         body: dict[str, Any] = {
             "model": self._config.model,
             "max_tokens": self._config.max_tokens,
@@ -60,28 +59,20 @@ class AnthropicMessagesJudge:
         }
         if self._config.temperature != 0:
             body["temperature"] = self._config.temperature
-        retries = max(1, self._config.retry)
-        last_error: Exception | None = None
-        async with httpx.AsyncClient(timeout=self._config.timeout) as client:
-            for attempt in range(retries):
+        async with httpx.AsyncClient(timeout=self._config.timeout, trust_env=uses_environment_proxy(base)) as client:
+            async def call() -> str:
+                response = await client.post(f"{base}/v1/messages", headers=headers, json=body)
+                response.raise_for_status()
                 try:
-                    resp = await client.post(f"{base}/v1/messages", headers=headers, json=body)
-                    if resp.status_code >= 400:
-                        raise ExtJudgeUnavailableError(
-                            f"anthropic messages endpoint HTTP {resp.status_code}: {resp.text[:200]}",
-                            context={"provider": self._config.provider, "model": self._config.model},
-                        )
-                    data = resp.json()
-                    blocks = data.get("content") or []
-                    return "".join(b.get("text", "") for b in blocks if b.get("type") == "text")
-                except ExtJudgeUnavailableError:
-                    raise
-                except Exception as e:  # noqa: BLE001 — retry, then wrap as EXT
-                    last_error = e
-                    if attempt < retries - 1:
-                        await asyncio.sleep(0.5 * (attempt + 1))
-        raise ExtJudgeUnavailableError(
-            f"judge provider call failed after {retries} attempts: "
-            f"{type(last_error).__name__}: {last_error}",
-            context={"provider": self._config.provider, "model": self._config.model},
-        ) from last_error
+                    data = response.json()
+                    blocks = data.get("content") if isinstance(data, dict) else None
+                    if not isinstance(blocks, list):
+                        raise InvalidJudgeResponse()
+                    text = "".join(b.get("text", "") for b in blocks if isinstance(b, dict) and b.get("type") == "text")
+                except (ValueError, TypeError):
+                    raise InvalidJudgeResponse() from None
+                if not text.strip():
+                    raise InvalidJudgeResponse()
+                return text
+
+            return await invoke_with_retry(call, self._config)

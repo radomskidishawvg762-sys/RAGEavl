@@ -231,6 +231,18 @@ export const EVIDENCE_TYPE_LABEL: Record<string, string> = {
   ranking_evidence: '排序证据',
   configuration_evidence: '配置证据',
   execution_evidence: '执行证据',
+  // Diagnosis contracts also return these fixed missing-evidence paths.
+  comparison_basis: '比较依据',
+  'comparison_basis.diff': '比较依据的差异记录',
+  'comparison_basis.deterministic_comparison_type': '确定性比较类型',
+  'reference_evidence.comparable': '参考证据的可比较性',
+  'answer_claim.checkable': '可核验的答案声明',
+  'answer_claim.parseable': '可可靠解析的答案数值',
+  'retrieved_evidence.parseable': '可可靠解析的检索数值证据',
+  'reference_evidence.parseable': '可可靠解析的参考数值证据',
+  retrieval_metadata: '检索元数据',
+  semantic_evidence: '语义证据',
+  items: '证据项',
 };
 
 export function evidenceTypeLabel(type: string): string {
@@ -425,8 +437,10 @@ const UNDETERMINED_REASON_LABEL: Record<string, string> = {
 export function scrubProviderText(text: string): string {
   return text
     .replace(/https?:\/\/[^\s)'"]+/g, '<url>')
-    .replace(/(sk|key|token)-[A-Za-z0-9_-]{8,}/gi, '<redacted>')
-    .replace(/(acc|acct|account|workspace|org|project)[_-]?[iI][dD]?[=:]?\s*[A-Za-z0-9_-]{6,}/g, '$1=<redacted>');
+    .replace(/\b(sk|key|token)-[A-Za-z0-9_-]{8,}/gi, '<redacted>')
+    .replace(/\b(authorization|api[_-]?key|access[_-]?token)\b["']?\s*[:=]\s*["']?(?:Bearer\s+)?[^"'\s,;}{]+/gi, '$1=<redacted>')
+    .replace(/\bBearer\s+[A-Za-z0-9._~+/-]+=*/gi, 'Bearer <redacted>')
+    .replace(/\b((?:acc(?:ount)?|acct|workspace|org(?:anization)?|project)[_-]?id)\b["']?\s*[:=]\s*["']?[A-Za-z0-9_-]{6,}/gi, '$1=<redacted>');
 }
 
 export function diagnosisTextLabel(text: string): string {

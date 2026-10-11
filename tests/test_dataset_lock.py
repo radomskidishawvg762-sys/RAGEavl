@@ -4,8 +4,8 @@ two concurrent runs) needs TEST_DATABASE_URL — deferred to T-22 per plan.
 T-07 guarantee: is_locked=True on an existing version blocks nothing for NEW
 versions (the sanctioned correction path, Spec §6.5 "引导创建新版本") but no
 service API can mutate a locked version's records — mutation entry points
-simply do not exist on DatasetService, and DatasetLockedError (409) is the
-contract reserved for run-creation (T-12).
+simply do not exist on DatasetService. Since 2026-10-11, locked versions
+remain reusable by new runs; locking protects content, not execution.
 """
 
 from __future__ import annotations

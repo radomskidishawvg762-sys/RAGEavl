@@ -152,12 +152,13 @@ def test_2_missing_dataset_404(ctx) -> None:
     assert resp.json()["code"] == "BIZ_NOT_FOUND"
 
 
-def test_3_locked_dataset_409(ctx) -> None:
+def test_3_locked_dataset_can_be_evaluated_again(ctx) -> None:
     ctx.repo.datasets["ds1"]["is_locked"] = True
-    resp = _post(ctx)
-    assert resp.status_code == 409
-    assert resp.json()["code"] == "BIZ_DATASET_LOCKED"
-    assert ctx.repo.runs == {}
+    first, second = _post(ctx), _post(ctx)
+    assert first.status_code == second.status_code == 202
+    assert first.json()["run_id"] != second.json()["run_id"]
+    assert len(ctx.repo.runs) == 2
+    assert ctx.repo.datasets["ds1"]["is_locked"] is True
 
 
 def test_4_invalid_config_409(ctx) -> None:

@@ -98,7 +98,7 @@ async function importDataset(page, { expectVersionOf = false } = {}) {
 
 async function runWizard(page, { versionMarker = 'v1', thresholdOverride = null, disableRagas = false } = {}) {
   await goto(page, `${BASE}/evaluations/new`);
-  // Step 1 dataset（按版本标记选择，避免误选已锁定版本）
+  // Step 1 dataset（按版本标记选择，区分本轮待测版本）
   await expectVisible(page, '[data-testid="select-dataset"]', '    wizard: dataset list');
   await page.locator('[data-testid="select-dataset"]', { hasText: versionMarker }).first().click();
   await page.getByRole('button', { name: '下一步' }).click();

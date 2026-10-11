@@ -32,6 +32,11 @@ export interface FailureExplorerRecommendation extends RecommendationView {
 }
 
 export function FailureExplorerPage() {
+  const { activeProjectId } = useProject();
+  return <ProjectFailureExplorerPage key={activeProjectId ?? 'none'} />;
+}
+
+function ProjectFailureExplorerPage() {
   const { activeProject } = useProject();
   const { state, error, runs } = useRunOptions(activeProject?.id ?? null);
   const [runId, setRunId] = useState('');
