@@ -17,6 +17,7 @@ class MetricSpec(BaseModel):
     description: str = ""
     input_requirements: list[str] = Field(default_factory=list)
     version: str
+    prompt_version: str | None = None
     default_severity: str | None = None
     # T-16C: Regression direction — registry metadata, never frontend-hardcoded.
     direction: Literal["higher_is_better", "lower_is_better"] = "higher_is_better"

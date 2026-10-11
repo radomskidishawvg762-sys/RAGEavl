@@ -325,11 +325,14 @@ def build_reproducibility_meta(
     applied override echo. Together with `effective_metrics` this keeps the
     invariant: executed parameters == metric_results == run snapshot."""
     versions: list[str] = []
+    metric_prompts: dict[str, str] = {}
     for name in enabled_metrics:
         try:
             spec = default_registry.get_metric(name).spec
             if spec.version:
                 versions.append(spec.version)
+            if spec.prompt_version:
+                metric_prompts[name] = spec.prompt_version
         except KeyError:
             continue
     metric_version = ",".join(dict.fromkeys(versions)) or "unknown"
@@ -356,7 +359,8 @@ def build_reproducibility_meta(
         "profile": profile,
         "profile_version": profile_version,
         "metric_version": metric_version,
-        "prompt_version": judge.get("prompt_version") if isinstance(judge, dict) else None,
+        "prompt_version": ",".join(dict.fromkeys(metric_prompts.values())) or (judge.get("prompt_version") if isinstance(judge, dict) else None),
+        "metric_prompts": metric_prompts,
         "judge_model": judge.get("model") if isinstance(judge, dict) else None,
         "judge_model_version": judge.get("model_version") if isinstance(judge, dict) else None,
         "model_version": None,

@@ -1,0 +1,27 @@
+{
+  "judge_config": {
+    "provider": "openai",
+    "model": "deepseek-v4-flash",
+    "model_version": "",
+    "base_url": "https://opencode.ai/zen/go/v1",
+    "temperature": 0,
+    "max_tokens": 1024,
+    "timeout": 60,
+    "retry": 1
+  },
+  "model_revision_status": "unavailable: provider model alias; immutable upstream revision not supplied",
+  "prompt_version": "faithfulness-claims-v1:a36a58e048b6c3239b2ec4651882121fac5b9ab989598b815e8f0fbfa2e6e13f",
+  "limits": {"max_calls": 96, "max_input_bytes": 1000000},
+  "guardrails": [
+    {"case_id": "G-short", "question": "收入是多少？", "answer": "230元", "contexts": ["收入为230元"], "expected": 1},
+    {"case_id": "G-pronoun", "question": "丙公司的收入？", "answer": "它的收入为230万元", "contexts": ["丙公司收入为230万元"], "expected": 1},
+    {"case_id": "G-chinese", "question": "收入是多少？", "answer": "收入为三百万元", "contexts": ["收入为3000000元"], "expected": 1},
+    {"case_id": "G-entity", "question": "丙公司的收入？", "answer": "丙公司收入为230万元", "contexts": ["丁公司收入为230万元"], "expected": 0},
+    {"case_id": "G-added-entity", "question": "丙公司的收入？", "answer": "丙公司收入为230万元", "contexts": ["收入为230万元"], "expected": 0},
+    {"case_id": "G-period", "question": "2025年的收入？", "answer": "2025年收入为230万元", "contexts": ["2024年收入为230万元"], "expected": 0},
+    {"case_id": "G-currency", "question": "收入是多少？", "answer": "收入为230元", "contexts": ["收入为230美元"], "expected": 0},
+    {"case_id": "G-unit", "question": "增长是多少？", "answer": "增长为23元", "contexts": ["增长为23%"], "expected": 0},
+    {"case_id": "G-extra", "question": "收入及利润是多少？", "answer": "收入为230万元，利润为80万元", "contexts": ["收入为230万元"], "expected": 0},
+    {"case_id": "G-negation", "question": "收入是多少？", "answer": "收入为230万元", "contexts": ["收入不是230万元，而是80万元"], "expected": 0}
+  ]
+}

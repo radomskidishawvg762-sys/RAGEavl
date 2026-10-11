@@ -8,8 +8,8 @@ Boundary rules honored here:
   - RAGAS original exceptions are converted into structured MetricResult.error;
     a single metric/record failure never propagates (FR-22 error isolation).
 
-RAGAS version is locked in pyproject (eval extra) and recorded in every
-MetricResult.metric_version as "ragas-<version>".
+RAGAS version is locked in pyproject (eval extra). Faithfulness additionally
+records its repository-owned prompt revision and content hash in metric_version.
 """
 
 from __future__ import annotations
@@ -23,6 +23,7 @@ from pydantic import BaseModel
 from app.core.errors import ExtJudgeUnavailableError, JudgeNotConfiguredError
 from app.domain.schemas import EvaluationRecord, MetricResult
 from app.engines.base import EvalParams
+from app.engines.faithfulness_prompts import PROMPT_VERSION, build_prompts
 from app.engines.judge import EmbeddingsClient, JudgeClient
 from app.metrics.base import MetricSpec
 from app.metrics.registry import MetricRegistry
@@ -34,6 +35,10 @@ except Exception:  # pragma: no cover - eval extra not installed
     RAGAS_VERSION = None
 
 METRIC_VERSION = f"ragas-{RAGAS_VERSION}" if RAGAS_VERSION else "ragas-unavailable"
+
+
+def metric_version_for(name: str) -> str:
+    return f"{METRIC_VERSION}+{PROMPT_VERSION}" if name == "faithfulness" else METRIC_VERSION
 
 
 def ragas_available() -> bool:
@@ -139,6 +144,8 @@ class RagasScorer:
             # equals the singleton's (so no default drifts).
             singleton = getattr(ragas_metrics, ragas_name)
             metric = type(singleton)()
+            if name == "faithfulness":
+                metric.statement_generator_prompt, metric.nli_statements_prompt = build_prompts()
             metric.llm = llm_wrapper
             if hasattr(metric, "embeddings"):
                 if emb_wrapper is None:
@@ -211,7 +218,8 @@ class RagasEngine:
                 engine=self.name,
                 description=f"RAGAS {d.name} (P0 general metric)",
                 input_requirements=d.input_requirements,
-                version=METRIC_VERSION,
+                version=metric_version_for(d.name),
+                prompt_version=PROMPT_VERSION if d.name == "faithfulness" else None,
                 direction="higher_is_better",
             )
             for d in RAGAS_METRIC_DEFS
@@ -291,7 +299,7 @@ class RagasEngine:
                         score=score,
                         threshold=threshold,
                         passed=(score >= threshold) if threshold is not None else None,
-                        metric_version=METRIC_VERSION,
+                        metric_version=metric_version_for(metric_name),
                     )
                 )
             except JudgeNotConfiguredError as e:
@@ -363,7 +371,7 @@ class RagasEngine:
             score=None,
             threshold=None,
             passed=None,
-            metric_version=METRIC_VERSION,
+            metric_version=metric_version_for(metric_name),
             error=error,
         )
 

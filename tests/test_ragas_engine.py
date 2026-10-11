@@ -178,10 +178,12 @@ async def test_metric_version_recorded_on_every_result() -> None:
     engine = RagasEngine(judge=PlaceholderJudge(JudgeConfig()), scorer=FakeScorer())
     results = await engine.evaluate(_record(), ALL_METRICS, EvalParams())
     assert results, "no results"
-    assert all(r.metric_version == METRIC_VERSION for r in results)
+    from app.engines.ragas import metric_version_for
+
+    assert all(r.metric_version == metric_version_for(r.metric_name) for r in results)
     assert METRIC_VERSION.startswith("ragas-")
     specs = engine.specs()
-    assert all(s.version == METRIC_VERSION for s in specs)
+    assert all(s.version == metric_version_for(s.name) for s in specs)
 
 
 # --- 5. registry access ---
