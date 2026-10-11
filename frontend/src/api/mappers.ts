@@ -201,6 +201,8 @@ export const REASON_EXPLAIN: Record<string, string> = {
   QUALITY_GATE_DISABLED: '当前配置中已关闭质量门禁，门禁未启用。',
   QUALITY_GATE_NOT_CONFIGURED: '当前配置未设置质量门禁，门禁不可用。',
   QUALITY_GATE_CONFIG_INVALID: '门禁配置无效（必需指标未启用或未配置阈值）。',
+  RUN_NOT_COMPLETED: '运行尚未完成（或已失败 / 已取消），门禁只评估已完成的运行。',
+  REQUIRED_METRIC_DETERMINISTIC_FAILURE: '必需指标存在无分数的确定性不一致（如单位不一致），按失败处理。',
 };
 
 /** DIRECTION_LABEL for call sites whose `direction` is an untyped string (some
@@ -241,6 +243,7 @@ export const EVIDENCE_TYPE_LABEL: Record<string, string> = {
   'retrieved_evidence.parseable': '可可靠解析的检索数值证据',
   'reference_evidence.parseable': '可可靠解析的参考数值证据',
   retrieval_metadata: '检索元数据',
+  reference_contexts: '参考上下文',
   semantic_evidence: '语义证据',
   items: '证据项',
 };
@@ -308,6 +311,7 @@ const COMPARISON_REASON_RULES: ReasonRule[] = [
   [/^metric version differs \((.+)\)$/, (_m, v) => `指标版本不同（${v}）`],
   [/^metric version not snapshotted$/, () => '未记录指标版本快照'],
   [/^config version differs \(profile key semantics\)$/, () => '配置指纹不同（Profile 键语义）'],
+  [/^metric coverage differs \(paired on common scored records only\): (.*)$/, (_m, list) => `指标有效覆盖不一致（仅按两侧都有分数的记录配对计算）：${metricListText(list)}`],
   [/^comparability is not DIRECT$/, () => `可比性不是「${presentComparability('DIRECT').label}」`],
   [/^overall score unavailable for run (.+)$/, (_m, id) => `运行 ${id} 没有总体分数`],
   [/^enabled metrics differ$/, () => '启用指标不同'],
@@ -424,6 +428,10 @@ const UNDETERMINED_REASON_LABEL: Record<string, string> = {
     '记录上没有参考证据（gold）—— 禁止归因',
   'no retrieved evidence (contexts) on record — attribution forbidden':
     '记录上没有检索证据（contexts）—— 禁止归因',
+  'multiple temporal values; reference/answer pairing cannot be determined':
+    '存在多个时间值，参考与答案的配对无法确定',
+  'only reference_answer on record (no reference_contexts) — retrieval attribution forbidden':
+    '记录上只有参考答案、没有参考上下文（reference_contexts）—— 禁止检索归因',
   'gold evidence not reliably comparable after deterministic normalization':
     'gold 证据在确定性归一化后不可可靠比较',
   'no retrieved evidence (contexts) on record — grounding cannot be checked':

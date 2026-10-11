@@ -13,6 +13,10 @@ baseline, never a financial threshold. Reads system.regression.epsilon from
 merged config when present (epsilon_source="config"); otherwise uses the
 minimal default 0.01 (epsilon_source="provisional_default"). Every verdict
 carries its epsilon + source.
+
+Unscored deterministic mismatches (unit_mismatch) never enter a delta; a net
+increase per paired record is a REGRESSION, a net decrease an IMPROVEMENT
+unless the scored delta itself regressed.
 """
 
 from __future__ import annotations
@@ -96,21 +100,33 @@ class RegressionService:
             "epsilon": self._epsilon,
             "epsilon_source": self._epsilon_source,
         }
+        # judged mismatches without a score (unit_mismatch) are invisible to the
+        # delta, so their per-record change decides first
+        net = m.get("new_unscored_mismatches", 0) - m.get("resolved_unscored_mismatches", 0)
+        base["unscored_mismatch_delta"] = net
+        if net > 0:
+            base["verdict"] = "REGRESSION"
+            return base
+        if net < 0:
+            delta_verdict = self._delta_verdict(m, direction)
+            base["verdict"] = "REGRESSION" if delta_verdict == "REGRESSION" else "IMPROVEMENT"
+            return base
+        base["verdict"] = self._delta_verdict(m, direction)
+        return base
+
+    def _delta_verdict(self, m: dict, direction: str) -> str:
         if not m.get("comparable"):
             # score=null is NEVER a regression (§五)
-            base["verdict"] = (
+            return (
                 "UNDETERMINED" if m.get("incomparable_reason") == "undetermined"
                 else "NOT_COMPARABLE"
             )
-            return base
         delta = m["delta"]
         if abs(delta) <= self._epsilon:
-            base["verdict"] = "STABLE"
-        elif direction == "higher_is_better":
-            base["verdict"] = "IMPROVEMENT" if delta > 0 else "REGRESSION"
-        else:  # lower_is_better
-            base["verdict"] = "REGRESSION" if delta > 0 else "IMPROVEMENT"
-        return base
+            return "STABLE"
+        if direction == "higher_is_better":
+            return "IMPROVEMENT" if delta > 0 else "REGRESSION"
+        return "REGRESSION" if delta > 0 else "IMPROVEMENT"  # lower_is_better
 
     # ---- category aggregation (§七) ----
 

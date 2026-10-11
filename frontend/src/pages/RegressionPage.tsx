@@ -218,7 +218,16 @@ function RegressionResult({ result }: { result: RegressionResponse }) {
                       <span className="mono">{m.epsilon}</span>
                       <span className={styles.dim}>（{m.epsilon_source === 'config' ? '配置' : '临时默认'}）</span>
                     </td>
-                    <td><RegressionBadge verdict={m.verdict} /></td>
+                    <td>
+                      <RegressionBadge verdict={m.verdict} />
+                      {m.unscored_mismatch_delta ? (
+                        <span className={styles.dim} data-testid={`reg-${m.metric}-unscored`}>
+                          {m.unscored_mismatch_delta > 0
+                            ? `（新增 ${m.unscored_mismatch_delta} 条无分数的确定性不一致）`
+                            : `（消除 ${-m.unscored_mismatch_delta} 条无分数的确定性不一致）`}
+                        </span>
+                      ) : null}
+                    </td>
                   </tr>
                 ))}
               </tbody>

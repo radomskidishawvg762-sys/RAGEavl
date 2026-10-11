@@ -47,6 +47,22 @@ _RUN_TERMINAL_STATES = {"completed", "completed_with_errors", "failed", "cancell
 _SCORABLE_STATES = {"completed", "completed_with_errors"}
 
 
+def row_comparison_type(row: dict) -> str | None:
+    """`comparison_type` from either row shape (trimmed scalar or raw basis)."""
+    comparison_type = row.get("comparison_type")
+    if comparison_type is None:
+        basis = row.get("comparison_basis") or {}
+        comparison_type = basis.get("comparison_type")
+    return comparison_type
+
+
+def is_unscored_mismatch(row: dict) -> bool:
+    """A judged deterministic failure that carries no score (e.g. unit_mismatch:
+    the two sides are not numerically comparable). Score means skip it, so it
+    is counted separately and must reach the gate / regression verdicts."""
+    return row.get("score") is None and row_comparison_type(row) in DETERMINISTIC_MISMATCH_TYPES
+
+
 def metric_status(row: dict) -> str:
     """Per-row Metric Execution Status (§三).
 
@@ -63,10 +79,7 @@ def metric_status(row: dict) -> str:
         if code in _NOT_CONFIGURED_CODES:
             return "not_configured"
         return "error"
-    comparison_type = row.get("comparison_type")
-    if comparison_type is None:
-        basis = row.get("comparison_basis") or {}
-        comparison_type = basis.get("comparison_type")
+    comparison_type = row_comparison_type(row)
     if comparison_type in _UNDETERMINED_COMPARISON_TYPES:
         return "undetermined"
     if comparison_type in DETERMINISTIC_MISMATCH_TYPES:
@@ -311,6 +324,7 @@ class ReportService:
                     "valid_count": valid_count,
                     "invalid_count": total_rows - valid_count,
                     "error_count": statuses.count("error") + statuses.count("not_configured"),
+                    "unscored_mismatch_count": sum(1 for r in rows if is_unscored_mismatch(r)),
                     "metric_version": rows[0].get("metric_version"),
                     "weight": float(weights.get(name, 1.0)),
                 }

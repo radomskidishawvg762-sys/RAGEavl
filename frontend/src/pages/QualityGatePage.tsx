@@ -18,7 +18,7 @@ import { EmptyState, LoadingState } from '../components/primitives/Feedback';
 import { ErrorState } from '../components/ErrorState';
 import { ScoreValue } from '../components/ScoreValue';
 import { QualityGateBadge } from '../status/StatusBadge';
-import { formatTimestamp } from '../utils/format';
+import { formatPercent, formatTimestamp } from '../utils/format';
 import styles from './QualityGatePage.module.css';
 
 export function QualityGatePage() {
@@ -141,6 +141,7 @@ function GateResult({ gate }: { gate: QualityGateResponse }) {
                   <th align="left">指标</th>
                   <th align="right">分数</th>
                   <th align="right">阈值</th>
+                  <th align="right">有效覆盖</th>
                   <th align="left">判定</th>
                   <th align="left">状态</th>
                   <th align="left">原因</th>
@@ -152,6 +153,11 @@ function GateResult({ gate }: { gate: QualityGateResponse }) {
                     <td className="mono">{m.metric}</td>
                     <td align="right" className="mono"><ScoreValue score={m.score} /></td>
                     <td align="right" className="mono">{m.threshold === null ? '—' : m.threshold}</td>
+                    <td align="right" className="mono" data-testid={`gate-${m.metric}-coverage`}>
+                      {m.valid_count == null || m.total_records == null
+                        ? '—'
+                        : `${m.valid_count}/${m.total_records}${m.coverage == null ? '' : `（${formatPercent(m.coverage)}）`}`}
+                    </td>
                     <td>
                       {m.passed === null ? (
                         <span className={styles.dim}>—</span>
@@ -170,7 +176,7 @@ function GateResult({ gate }: { gate: QualityGateResponse }) {
           </Panel>
         )}
         <p className={styles.hint}>
-          「无法评估」表示必需指标没有有效分数（分数为空），与「有分数但低于阈值」是两类不同原因；覆盖率等执行信息见评估工作台。
+          「无法评估」表示必需指标没有有效分数（分数为空），与「有分数但低于阈值」是两类不同原因。「有效覆盖」是该指标有有效分数的记录数 / 运行总记录数，分数只来自这些记录。
         </p>
       </Section>
     </>

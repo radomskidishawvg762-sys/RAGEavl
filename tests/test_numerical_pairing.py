@@ -171,8 +171,8 @@ def test_single_ok_candidates_keep_legacy_fast_path() -> None:
     assert "pairing" not in (result.comparison_basis.diff or {})
 
 
-def test_metric_version_is_v2() -> None:
-    assert INTEGRITY_METRIC_VERSION == "integrity-normalization-v2"
+def test_metric_version_is_v3() -> None:
+    assert INTEGRITY_METRIC_VERSION == "integrity-normalization-v3"
 
 
 # ---------------- pairing module-level: extract -> pair pipeline ----------------

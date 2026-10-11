@@ -191,6 +191,7 @@ function ComparisonResult({ result }: { result: ComparisonResponse }) {
                   <th align="right">候选</th>
                   <th align="right">变化量 Delta</th>
                   <th align="right">相对变化 Relative</th>
+                  <th align="right">配对记录</th>
                   <th align="left">状态</th>
                 </tr>
               </thead>
@@ -205,12 +206,24 @@ function ComparisonResult({ result }: { result: ComparisonResponse }) {
                     <td align="right" className="mono">
                       {m.relative_delta === null ? '—' : formatPercent(m.relative_delta)}
                     </td>
+                    <td
+                      align="right"
+                      className="mono"
+                      data-testid={`cmp-${m.name}-paired`}
+                      title="两侧都有有效分数的记录数（基线有效 / 候选有效）"
+                    >
+                      {m.paired_count == null
+                        ? '—'
+                        : `${m.paired_count}（${m.baseline_valid_count ?? '—'} / ${m.candidate_valid_count ?? '—'}）`}
+                    </td>
                     <td>
                       {m.comparable ? (
                         <span className={styles.ok}>可比</span>
                       ) : (
                         <span className={styles.incomparable} title={m.incomparable_reason ?? ''}>
-                          {incomparableLabel(m.baseline_status, m.candidate_status)}
+                          {m.incomparable_reason === 'no_paired_records'
+                            ? '无两侧都有分数的记录'
+                            : incomparableLabel(m.baseline_status, m.candidate_status)}
                         </span>
                       )}
                     </td>

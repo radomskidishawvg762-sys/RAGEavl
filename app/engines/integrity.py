@@ -13,6 +13,9 @@ Metric version pins the normalization+comparison semantics:
   "integrity-normalization-v2" (v2: deterministic multi-candidate pairing for
   numerical_consistency — strict unique affinity pairing replaces first-ok
   selection whenever either side states several ok values).
+  "integrity-normalization-v3" (v3: temporal month granularity, text-order
+  candidates, and multi-interval temporal records compare as interval sets —
+  ambiguous unless both sides state the same set).
 """
 
 from __future__ import annotations
@@ -43,7 +46,7 @@ from app.metrics.integrity.comparison import (
 from app.metrics.integrity.pairing import pair_or_fallback
 from app.metrics.registry import MetricRegistry
 
-INTEGRITY_METRIC_VERSION = "integrity-normalization-v2"
+INTEGRITY_METRIC_VERSION = "integrity-normalization-v3"
 
 
 class IntegrityMetricDef(BaseModel):
@@ -188,6 +191,8 @@ class IntegrityEngine:
                     absolute_tolerance=tolerance.get("absolute"),
                     relative_tolerance=tolerance.get("relative"),
                 )
+            elif d.kind == "temporal":
+                outcome = self._compare_temporal_sets(ref_oks, ans_oks)
             else:
                 outcome = self._compare(d.kind, ref, ans, tolerance)
         else:
@@ -267,6 +272,36 @@ class IntegrityEngine:
             comparison_basis=basis,
             metric_version=INTEGRITY_METRIC_VERSION,
             error=({"reason": outcome.reason} if outcome.reason and outcome.score is None else None),
+        )
+
+    @staticmethod
+    def _compare_temporal_sets(
+        ref_oks: list[NormalizedBase], ans_oks: list[NormalizedBase]
+    ) -> ComparisonOutcome:
+        """One distinct interval per side compares directly; several distinct
+        intervals only match as identical sets — any other binding is a guess."""
+        def distinct(items):
+            by_interval: dict[tuple, NormalizedBase] = {}
+            for item in items:
+                by_interval.setdefault((item.interval_start, item.interval_end), item)
+            return by_interval
+
+        ref_set, ans_set = distinct(ref_oks), distinct(ans_oks)
+        if len(ref_set) == 1 and len(ans_set) == 1:
+            return compare_temporal(next(iter(ref_set.values())), next(iter(ans_set.values())))
+        intervals = {
+            "reference_intervals": [list(k) for k in ref_set],
+            "answer_intervals": [list(k) for k in ans_set],
+        }
+        if set(ref_set) == set(ans_set):
+            return ComparisonOutcome(
+                comparison_type="match", score=1.0,
+                detail={**intervals, "strategy": "interval-set-equality-v1"},
+            )
+        return ComparisonOutcome(
+            comparison_type="ambiguous", score=None,
+            reason="multiple temporal values; reference/answer pairing cannot be determined",
+            detail=intervals,
         )
 
     @staticmethod

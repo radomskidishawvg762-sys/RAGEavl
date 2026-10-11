@@ -4,9 +4,10 @@ Hard boundaries (§七/§十一):
   - Never calls an Engine / Judge / RAG Adapter / metric evaluation. Everything
     is derived from already-persisted runs + metric_results rows.
   - Never mutates any row; no new Repository methods.
-  - Metric-level scores are the SAME numbers the Report shows — reused via
-    ReportService._aggregate_metrics (pure aggregation of persisted scores,
-    never a recompute). The run's own overall_score is read as-is (§五).
+  - Metric-level scores are means of persisted scores over the records both
+    runs scored (paired on record_id); statuses reuse
+    ReportService._aggregate_metrics. Differing scored-record sets mark the
+    comparison LIMITED. The run's own overall_score is read as-is (§五).
 
 delta rules (§二): delta = candidate - baseline; relative_delta = delta /
 baseline (None when baseline is 0 or missing). A null score is NEVER coerced
@@ -19,7 +20,11 @@ from datetime import UTC, datetime
 from typing import Any
 
 from app.repositories.evaluation import EvaluationRepository
-from app.services.report_service import ReportService
+from app.services.report_service import (
+    ReportService,
+    compute_overall_score,
+    is_unscored_mismatch,
+)
 
 _TERMINAL_STATES = {"completed", "completed_with_errors"}
 
@@ -61,6 +66,11 @@ class ComparisonService:
                 b_rows, _meta(baseline).get("metric_weights") or {},
                 c_rows, _meta(candidate).get("metric_weights") or {},
             )
+            uneven = [m["name"] for m in metrics if not m["coverage_consistent"]]
+            if uneven:
+                status = "LIMITED"
+                reasons = [*reasons, f"metric coverage differs (paired on common scored "
+                                     f"records only): {uneven}"]
         overall = self._compare_overall(baseline, candidate, status)
 
         return {
@@ -152,22 +162,46 @@ class ComparisonService:
     # ---- per-metric comparison (§二/§四) ----
 
     @staticmethod
+    def _by_record(rows: list[dict]) -> dict[str, dict[str, dict]]:
+        out: dict[str, dict[str, dict]] = {}
+        for row in rows:
+            out.setdefault(row["metric_name"], {})[row.get("record_id")] = row
+        return out
+
+    @staticmethod
     def _compare_metrics(b_rows, b_weights, c_rows, c_weights) -> list[dict]:
-        # same numbers the Report shows (persisted-score aggregation only)
+        """Scores are means over the records BOTH runs scored (paired on
+        record_id) — a run-level mean over different record sets is not a
+        like-for-like delta. Statuses come from the full-run aggregation."""
         b_agg = {m["name"]: m for m in ReportService._aggregate_metrics(b_rows, b_weights)}
         c_agg = {m["name"]: m for m in ReportService._aggregate_metrics(c_rows, c_weights)}
+        b_rec, c_rec = ComparisonService._by_record(b_rows), ComparisonService._by_record(c_rows)
         out: list[dict] = []
         for name in sorted(set(b_agg) | set(c_agg)):
             b, c = b_agg.get(name), c_agg.get(name)
+            b_by, c_by = b_rec.get(name, {}), c_rec.get(name, {})
+            b_valid = {rid for rid, r in b_by.items() if r.get("score") is not None}
+            c_valid = {rid for rid, r in c_by.items() if r.get("score") is not None}
+            paired = b_valid & c_valid
+            common = set(b_by) & set(c_by)
             b_score = b["score"] if b else None
             c_score = c["score"] if c else None
-            comparable = b_score is not None and c_score is not None
+            if paired:
+                b_score = compute_overall_score([b_by[rid] for rid in paired], b_weights)[0]
+                c_score = compute_overall_score([c_by[rid] for rid in paired], c_weights)[0]
+            comparable = bool(paired)
             delta = None
             relative_delta = None
             if comparable:
                 delta = c_score - b_score
                 if b_score != 0:
                     relative_delta = delta / b_score
+            if comparable:
+                reason = None
+            elif b_valid and c_valid:
+                reason = "no_paired_records"
+            else:
+                reason = ComparisonService._incomparable_reason(b, c)
             out.append({
                 "name": name,
                 "category": (b or c).get("category"),
@@ -179,7 +213,19 @@ class ComparisonService:
                 "candidate_status": c["status"] if c else "missing",
                 "metric_version": (b or c).get("metric_version"),
                 "comparable": comparable,
-                "incomparable_reason": None if comparable else ComparisonService._incomparable_reason(b, c),
+                "incomparable_reason": reason,
+                "baseline_valid_count": len(b_valid),
+                "candidate_valid_count": len(c_valid),
+                "paired_count": len(paired),
+                # a side with no valid score at all is already metric-level
+                # not comparable; coverage only qualifies deltas both sides have
+                "coverage_consistent": not (b_valid and c_valid) or b_valid == c_valid,
+                "new_unscored_mismatches": sum(
+                    1 for rid in common
+                    if is_unscored_mismatch(c_by[rid]) and not is_unscored_mismatch(b_by[rid])),
+                "resolved_unscored_mismatches": sum(
+                    1 for rid in common
+                    if is_unscored_mismatch(b_by[rid]) and not is_unscored_mismatch(c_by[rid])),
             })
         return out
 

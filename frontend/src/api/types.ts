@@ -433,6 +433,10 @@ export interface QualityGateMetric {
   passed: boolean | null;
   status: QualityGateStatus;
   reason: string | null;
+  valid_count?: number | null;
+  total_records?: number | null;
+  coverage?: number | null;
+  unscored_mismatch_count?: number;
 }
 
 export interface QualityGateResponse {
@@ -460,6 +464,12 @@ export interface ComparisonMetricItem {
   metric_version: string | null;
   comparable: boolean;
   incomparable_reason: string | null;
+  baseline_valid_count?: number;
+  candidate_valid_count?: number;
+  paired_count?: number;
+  coverage_consistent?: boolean;
+  new_unscored_mismatches?: number;
+  resolved_unscored_mismatches?: number;
 }
 
 export interface ComparisonResponse {
@@ -495,6 +505,7 @@ export interface RegressionMetricItem {
   relative_delta: number | null;
   epsilon: number;
   epsilon_source: string;
+  unscored_mismatch_delta?: number;
   verdict: RegressionVerdict;
 }
 

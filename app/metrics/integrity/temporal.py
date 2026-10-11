@@ -7,9 +7,9 @@ denotes (year / fiscal_year / quarter / reporting_period / date).
 
 Supported: year (2024年 / 2024年度), fiscal year (FY2024 / FY24 / 2024财年 —
 mapped to the calendar year, fiscal offsets are company-specific config and
-NOT guessed), quarter (Q1 2024 / 2024Q1 / 2024年第一季度), reporting periods
-(上半年/下半年/全年 with explicit year), concrete dates (2024年3月15日 /
-2024-03-15 / 2024/3/15), as-of dates (截至/截止 …).
+NOT guessed), quarter (Q1 2024 / 2024Q1 / 2024年第一季度), month (2024年3月 /
+2024-03), reporting periods (上半年/下半年/全年 with explicit year), concrete
+dates (2024年3月15日 / 2024-03-15 / 2024/3/15), as-of dates (截至/截止 …).
 
 Relative expressions without an anchor (去年/今年/上一报告期/报告期内) and
 anything unparseable -> ambiguous. Never guess.
@@ -23,7 +23,7 @@ from typing import Literal
 
 from app.metrics.integrity.base import NormalizedBase
 
-Granularity = Literal["year", "fiscal_year", "quarter", "reporting_period", "date"]
+Granularity = Literal["year", "fiscal_year", "quarter", "month", "reporting_period", "date"]
 
 _CN_Q = {"一": 1, "二": 2, "三": 3, "四": 4}
 _RELATIVE_TERMS = ("去年", "今年", "明年", "上一年度", "上一报告期", "报告期内", "最近", "最新")
@@ -69,6 +69,12 @@ _PATTERNS: list[tuple[re.Pattern[str], Granularity]] = [
             r"(?:截至|截止(?:至)?)?\s*(\d{4})[年./-](\d{1,2})[月./-](\d{1,2})日?"
         ),
         "date",
+    ),
+    # month: 2024年3月 / 2024-03 (a following day number belongs to the date pattern;
+    # the digit guards keep 2023-2024 a year range, not a month)
+    (
+        re.compile(r"(?<!\d)(\d{4})(?:\s*年\s*(\d{1,2})\s*月(?!\s*\d)|-(\d{1,2})(?![\d./-]))"),
+        "month",
     ),
     # quarter: 2024Q1 / Q1 2024 / 2024年第一季度 / 2024年第1季度 / 2024年Q1
     (
@@ -117,6 +123,11 @@ def normalize_temporal(text: str) -> NormalizedTemporal:
             as_of = "截至" in m.group(0) or "截止" in m.group(0)
             return _make(year, (month, day), (month, day), "date", raw,
                          metadata={"as_of": as_of})
+        if granularity == "month":
+            year, month = int(groups[0]), int(groups[1] or groups[2])
+            if not 1 <= month <= 12:
+                continue
+            return _make(year, (month, 1), (month, _days_in_month(year, month)), "month", raw)
         if granularity == "quarter":
             if groups[0] is not None:  # Q1 2024 form
                 q, year = int(groups[0]), _two_digit_year(int(groups[1]))
@@ -156,15 +167,21 @@ def normalize_temporal(text: str) -> NormalizedTemporal:
 
 
 def extract_temporal(text: str) -> list[NormalizedTemporal]:
-    """All distinct temporal candidates in text (one entry per pattern hit)."""
-    results: list[NormalizedTemporal] = []
+    """All distinct temporal candidates in text order (one entry per pattern hit;
+    earlier, more specific patterns claim overlapping spans)."""
+    hits: list[tuple[int, NormalizedTemporal]] = []
     seen_spans: list[tuple[int, int]] = []
-    for pattern, _ in _PATTERNS:
+    for pattern, granularity in _PATTERNS:
         for m in pattern.finditer(text):
             if any(not (m.end() <= a or m.start() >= b) for a, b in seen_spans):
                 continue
+            if granularity == "month":
+                month = int(m.group(2) or m.group(3))
+                if not 1 <= month <= 12:
+                    continue
             seen_spans.append((m.start(), m.end()))
-            results.append(normalize_temporal(m.group(0)))
+            hits.append((m.start(), normalize_temporal(m.group(0))))
+    results = [item for _, item in sorted(hits, key=lambda h: h[0])]
     if not results and _RELATIVE_ONLY.search(text):
         results.append(normalize_temporal(text))
     return results

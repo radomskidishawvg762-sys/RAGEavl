@@ -1,5 +1,11 @@
 import { expect, it } from 'vitest';
-import { diagnosisTextLabel, evidenceTypeLabel, scrubProviderText } from '../src/api/mappers';
+import {
+  comparisonReasonLabel,
+  diagnosisTextLabel,
+  evidenceTypeLabel,
+  REASON_EXPLAIN,
+  scrubProviderText,
+} from '../src/api/mappers';
 
 it('报错详情脱敏 URL、独立密钥、Bearer 和账号字段', () => {
   const raw = '连接 https://test.invalid/api 失败 sk-reviewSecret123456 authorization: Bearer reviewBearer123456 api_key=reviewKey123456 account_id=reviewAccount123456';
@@ -19,6 +25,7 @@ it.each([
   ['semantic_evidence', '语义证据'],
   ['comparison_basis', '比较依据'],
   ['comparison_basis.deterministic_comparison_type', '确定性比较类型'],
+  ['reference_contexts', '参考上下文'],
 ])('已知缺失证据路径使用中文：%s', (key, label) => {
   expect(evidenceTypeLabel(key)).toBe(label);
 });
@@ -33,6 +40,23 @@ it('JSON 格式的鉴权字段和账号字段也脱敏', () => {
   expect(text).not.toMatch(/reviewBearer|reviewKey|reviewAccount/);
 });
 
+
+it('只有参考答案时的检索无法判定原因使用中文', () => {
+  expect(diagnosisTextLabel(
+    'only reference_answer on record (no reference_contexts) — retrieval attribution forbidden',
+  )).toBe('记录上只有参考答案、没有参考上下文（reference_contexts）—— 禁止检索归因');
+});
+
+it('指标覆盖不一致的可比性原因使用中文', () => {
+  expect(comparisonReasonLabel(
+    "metric coverage differs (paired on common scored records only): ['faithfulness']",
+  )).toBe('指标有效覆盖不一致（仅按两侧都有分数的记录配对计算）：faithfulness');
+});
+
+it('新增门禁原因码有中文说明', () => {
+  expect(REASON_EXPLAIN.RUN_NOT_COMPLETED).toBeTruthy();
+  expect(REASON_EXPLAIN.REQUIRED_METRIC_DETERMINISTIC_FAILURE).toBeTruthy();
+});
 
 it('根因中的事实字段按词边界转换为中文', () => {
   expect(diagnosisTextLabel('Numerical Mismatch (abs_diff=100)')).toBe('数值不一致 (绝对差=100)');

@@ -108,11 +108,33 @@ def test_normalization_absorbs_punctuation_and_case() -> None:
     assert out.status == "undetermined"  # gold present -> never missing
 
 
-def test_gold_answer_fallback_source_is_traced() -> None:
+def test_reference_answer_only_is_undetermined_not_missing_evidence() -> None:
+    """reference_answer is the expected answer, not retrieval gold: substring
+    absence in contexts cannot attribute missing_evidence."""
     rec = _record(contexts=["无关内容"], reference_answer="营业收入为1亿元")
     out = evaluate_retrieval(rec)
+    assert out.status == "undetermined"
+    assert out.code is None and out.bundle is None and out.candidate is None
+    assert "reference_contexts" in out.missing_evidence
+
+
+def test_paraphrased_context_with_reference_answer_only_is_not_missing_evidence() -> None:
+    """同义改写反例: the context states the gold fact in other words."""
+    rec = _record(
+        contexts=["公司2024年实现营收一亿元，较上年增长一成"],
+        reference_answer="2024年营业收入为1亿元，同比增长10%",
+    )
+    out = evaluate_retrieval(rec)
+    assert out.status == "undetermined"
+    assert out.code != CODE_MISSING
+
+
+def test_reference_contexts_still_win_over_reference_answer() -> None:
+    rec = _record(contexts=["无关内容"], reference_contexts=["营业收入为1亿元"],
+                  reference_answer="营业收入为1亿元")
+    out = evaluate_retrieval(rec)
     assert out.status == "diagnosed" and out.code == CODE_MISSING
-    assert _summary_item(out).content["gold_source"] == "reference_answer"
+    assert _summary_item(out).content["gold_source"] == "reference_contexts"
 
 
 # ---------------- Rule 2: retrieval.top_k_issue ----------------
@@ -317,6 +339,31 @@ def test_service_level_retrieval_diagnosis_end_to_end() -> None:
     (bucket,) = rld["items"]
     assert bucket["failure_type"] == "retrieval.missing_evidence"
     assert bucket["count"] == 1 and bucket["ratio"] == pytest.approx(1.0)
+
+
+def test_service_level_paraphrase_with_reference_answer_only_is_undetermined() -> None:
+    from app.models import DatasetRecord
+
+    repo = FakeEvaluationRepo(
+        {"ds1": {"is_locked": False, "record_count": 1, "version": "v1"}},
+        [DatasetRecord(
+            id="r1", dataset_id="ds1", row_index=0, question="q?",
+            reference_answer="2024年营业收入为1亿元，同比增长10%", reference_contexts=None,
+            metadata_={"answer": "a", "contexts": ["公司2024年实现营收一亿元，较上年增长一成"]},
+        )],
+    )
+    svc = EvaluationService(repo)
+    run = svc.create_run(project_id="p1", dataset_id="ds1", config_id="c1",
+                         reproducibility_meta={"config_version": "x", "metric_version": "stub-v1"})
+    asyncio.run(svc.execute_run(
+        run.id, engines=[_RecallStubEngine()], enabled_metrics=["context_recall"],
+        params=EvalParams(), diagnosis_engine=DiagnosisEngine(),
+    ))
+    assert len(repo.diagnoses) == 1
+    d = repo.diagnoses[0]
+    assert d["status"] == "undetermined"
+    assert d["failure_type"] != CODE_MISSING
+    assert d.get("confidence") != "high"
 
 
 def test_service_level_top_k_issue_end_to_end() -> None:

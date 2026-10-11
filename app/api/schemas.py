@@ -378,6 +378,14 @@ class MetricComparisonItem(BaseModel):
     incomparable_reason: str | None = None
     #   undetermined|not_configured|execution_error|not_run  (a side has no valid score)
     #   not_in_baseline|not_in_candidate                    (metric absent in one run)
+    #   no_paired_records                                   (no record scored on both sides)
+    # scores/delta are over records scored on BOTH sides (paired on record_id)
+    baseline_valid_count: int = 0
+    candidate_valid_count: int = 0
+    paired_count: int = 0
+    coverage_consistent: bool = True
+    new_unscored_mismatches: int = 0  # paired records newly judged unit_mismatch etc.
+    resolved_unscored_mismatches: int = 0
 
 
 class OverallComparison(BaseModel):
@@ -420,6 +428,7 @@ class MetricRegressionItem(BaseModel):
     relative_delta: float | None = None
     epsilon: float
     epsilon_source: str  # config | provisional_default
+    unscored_mismatch_delta: int = 0  # new - resolved unscored deterministic mismatches
     verdict: RegressionVerdict
 
 
@@ -468,6 +477,10 @@ class QualityGateMetric(BaseModel):
     passed: bool | None = None
     status: QualityGateStatus
     reason: str | None = None
+    valid_count: int | None = None  # records with a valid score for this metric
+    total_records: int | None = None
+    coverage: float | None = None  # valid_count / total_records
+    unscored_mismatch_count: int = 0  # judged deterministic mismatches without a score
 
 
 class QualityGateResponse(BaseModel):

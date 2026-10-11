@@ -5,7 +5,8 @@ metric) only marks the sample for diagnosis. WHETHER a retrieval root cause
 can be attributed is decided SOLELY by deterministic comparison of persisted
 evidence on the EvaluationRecord:
 
-  gold evidence      <- record.reference_contexts (fallback: reference_answer)
+  gold evidence      <- record.reference_contexts (reference_answer alone is
+                        traced but never attributes a retrieval root cause)
   retrieved evidence <- record.contexts
   top_k datum        <- record.metadata["rag"]["top_k"] (optional passthrough)
 
@@ -177,6 +178,14 @@ def evaluate_retrieval(record: EvaluationRecord) -> RetrievalCheckOutcome:
         return _undetermined(
             "no retrieved evidence (contexts) on record — attribution forbidden",
             ["retrieved_evidence"],
+        )
+    if gold_source == "reference_answer":
+        # An expected answer is not retrieval gold: retrieved text may state it
+        # in other words, so substring absence proves nothing about retrieval.
+        return _undetermined(
+            "only reference_answer on record (no reference_contexts) — "
+            "retrieval attribution forbidden",
+            ["reference_contexts"],
         )
     if not all(normalize_text(g) for g in gold):
         return _undetermined(
