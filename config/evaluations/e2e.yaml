@@ -8,7 +8,8 @@ metrics:
   context_recall: { enabled: true, threshold: null, weight: 1.0 }
   context_precision: { enabled: true, threshold: null, weight: 1.0 }
   faithfulness: { enabled: true, threshold: null, weight: 1.0 }
-  answer_relevancy: { enabled: true, threshold: null, weight: 1.0 }
+  # No real embeddings provider yet; an explicit enable is rejected at run creation.
+  answer_relevancy: { enabled: false, threshold: null, weight: 1.0 }
   entity_consistency: { enabled: true, threshold: 0.9, weight: 1.0 }
   temporal_consistency: { enabled: true, threshold: 0.9, weight: 1.0 }
   numerical_consistency: { enabled: true, threshold: 0.9, weight: 1.0 }

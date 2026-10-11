@@ -8,9 +8,10 @@ Validates the complete MVP chain on the real database:
 
 Judge = opencode.ai/zen/go (OpenAI-compatible, model deepseek-v4-flash). RAGAS
 faithfulness/context_recall are scored by the real LLM (non-deterministic,
-range/consistency-checked); answer_relevancy/context_precision need embeddings
-(unconfigured) and persist BIZ_JUDGE_NOT_CONFIGURED. Integrity/compare/gate
-assertions are exact/deterministic.
+range/consistency-checked). answer_relevancy stays disabled: no embeddings
+provider is implemented, and enabling it is rejected when the run is created.
+context_precision needs embeddings (unconfigured) and persists
+BIZ_JUDGE_NOT_CONFIGURED. Integrity/compare/gate assertions are exact/deterministic.
 
 Phases:
   A. real uvicorn server + httpx API flow
@@ -250,8 +251,6 @@ def _seed_harness(ctx: dict, run_a: str, record_id: str) -> dict:
             _m("entity_consistency", "integrity", 1.0, threshold=0.9),
             _m("faithfulness", "generation", 0.84),
             _m("context_recall", "retrieval", 0.88),
-            _m("answer_relevancy", "generation", None,
-               error={"code": "BIZ_JUDGE_NOT_CONFIGURED"}),
             _m("context_precision", "retrieval", None,
                error={"code": "BIZ_JUDGE_NOT_CONFIGURED"}),
         ])
@@ -358,10 +357,11 @@ def _verify_compare_regression(checks: Checks, run_a: str, h: dict) -> None:
             exp = "STABLE" if abs(delta) <= EPSILON else ("IMPROVEMENT" if delta > 0 else "REGRESSION")
             checks.add(f"{name} verdict consistent with delta ({exp})",
                        rv[name]["verdict"] == exp, f"{rv[name]['verdict']} vs {exp}")
-    for name in ("answer_relevancy", "context_precision"):
-        item = m.get(name)
-        checks.add(f"{name} NOT comparable (embeddings not configured)",
-                   bool(item) and item.get("comparable") is False, str(item))
+    item = m.get("context_precision")
+    checks.add("context_precision NOT comparable (embeddings not configured)",
+               bool(item) and item.get("comparable") is False, str(item))
+    checks.add("answer_relevancy not in the run (disabled; no embeddings provider)",
+               "answer_relevancy" not in m, str(sorted(m)))
 
     cmp_12 = httpx.get(f"{_BASE}/api/comparisons",
                        params={"baseline_run_id": h["h1"], "candidate_run_id": h["h2"]}, timeout=60).json()
@@ -585,10 +585,11 @@ def main() -> int:
 
         audit = _audit(run_a)
         checks.add("evaluation_results count == 6 records", audit["results"] == 6, str(audit["results"]))
-        checks.add("metric_results count == 6 records x 7 metrics (42)",
-                   audit["metric_rows"] == 42, str(audit["metric_rows"]))
-        checks.add("answer_relevancy embeddings-error rows stay null (6, never 0)",
-                   audit["null_by_metric"].get("answer_relevancy") == 6, str(audit["null_by_metric"]))
+        checks.add("metric_results count == 6 records x 6 enabled metrics (36)",
+                   audit["metric_rows"] == 36, str(audit["metric_rows"]))
+        checks.add("answer_relevancy not evaluated (disabled; no embeddings provider)",
+                   audit["null_by_metric"].get("answer_relevancy", 0) == 0,
+                   str(audit["null_by_metric"]))
         checks.add("numerical ambiguous record stays null (1)",
                    audit["null_by_metric"].get("numerical_consistency") == 1)
         checks.add("3 integrity mismatches diagnosed (entity/numerical/temporal)",
