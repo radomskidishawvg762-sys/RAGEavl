@@ -39,6 +39,7 @@ const METRIC_BUCKET: Record<MetricExecutionStatus, Presentation> = {
   not_configured: 'not_configured',
   error: 'error',
   not_run: 'not_run',
+  not_applicable: 'not_run',
 };
 
 /**

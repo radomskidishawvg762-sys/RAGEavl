@@ -2,7 +2,7 @@
 
 > 本文档描述项目的**真实状态**。文中所有数字都标注了来源；实测的注明实测日期与命令，未验证的明确写「未验证」。不写没有依据的数字。
 >
-> 最后核对日期：**2026-09-28**
+> 最后核对日期：**2026-10-12**
 
 ---
 
@@ -33,11 +33,11 @@ Evaluation → Failure Detection → Diagnosis → Evidence → Root Cause
 
 绝大多数评估工具止步于「分数低」。本项目强制要求：任何一条 Diagnosis 都必须由 **Evidence 契约**支撑。
 
-- 诊断是 **规则优先（rules-first）**，LLM 只在规则不可判定时兜底。
+- 诊断是 **规则优先（rules-first）**。完整性比较的 LLM 兜底尚未实现：不确定时记 `ambiguous`，不调用模型。
 - Evidence 必须是结构化的 `{contract: "<type>.v1", items: [{type, source, locator, content}]}`，**禁止扁平字符串数组**。
-- 契约不满足 → 抛 `InsufficientEvidenceError` → 该记录落 `undetermined`。
+- 契约不满足时，`DiagnosisEngine` 返回 `undetermined` 并带上 `missing_evidence`，服务把这条诊断落库。`InsufficientEvidenceError` 只由 `assert_evidence_present` 在证据包没有任何条目时抛出；诊断引擎不抛它。`app/diagnosis/evidence.py` 里曾经有一份同名类，没有被抛出过，已删除。
 - **禁止 `evidence.length >= 1` 这类兜底规则**，也禁止任何「分数低所以根因是 X」的推导。
-- 规则不可判定且 Judge 不可用时，输出 `comparison_type: "ambiguous"`、`score: null`、`passed: null` —— **绝不编一个看起来合理的分数**。Run 因此标记为 `completed_with_errors`。
+- 确定性比较无法下结论时，输出 `comparison_type: "ambiguous"`、`score: null`、`passed: null` —— **绝不编一个看起来合理的分数**。这不是执行错误。执行错误（指标行带 `error` 且没有 `comparison_basis`）只出现在 `execution_errors`，不再另写一条 `undetermined` 诊断。
 
 这条主线的直接后果：`undetermined` 与「失败」在数据模型里是两种东西，报告里也分开展示，不会混同。
 
@@ -50,7 +50,7 @@ Evaluation → Failure Detection → Diagnosis → Evidence → Root Cause
 ✓ 按注册表 spec 结构性分派
 ```
 
-这条是 spec 明文规定的静态检查项（I-8 之外的 ADR-03）。**注意：本仓库没有 CI pipeline，所以它是 review 时人工保证的，不是自动化门禁。**
+这条是 spec 明文规定的静态检查项（I-8 之外的 ADR-03）。仓库有 CI（`.github/workflows/ci.yml`，push / pull request 到 `main` 时跑后端 pytest 和前端检查）。ADR-03 与 I-8（禁止在 `api/`、`services/`、`domain/` 下 import supabase）仍然没有单独的自动化测试，review 时仍要看。
 
 同理，加权总分 `overall_score` **不是一个引擎**：它在 Run 完成时由 `services/report_service.compute_overall_score()` 依据快照里的 `metric_weights` 算一次，之后从持久化的 Run 读回，不参与引擎执行。
 
@@ -84,7 +84,7 @@ FastAPI → Service → Repository → SQLAlchemy 2.0 → psycopg[binary] → Po
 
 禁止方向：Engine→Service、Domain→FastAPI、Engine A→Engine B、Service→Session/ORM、Service→supabase SDK。
 
-规模（2026-09-28 实测 `find`）：`app/` 下 89 个 `.py`；`frontend/src/` 下 56 个 `.ts/.tsx`。
+规模（2026-10-12 实测）：`app/` 下 92 个 `.py`；`frontend/src/` 下 56 个 `.ts/.tsx`。
 
 ### 3.2 数据模型
 
@@ -107,9 +107,9 @@ SELECT ... FOR UPDATE（锁定 dataset 行）
   → COMMIT → 202 {run_id, status, reproducibility_meta}
 ```
 
-Run 状态：`pending, running, completed, completed_with_errors, failed, cancelled`（无百分比阈值）。8 个强制复现字段：`dataset_version, config_version, metric_version, prompt_version, judge_model, judge_model_version, model_version, timestamp`。
+Run 状态：`pending, running, completed, completed_with_errors, failed, cancelled`（无百分比阈值）。任一指标行带执行错误时，Run 记为 `completed_with_errors`，`error_summary.metric_errors` 记下条数。8 个复现字段：`dataset_version, config_version, metric_version, prompt_version, judge_model, judge_model_version, model_version, timestamp`。其中 `model_version` 允许为 null，含义是 **unavailable**（上游模型修订号拿不到，不拿模型别名冒充）。
 
-数据集版本不可变（ADR-06）：`is_locked` 是硬约束，改数据只能建新版本。
+数据集版本不可变（ADR-06）：`is_locked` 保护内容，不阻止对同一版本再跑评估。`DatasetLockedError`（409 `BIZ_DATASET_LOCKED`）是「若有人去改锁定内容」的错误契约；当前服务没有修改已锁定记录的入口，再导入会新建版本，这个异常类没有被服务层抛出。
 
 ### 3.3 指标与失败分类
 
@@ -120,7 +120,7 @@ Run 状态：`pending, running, completed, completed_with_errors, failed, cancel
 | RagasEngine | 默认启用 `faithfulness`、`context_recall`、`context_precision`。`answer_relevancy` 需要 embeddings；仓库里没有真实 embeddings 实现，默认关闭。配置里显式启用而 embeddings 不可用时，创建 Run 会被拒绝 |
 | IntegrityEngine | `entity_consistency`、`temporal_consistency`、`numerical_consistency` |
 
-Integrity 走 **Deterministic-first Hybrid**（ADR-04）：抽取 → 归一化（别名 / 单位 / 日期解析）→ 确定性比较 → 容差与等价判定 → **仅在不确定时才调 LLM**。每个结果必须带 `comparison_basis`；时间必须解析成区间（不做原始字符串比较）；数值必须抽数 → 单位归一 → 容差（不做字符串相等）。
+Integrity 走确定性比较（ADR-04）：抽取 → 归一化（别名 / 单位 / 日期解析）→ 确定性比较 → 容差与等价判定。**LLM 兜底尚未实现**。两侧都抽不到实体、数值或时间时，`comparison_type` 为 `not_applicable`，分数为 null，不进均值。没有 alias table 的新 Run 会在实体一致性上标明「该指标未生效」。每个结果必须带 `comparison_basis`；时间必须解析成区间（不做原始字符串比较）；数值必须抽数 → 单位归一 → 容差（不做字符串相等）。`comparison_basis.tolerance_applied` 记录数值比较实际使用的绝对/相对容差。
 
 失败分类法共 **14 个 code**（实测 `app/diagnosis/taxonomy.py`）：
 
@@ -145,7 +145,7 @@ config/system.yaml  <  config/domains/<domain>.yaml  <  config/evaluations/<prof
 - Profile YAML 才有 `threshold` / `weight`；`threshold: null` 表示不做 PASS/FAIL 判定。
 - Run 创建时快照 `config_version = sha256(yaml_dump(merged config))`。
 - 历史免疫：Profile 之后改版，不影响已完成 Run 的结果与门禁判定（有测试锁定）。
-- **无运行时热重载**（ADR-05）；YAML 运行时持久化 = by design 不实现。
+- 没有文件监视器，也没有进程内配置缓存。`ConfigService.load()` 每次调用都从磁盘重新读取 YAML。ADR-05 不把配置放进数据库、也不做热替换守护进程；下一次请求会看到磁盘上的新文件。
 
 实测 `config/` 下现有 5 个文件：`system.yaml`、`domains/general.yaml`、`evaluations/{default,e2e,e2e_gate_disabled}.yaml`。
 
@@ -208,7 +208,7 @@ config/system.yaml  <  config/domains/<domain>.yaml  <  config/evaluations/<prof
 /profiles              /metrics               /settings
 ```
 
-技术栈：React 18 + TypeScript + Ant Design + ECharts + Axios（Vite，target `es2020`）。
+技术栈：React 18 + TypeScript + Vite + ECharts（target `es2020`）。HTTP 用 `fetch`。没有 Ant Design，没有 Axios。后端没有 CORS 中间件。
 
 进度轮询：`status ∈ {pending, running}` 时每 1.5s 打 `/api/evaluations/{id}/progress`，到终态停止并拉完整报告。
 
@@ -240,30 +240,31 @@ C. no-re-execution spy —— 只读服务在真实库上必须仍然成功
 
 ### 5.4 测试
 
-| 套件 | 位置 | 规模（2026-09-28 实测） |
+| 套件 | 位置 | 规模（2026-10-12 实测） |
 |------|------|------|
-| 后端 | `tests/`（47 个 `.py`） | 540 collected → 540 passed / 0 skipped |
-| 前端 | `frontend/tests/`（7 个文件） | 63 passed |
+| 后端 | `tests/`（67 个 `.py`） | 689 passed，1 skipped |
+| 前端 | `frontend/tests/`（vitest 11 个文件） | 90 passed |
 
-后端含 13 个 PostgreSQL 集成测试；本地栈启动后**全部真跑通过**（13/13，见 §6.1）。
+后端里有 19 个 PostgreSQL 集成测试；`TEST_DATABASE_URL` 已配置时这 19 个全部执行并通过。
 
 ---
 
-## 6. 当前实测状态（2026-09-28）
+## 6. 当前实测状态（2026-10-12）
 
 命令与原始结果：
 
 ```bash
 .venv/Scripts/python.exe -m pytest -q
-#   534 tests collected
-#   521 passed, 13 skipped, 30 warnings in 52.73s
+#   689 passed, 1 skipped, 153 warnings in 14.42s
+#   PostgreSQL integration tests executed: 19
+#   Integration tests passed: 19
 
 .venv/Scripts/python.exe -m ruff check .
 #   All checks passed!
 
-cd frontend && npx vitest run
-#   Test Files  7 passed (7)
-#        Tests  63 passed (63)
+cd frontend && npm test
+#   Test Files  11 passed (11)
+#        Tests  90 passed (90)
 ```
 
 ### 6.1 集成测试为什么 skip —— 原因已经变了
@@ -277,7 +278,7 @@ skip 数量碰巧仍是 13，但**语义完全不同**了。汇总行会打印�
 `Integration tests skipped: 13 (TEST_DATABASE_URL unreachable: OperationalError)`，
 不再用「not configured or unreachable」这种二选一的含糊措辞。
 
-当前本机实测（2026-09-28 晚）：**本地栈已启动** —— `supabase start` 拉起，54321-54327 均监听，`rageval_test` 可达（PostgreSQL 17.6，11 张表），Docker Desktop 运行中。所以这 13 个集成测试**已真跑并全部通过**（13/13）。此前的「栈未启动 → unreachable → NOT VERIFIED」是同一会话早些时候的状态。
+2026-09-28 晚那次本地栈启动后，当时的 13 个集成测试全部通过。2026-10-12 再测：集成测试已是 19 个，`TEST_DATABASE_URL` 已配置，19/19 通过。上面表格里的「13」是当时的数量，不是现在的数量。
 
 要真正验证：
 
@@ -300,8 +301,8 @@ pytest
 
 ## 7. 已知限制（诚实清单）
 
-1. ~~**13 个 PostgreSQL 集成测试当前未验证**（§6.1），因为本地栈没起。~~ **已解除（2026-09-28 晚）**：本地栈启动后 13/13 真跑通过。
-2. **没有 CI pipeline**。ADR-03（业务层不许按引擎名分支）、I-8（`api/`/`services/`/`domain/` 下不许 import supabase）这类 spec 静态检查，在本仓库是 **review 时人工保证**，不是自动化门禁。
+1. ~~**PostgreSQL 集成测试未验证**~~ **已解除**：2026-10-12 实测 19/19 通过。
+2. **CI 已有**（`.github/workflows/ci.yml`）。ADR-03（业务层不许按引擎名分支）和 I-8（`api/`/`services/`/`domain/` 下不许 import supabase）仍然没有单独的自动化测试，review 时还要看。
 3. **引擎级 Pipeline 选择 UI 缺失**（FR-12 剩余项）。指标级的启用/阈值/权重覆盖是全链生效的；引擎级选择只有后端能力，没有 UI。
 4. **Run 级 RAG Input 配置无后端 API**，当前由 `system.yaml` 决定，UI 如实标注为 Backend Gap。
 5. **Settings 页 Judge 支持当前进程内修改与真实连接测试**；测试当前草稿且不保存，重启恢复环境变量配置。RAG / Evaluation 的系统默认参数仍只读。详见 README「Judge 连接测试与重试」。
@@ -317,17 +318,17 @@ pytest
 
 | 数字 | 来源 | 状态 |
 |------|------|------|
-| 534 / 521 / 13 / 30 warnings | `pytest -q` 实测 | ✅ 实测 2026-09-28 |
-| 63 / 7 files | `npx vitest run` 实测 | ✅ 实测 2026-09-28 |
-| ruff All checks passed | `ruff check .` 实测 | ✅ 实测 2026-09-28 |
+| 689 passed / 1 skipped / 153 warnings；其中 19 个集成测试通过 | `pytest -q` 实测 | ✅ 实测 2026-10-12 |
+| 90 / 11 files | `npm test`（vitest）实测 | ✅ 实测 2026-10-12 |
+| ruff All checks passed | `ruff check .` 实测 | ✅ 实测 2026-10-12 |
 | 15 页面 / 15 路由 | `ls frontend/src/pages/*.tsx`、`App.tsx` 实测 | ✅ 实测 2026-09-28 |
 | 10 张表 / 3 个 revision | `app/models/__init__.py`、`alembic/versions/` 实测 | ✅ 实测 2026-09-28 |
 | 14 个失败 code | `app/diagnosis/taxonomy.py` 实测 | ✅ 实测 2026-09-28 |
-| 89 / 56 个源文件 | `find` 实测 | ✅ 实测 2026-09-28 |
+| 92 / 56 个源文件 | `app/` 的 `.py`、`frontend/src/` 的 `.ts/.tsx` 计数 | ✅ 实测 2026-10-12 |
 | 端口 54320-54323 / PG 17 | `supabase/supabase/config.toml` 实测 | ✅ 实测 2026-09-28 |
 | `DATABASE_URL` → `127.0.0.1:54322` | `.env.local` 实测（只看 host，密码打码） | ✅ 实测 2026-09-28 |
 | 7 个指标 | 代码注册表（`ragas.py` / `integrity.py` 的 `MetricSpec`） | ✅ 代码可查 |
-| 13 个集成测试**通过与否** | pytest 实测 | ✅ **13/13 通过**（2026-09-28，本地栈已启动） |
+| 19 个集成测试**通过与否** | pytest 实测 | ✅ **19/19 通过**（2026-10-12，`TEST_DATABASE_URL` 已配置） |
 | 前端 / 后端 E2E 通过数（75/75、50/50） | `MVP_FINAL_ACCEPTANCE.md` §7/§5 记录 | ⚠️ 历史记录（2026-09-01），本次未重跑 |
 | Benchmark v0.1 全维度 100% | `MVP_FINAL_ACCEPTANCE.md` §8 | ⚠️ 历史记录（2026-09-01），本次未重跑 |
 

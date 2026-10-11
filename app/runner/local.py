@@ -44,10 +44,11 @@ class LocalAsyncRunner:
         total = len(records)
         evaluated = 0
         errors = 0
+        metric_errors = 0
         cancelled = False
 
         async def _one(record: EvaluationRecord) -> None:
-            nonlocal evaluated, errors, cancelled
+            nonlocal evaluated, errors, metric_errors, cancelled
             async with self._sem:
                 # cancellation is checked AFTER acquiring the semaphore so
                 # queued tasks observe the flag when they actually start
@@ -63,6 +64,7 @@ class LocalAsyncRunner:
                         engines, record, enabled_metrics, params
                     )
                     evaluated += 1
+                    metric_errors += sum(1 for item in results if item.error)
                     done = results
                 except Exception as e:  # noqa: BLE001 — FR-22 isolation
                     errors += 1
@@ -79,6 +81,8 @@ class LocalAsyncRunner:
         await asyncio.gather(*(_one(r) for r in records))
 
         status = self._determine_status(total, evaluated, errors)
+        if status == "completed" and metric_errors:
+            status = "completed_with_errors"
         coverage = (evaluated / total) if total else 0.0
         return RunSummary(
             total=total,
@@ -87,6 +91,7 @@ class LocalAsyncRunner:
             coverage=coverage,
             status=status,
             cancelled=cancelled,
+            metric_errors=metric_errors,
         )
 
     @staticmethod

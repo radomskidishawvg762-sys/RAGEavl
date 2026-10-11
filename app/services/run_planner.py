@@ -234,6 +234,15 @@ def resolve_profile(merged: dict) -> RunPlan:
     alias_table = merged.get("alias_table") if isinstance(merged.get("alias_table"), dict) else {}
     if alias_table:
         extra["alias_table"] = alias_table
+    tolerance = merged.get("tolerance")
+    if isinstance(tolerance, dict):
+        applied_tolerance = {
+            key: tolerance[key]
+            for key in ("absolute", "relative")
+            if key in tolerance and tolerance[key] is not None
+        }
+        if applied_tolerance:
+            extra["tolerance"] = applied_tolerance
 
     severity = merged.get("severity_mapping")
     # T-14A: judge config (PUBLIC fields only — api_key never leaves the env ->
@@ -381,6 +390,9 @@ def build_reproducibility_meta(
         "judge_model_version": judge.get("model_version") if isinstance(judge, dict) else None,
         "model_version": None,
         "timestamp": datetime.now(UTC).isoformat(),
+        # False when this run has no alias table. Historical snapshots omit the
+        # key; the report must not infer "未生效" from that absence.
+        "alias_table_present": isinstance(merged.get("alias_table"), dict) and bool(merged.get("alias_table")),
         # T-14C: enabled metrics + per-metric weight are snapshotted so the
         # Report never has to re-read/re-resolve the Profile (runs replayable)
         "enabled_metrics": list(enabled_metrics),

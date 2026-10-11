@@ -304,5 +304,6 @@ def test_15_post_actually_invokes_runner_not_router_loop(ctx) -> None:
     # chain produced real engine results through Runner -> Pipeline -> Engine
     scores = [m["score"] for m in ctx.repo.metric_results
               if m["metric_name"] == "temporal_consistency"]
-    assert len(scores) == 3 and set(scores) == {1.0, 0.0}
+    # r2 states amounts, not a time, so temporal_consistency is not_applicable.
+    assert len(scores) == 3 and set(scores) == {1.0, 0.0, None}
     assert len(ctx.repo.eval_results) == 3

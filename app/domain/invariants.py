@@ -9,10 +9,12 @@ logger = logging.getLogger(__name__)
 
 
 class InsufficientEvidenceError(Exception):
-    """Evidence did not satisfy a diagnosis type's contract (ADR-07).
+    """Raised by `assert_evidence_present` when a bundle has no items.
 
-    Never infer root cause from score alone (A.5.5). DiagnosisEngine persists
-    `undetermined` instead of guessing.
+    DiagnosisEngine does not raise this. An unmet integrity contract returns
+    `DiagnosisResult(status="undetermined", missing_evidence=[...])` and the
+    service persists that undetermined row. The duplicate class that used to
+    live on `EvidenceCollector` was never raised.
     """
 
     def __init__(self, contract: str, missing: list[str] | None = None) -> None:

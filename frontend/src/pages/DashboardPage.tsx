@@ -369,7 +369,10 @@ function MetricGroup({ category, metrics }: { category: string; metrics: MetricR
           <tbody>
             {metrics.map((m) => (
               <tr key={m.name} data-testid={`metric-${m.name}`}>
-                <td className="mono">{m.name}</td>
+                <td className="mono">
+                  {m.name}
+                  {m.inactive_reason ? <div className={styles.dim}>{m.inactive_reason}</div> : null}
+                </td>
                 <td><ScoreValue score={m.score} /></td>
                 <td>{m.threshold === null ? '—' : m.threshold}</td>
                 <td><MetricStatusBadge status={m.status} passed={m.passed} /></td>

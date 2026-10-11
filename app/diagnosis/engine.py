@@ -74,6 +74,14 @@ class DiagnosisEngine:
         self._collector = collector or EvidenceCollector()
 
     def diagnose(self, record: EvaluationRecord, result: MetricResult) -> DiagnosisResult:
+        # Execution errors stay on the metric row. They are not undetermined
+        # diagnoses, so the same problem is not listed twice.
+        if result.error is not None and result.comparison_basis is None:
+            code = result.error.get("code", "unknown")
+            return DiagnosisResult(
+                status="not_failed",
+                reason=f"metric error ({code}): execution error is not a diagnosis",
+            )
         classification = self._classifier.classify(result)
         if classification.status != "failure" or classification.failure is None:
             return DiagnosisResult(

@@ -46,6 +46,14 @@ class NotFoundError(AppError):
 
 
 class DatasetLockedError(AppError):
+    """409 contract for a write that would change a locked dataset's content.
+
+    Nothing in the service layer raises this. DatasetService has no method that
+    mutates a locked version's records; importing again creates a new version.
+    `is_locked` does not block new evaluation runs. The class stays so a future
+    content-write path can return `BIZ_DATASET_LOCKED` without inventing a code.
+    """
+
     code = "BIZ_DATASET_LOCKED"
     http_status = 409
 

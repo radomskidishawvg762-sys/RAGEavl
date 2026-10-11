@@ -92,6 +92,9 @@ def extract_entities(
     Candidates: known alias/canonical occurrences (longest first) + quoted or
     bracketed spans. Unclassifiable raw runs are NOT emitted as candidates
     (no NER in MVP) — callers compare what they can see.
+
+    An empty list means this text has no comparable entity. The engine records
+    not_applicable when both sides are empty; it does not score that as a match.
     """
     table = alias_table or {}
     by_alias, canonical_keys = _fold_alias_table(table)

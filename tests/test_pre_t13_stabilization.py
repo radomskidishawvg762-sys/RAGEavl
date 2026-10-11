@@ -263,7 +263,7 @@ def test_c3_frozen_contracts_unchanged() -> None:
 
     assert ComparisonType.__args__ == ("match", "value_mismatch", "unit_mismatch", "scale_mismatch",
                                        "missing_reference", "ambiguous", "entity_mismatch",
-                                       "temporal_mismatch")
+                                       "temporal_mismatch", "not_applicable")
     assert DiagnosisResult.model_fields["status"].annotation.__args__ == (
         "diagnosed", "undetermined", "not_failed",
     )

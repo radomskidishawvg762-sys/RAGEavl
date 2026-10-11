@@ -28,6 +28,7 @@ class RunSummary(BaseModel):
     coverage: float
     status: RunStatus
     cancelled: bool = False  # Pre-T13 C1: set when is_cancelled() fired mid-run
+    metric_errors: int = 0  # metric rows that carry an execution error
 
 
 @runtime_checkable

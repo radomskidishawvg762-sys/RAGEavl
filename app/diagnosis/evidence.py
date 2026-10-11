@@ -32,14 +32,6 @@ from app.domain.schemas import (
 INTEGRITY_CONTRACT_TYPES: tuple[str, ...] = ("reference_evidence", "answer_claim")
 
 
-class InsufficientEvidenceError(Exception):
-    """Raised when evidence does not satisfy the contract (Spec A.5.5)."""
-
-    def __init__(self, missing: list[str]) -> None:
-        self.missing = missing
-        super().__init__(f"evidence contract unmet, missing: {missing}")
-
-
 def _answer_locator(answer: str, claim: str, index: int) -> str:
     """`answer_claim` 的定位：片段在答案原文中的字符区间。
 
@@ -66,7 +58,7 @@ class EvidenceCollector:
         basis = result.comparison_basis
         items: list[Evidence] = []
 
-        ref_content, ref_source, ref_locator = self._reference_side(record)
+        ref_content, ref_source, ref_locator = self._reference_side(record, basis)
         if ref_content:
             items.append(
                 Evidence(
@@ -116,21 +108,53 @@ class EvidenceCollector:
     # ---- internals ----
 
     @staticmethod
-    def _reference_side(record: EvaluationRecord) -> tuple[str, str, str]:
-        if record.reference_contexts:
-            first = record.reference_contexts[0]
-            if first and first.strip():
-                return first, "reference_contexts", "record.reference_contexts[0]"
-        if record.reference_answer and record.reference_answer.strip():
-            return record.reference_answer, "reference_answer", "record.reference_answer"
-        return "", "", ""
+    def _deciding_pair(basis: ComparisonBasis | None) -> tuple[str | None, str | None]:
+        """Raw texts of the pair that decided the comparison.
+
+        Multi-value numerical results store every couple. The first couple that
+        is not a match is the one the outcome followed (lowest paired index).
+        A single-value result uses the primary raw on each side.
+        """
+        if basis is None:
+            return None, None
+        couples = ((basis.diff or {}).get("pairing") or {}).get("couples") or []
+        for couple in couples:
+            if not isinstance(couple, dict):
+                continue
+            if couple.get("score") == 0.0 or couple.get("comparison_type") not in (None, "match"):
+                return couple.get("reference_raw"), couple.get("answer_raw")
+        reference = (basis.reference or {}).get("primary")
+        answer = (basis.answer or {}).get("primary")
+        ref_raw = reference.get("raw") if isinstance(reference, dict) else None
+        ans_raw = answer.get("raw") if isinstance(answer, dict) else None
+        return ref_raw, ans_raw
+
+    @staticmethod
+    def _reference_side(
+        record: EvaluationRecord, basis: ComparisonBasis | None
+    ) -> tuple[str, str, str]:
+        reference = (record.reference_answer or "").strip()
+        if not reference:
+            return "", "", ""
+        raw, _answer_raw = EvidenceCollector._deciding_pair(basis)
+        content = raw.strip() if isinstance(raw, str) and raw.strip() else reference
+        answer = reference
+        start = answer.find(content) if content else -1
+        if start != -1 and answer.find(content, start + 1) == -1:
+            locator = f"reference_answer[{start}:{start + len(content)}]"
+        else:
+            locator = "record.reference_answer"
+        return content, "reference_answer", locator
 
     @staticmethod
     def _answer_claim(
         record: EvaluationRecord, basis: ComparisonBasis | None
     ) -> tuple[str, dict | None]:
+        _ref_raw, answer_raw = EvidenceCollector._deciding_pair(basis)
         normalized = (basis.answer or {}).get("primary") if basis else None
-        claim_raw = (normalized or {}).get("raw") if isinstance(normalized, dict) else None
+        claim_raw = (answer_raw or "").strip() if answer_raw else None
+        if not claim_raw and isinstance(normalized, dict):
+            claim_raw = (normalized.get("raw") or "").strip() or None
         content = claim_raw or record.answer
         metadata = {"normalized": normalized} if normalized else None
         return (content or "").strip(), metadata

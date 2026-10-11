@@ -73,6 +73,11 @@
   padding: var(--sp-4);
 }
 
+.dim {
+  color: var(--color-text-subtle);
+  font-size: var(--fs-sm);
+}
+
 .metricTable,
 .failureTable,
 .runTable {

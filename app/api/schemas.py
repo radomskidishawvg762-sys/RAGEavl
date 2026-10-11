@@ -237,12 +237,13 @@ class MetricReportItem(BaseModel):
     score: float | None = None
     threshold: float | None = None
     passed: bool | None = None
-    status: str  # completed|failed|undetermined|not_configured|error|not_run
+    status: str  # completed|undetermined|not_configured|error|not_run|not_applicable
     valid_count: int
     invalid_count: int
     error_count: int
     metric_version: str | None = None
     weight: float = 1.0
+    inactive_reason: str | None = None
 
 
 class RawMetricItem(BaseModel):

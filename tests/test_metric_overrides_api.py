@@ -157,12 +157,14 @@ def test_2_threshold_override_flows_to_execution_and_snapshot(ctx) -> None:
     # requirement 6 (execution-path proof): profile threshold was null ->
     # passed was None; with the override the engine REALLY judged — persisted
     # `passed` follows the comparison outcome against the OVERRIDDEN threshold
-    assert all(m["passed"] is not None for m in rows)
     assert sum(1 for m in rows if m["passed"] is False) == 1  # value_mismatch record
-    assert sum(1 for m in rows if m["passed"] is True) == 2   # match records
+    assert sum(1 for m in rows if m["passed"] is None) == 2   # no number on either side
     for m in rows:
         ctype = (m["comparison_basis"] or {}).get("comparison_type")
-        assert m["passed"] is (ctype == "match")
+        if ctype == "not_applicable":
+            assert m["passed"] is None
+        else:
+            assert m["passed"] is (ctype == "match")
 
     meta = resp.json()["reproducibility_meta"]
     assert meta["metric_overrides"] == {"numerical_consistency": {"threshold": 0.5}}

@@ -424,8 +424,8 @@ def test_10_run_failed_when_all_records_error() -> None:
 
 def test_11_partial_results_preserved() -> None:
     """Record with one OK metric + one error metric: both rows persisted,
-    record counts as evaluated, run completes with errors only if a record
-    produced nothing evaluable."""
+    the record counts as evaluated, and the metric error marks the run
+    completed_with_errors."""
     from app.domain.schemas import MetricResult as MR
 
     class _MixedEngine:
@@ -450,7 +450,8 @@ def test_11_partial_results_preserved() -> None:
     ok = next(m for m in repo.metric_results if m["metric_name"] == "m1")
     bad = next(m for m in repo.metric_results if m["metric_name"] == "m2")
     assert ok["error"] is None and bad["error"] is not None
-    assert repo.runs[summary["run_id"]]["status"] == "completed"  # record evaluated
+    assert repo.runs[summary["run_id"]]["status"] == "completed_with_errors"
+    assert repo.runs[summary["run_id"]]["error_summary"]["metric_errors"] == 1
     assert repo.eval_results[0]["is_failure"] is False
 
 
@@ -512,8 +513,8 @@ def test_error_never_written_for_ambiguous_or_mismatch() -> None:
     _create_and_execute(svc, repo, [IntegrityEngine()], INTEGRITY)
     judged = [m for m in repo.metric_results
               if m["comparison_basis"] is not None]
-    # 4 records x 3 integrity metrics = 12 rows, ALL of them judged outcomes
-    # (empty sides are vacuous matches with a basis; no evaluator errors here)
+    # 4 records x 3 integrity metrics = 12 rows. Sides with nothing to compare
+    # are not_applicable (score null, error null), not evaluator errors.
     assert len(judged) == 12
     for m in judged:
         assert m["error"] is None, f"{m['metric_name']}: {m['comparison_basis']['comparison_type']}"

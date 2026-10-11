@@ -378,16 +378,24 @@ class EvaluationService:
 
         evaluated = state["evaluated"]
         error_records = state["error_records"]
+        metric_errors = summary.metric_errors
         coverage = (evaluated / total) if total else 0.0
         status = "cancelled" if summary.cancelled else LocalAsyncRunner._determine_status(
             total, evaluated, error_records
         )
+        if status == "completed" and metric_errors:
+            status = "completed_with_errors"
         # T-14C §七: overall_score is computed ONCE at run completion and
         # persisted — GET /report reads the stored value, never recomputes.
         overall_score, _valid, _total = compute_overall_score(
             self._repo.list_metric_rows_for_run(run_id),
             (run.reproducibility_meta or {}).get("metric_weights") or {},
         )
+        error_summary = None
+        if error_details or metric_errors:
+            error_summary = {"error_records": error_records, "details": error_details}
+            if metric_errors:
+                error_summary["metric_errors"] = metric_errors
         finished = self._repo.finish_run_if_running(
             run_id,
             status=status,
@@ -396,8 +404,7 @@ class EvaluationService:
             error_records=error_records,
             evaluation_coverage=coverage,
             finished_at=_utcnow(),
-            error_summary=({"error_records": error_records, "details": error_details}
-                           if error_details else None),
+            error_summary=error_summary,
         )
         # Fresh column read, not get_run: the ORM-enabled UPDATE above syncs its
         # SET values onto the in-session object even when rowcount == 0.

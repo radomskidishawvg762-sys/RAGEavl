@@ -28,10 +28,10 @@ from app.metrics.integrity.chinese_number import parse_chinese_number
 DEFAULT_ABSOLUTE_TOLERANCE = 1e-9
 DEFAULT_RELATIVE_TOLERANCE = 1e-6
 
-# unit token -> (normalized unit, scale factor to base yuan, currency)
-# English magnitude words are normalized into the SAME base-yuan space as the
-# CJK tokens (million == 百万元 == 1e6). case-insensitive matching is handled
-# by lowering the candidate token before lookup.
+# unit token -> (normalized unit, scale factor to base, currency)
+# English magnitude words scale the number (million == 1e6) but are not a
+# currency by themselves. Currency is attached only when a currency word is
+# adjacent; see _magnitude_currency. case-insensitive matching lowers the token.
 _UNIT_TABLE: dict[str, tuple[str, float, str | None]] = {
     "元": ("元", 1.0, "CNY"),
     "万元": ("万元", 1e4, "CNY"),
@@ -41,17 +41,24 @@ _UNIT_TABLE: dict[str, tuple[str, float, str | None]] = {
     "%": ("percent", 1e-2, None),
     "％": ("percent", 1e-2, None),
     "‰": ("permille", 1e-3, None),
-    "thousand": ("thousand", 1e3, "CNY"),
-    "million": ("million", 1e6, "CNY"),
-    "billion": ("billion", 1e9, "CNY"),
-    "trillion": ("trillion", 1e12, "CNY"),
+    "thousand": ("thousand", 1e3, None),
+    "million": ("million", 1e6, None),
+    "billion": ("billion", 1e9, None),
+    "trillion": ("trillion", 1e12, None),
     "percent": ("percent", 1e-2, None),
     "per cent": ("percent", 1e-2, None),
 }
+_MAGNITUDE_UNITS = frozenset({"thousand", "million", "billion", "trillion"})
+# A currency word immediately before or after the magnitude. 元 is only looked
+# for AFTER the magnitude so it is not confused with a preceding 万元 token
+# unless that 元 is the adjacent character.
+_CNY_BEFORE = re.compile(r"(?:人民币|RMB|CNY|¥|￥)\s*$", re.IGNORECASE)
+_CNY_AFTER = re.compile(r"^\s*(?:人民币|RMB|CNY|元|¥|￥)", re.IGNORECASE)
 
 # Comparison class per NORMALIZED unit token, derived from _UNIT_TABLE so the two
-# cannot drift apart — they once did, making English and CJK amounts of the same
-# value (e.g. "5 million" vs "500万元") a confirmed unit_mismatch.
+# cannot drift apart. English magnitudes are unitless here; an adjacent currency
+# word sets NormalizedNumerical.currency and the comparator treats that instance
+# as currency.
 _RATIO_UNITS = frozenset({"percent", "permille"})
 UNIT_CLASS_BY_UNIT: dict[str, str] = {
     normalized: ("ratio" if normalized in _RATIO_UNITS else "currency" if currency else "unitless")
@@ -86,6 +93,25 @@ def _precision_of(num_text: str) -> int:
 
 def _clean_number(num_text: str) -> float:
     return float(num_text.replace(",", ""))
+
+
+def _magnitude_currency(text: str, start: int, end: int) -> str | None:
+    """CNY only when a currency word touches the magnitude. Bare million/billion
+    stay scale words."""
+    if _CNY_BEFORE.search(text[:start]) or _CNY_AFTER.match(text[end:]):
+        return "CNY"
+    return None
+
+
+def _widen_magnitude(text: str, start: int, end: int) -> tuple[str, int, int]:
+    """Include an adjacent currency word so normalization can see it."""
+    pre = _CNY_BEFORE.search(text[:start])
+    post = _CNY_AFTER.match(text[end:])
+    if pre:
+        start -= len(pre.group(0))
+    if post:
+        end += len(post.group(0))
+    return text[start:end], start, end
 
 
 def normalize_numerical(text: str) -> NormalizedNumerical:
@@ -134,6 +160,8 @@ def normalize_numerical(text: str) -> NormalizedNumerical:
             )
         if unit_token:
             unit, scale, currency = _UNIT_TABLE[unit_token.lower()]
+            if unit_token.lower() in _MAGNITUDE_UNITS:
+                currency = _magnitude_currency(raw, m.start(), m.end())
             value = _clean_number(m.group("num"))
             return NormalizedNumerical(
                 raw=raw, parse_status="ok", value=value, unit=unit,
@@ -228,6 +256,11 @@ def extract_numerical(text: str) -> list[NormalizedNumerical]:
         trailing = "" if has_unit else text[m.end() : m.end() + 1]
         if not has_unit and trailing in _DATE_COMPONENT_SUFFIX:
             continue  # bare year/date component -> temporal domain
+        if has_unit and (m.group("unit") or "").lower() in _MAGNITUDE_UNITS:
+            snippet, span_start, span_end = _widen_magnitude(text, m.start(), m.end())
+            spans.append((span_start, span_end))
+            results.append(normalize_numerical(snippet))
+            continue
         spans.append((m.start(), m.end()))
         results.append(normalize_numerical(_with_context(m.group(0), trailing)))
     # 3) Chinese numerals

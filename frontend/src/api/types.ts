@@ -20,7 +20,8 @@ export type MetricExecutionStatus =
   | 'undetermined'
   | 'not_configured'
   | 'error'
-  | 'not_run';
+  | 'not_run'
+  | 'not_applicable';
 
 export interface ErrorBody {
   detail: string;
@@ -230,6 +231,7 @@ export interface MetricReportItem {
   error_count: number;
   metric_version: string | null;
   weight: number;
+  inactive_reason?: string | null;
 }
 
 export interface RawMetricItem {

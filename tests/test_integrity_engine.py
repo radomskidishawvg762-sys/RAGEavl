@@ -20,6 +20,10 @@ from app.metrics.integrity.comparison import (
     compare_numerical,
     compare_temporal,
 )
+from app.metrics.integrity.numerical import (
+    DEFAULT_ABSOLUTE_TOLERANCE,
+    DEFAULT_RELATIVE_TOLERANCE,
+)
 from app.metrics.registry import MetricRegistry
 
 ALIASES = {"中国平安": "中国平安", "平安": "中国平安", "Ping An": "中国平安"}
@@ -123,31 +127,24 @@ def test_numerical_opposite_sign_is_mismatch() -> None:
 
 
 def test_numerical_english_magnitude_units_same_base() -> None:
-    """English magnitude words normalize into the same base space as each other
-    and as the CJK currency tokens (million == 百万元 == 1e6).
-
-    They are classified as CURRENCY (decided 2026-09-28), not as bare unitless
-    magnitudes: a bare number states no unit, so "12.6 million" vs "12600000" is
-    a unit-class mismatch — the two sides are only comparable once both state
-    the currency.
+    """English magnitude words share a unitless scale space with each other.
+    They are not currency unless a currency word is adjacent, so a bare
+    magnitude and a bare number of the same base are the same scale.
     """
     out = compare_numerical(normalize_numerical("1000 million"), normalize_numerical("1 billion"))
     assert out.comparison_type == "match" and out.score == 1.0
     out2 = compare_numerical(normalize_numerical("1 million"), normalize_numerical("1000 thousand"))
     assert out2.comparison_type == "match"
-    # Same numeric base, but only one side states a unit.
     out3 = compare_numerical(normalize_numerical("12.6 million"), normalize_numerical("12600000"))
-    assert out3.comparison_type == "unit_mismatch" and out3.score is None
+    assert out3.comparison_type == "match" and out3.score == 1.0
 
 
-def test_numerical_english_and_cjk_currency_are_comparable() -> None:
-    """Regression: an English magnitude and its CJK currency equivalent used to
-    come back a CONFIRMED unit_mismatch failure, because _unit_class() knew only
-    the CJK tokens while _UNIT_TABLE had already tagged the English ones CNY."""
+def test_numerical_english_magnitude_is_not_cny_without_a_currency_word() -> None:
+    """A bare "million" used to be classified as CNY and matched 万元."""
     out = compare_numerical(normalize_numerical("5 million"), normalize_numerical("500万元"))
-    assert out.comparison_type == "match" and out.score == 1.0
-    out2 = compare_numerical(normalize_numerical("200 million"), normalize_numerical("2亿元"))
-    assert out2.comparison_type == "match"
+    assert out.comparison_type == "unit_mismatch" and out.score is None
+    stated = compare_numerical(normalize_numerical("5 million 元"), normalize_numerical("500万元"))
+    assert stated.comparison_type == "match" and stated.score == 1.0
 
 
 def test_numerical_english_scale_confusion_detected() -> None:
@@ -270,7 +267,10 @@ def test_engine_comparison_basis_records_basis_on_mismatch() -> None:
     assert basis.comparison_type == "value_mismatch"
     assert basis.reference["primary"]["unit"] == "亿元"
     assert basis.diff["base"]["abs_diff"] == 1e8
-    assert basis.tolerance_applied is None  # defaults used, none supplied
+    assert basis.tolerance_applied == {
+        "absolute": DEFAULT_ABSOLUTE_TOLERANCE,
+        "relative": DEFAULT_RELATIVE_TOLERANCE,
+    }
 
 
 def test_engine_threshold_and_passed_semantics() -> None:
@@ -288,7 +288,10 @@ def test_engine_tolerances_via_params() -> None:
     params = EvalParams(extra={"tolerance": {"absolute": 0.5}})
     r = _run(_record("100元", "100.2元"), ["numerical_consistency"], params)[0]
     assert r.score == 1.0
-    assert r.comparison_basis.tolerance_applied == {"absolute": 0.5}
+    assert r.comparison_basis.tolerance_applied == {
+        "absolute": 0.5,
+        "relative": DEFAULT_RELATIVE_TOLERANCE,
+    }
 
 
 def test_engine_registry_and_no_branching_wiring() -> None:

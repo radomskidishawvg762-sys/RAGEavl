@@ -29,6 +29,7 @@ from app.metrics.integrity.temporal import NormalizedTemporal
 ComparisonTypeStr = Literal[
     "match", "value_mismatch", "unit_mismatch", "scale_mismatch",
     "missing_reference", "ambiguous", "entity_mismatch", "temporal_mismatch",
+    "not_applicable",
 ]
 
 _MATCH = 1.0
@@ -116,13 +117,15 @@ def compare_temporal(ref: NormalizedTemporal, ans: NormalizedTemporal) -> Compar
 
 # ---------------- numerical ----------------
 
-def _unit_class(unit: str | None) -> str:
-    """Comparison class for a NORMALIZED unit token.
+def _unit_class(unit: str | None, currency: str | None = None) -> str:
+    """Comparison class for a normalized value.
 
-    Derived from _UNIT_TABLE (numerical.py) rather than re-listed, so the table's
-    currency metadata and this classification cannot drift apart — see the note
-    on UNIT_CLASS_BY_UNIT for the English/CJK unit_mismatch bug that drift caused.
+    The unit table classifies the token. An instance currency (set only when a
+    currency word sits next to an English magnitude) overrides that, so a bare
+    "million" stays unitless while "5 million 元" is currency.
     """
+    if currency:
+        return "currency"
     return UNIT_CLASS_BY_UNIT.get(unit or "", "unitless")
 
 
@@ -158,7 +161,7 @@ def compare_numerical(
             detail=detail,
         )
 
-    r_class, a_class = _unit_class(ref.unit), _unit_class(ans.unit)
+    r_class, a_class = _unit_class(ref.unit, ref.currency), _unit_class(ans.unit, ans.currency)
     detail["unit_class"] = {"reference": r_class, "answer": a_class}
     if r_class != a_class:
         return ComparisonOutcome(

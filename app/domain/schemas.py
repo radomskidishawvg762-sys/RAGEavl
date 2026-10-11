@@ -10,6 +10,7 @@ Category = Literal["retrieval", "generation", "integrity"]
 ComparisonType = Literal[
     "match", "value_mismatch", "unit_mismatch", "scale_mismatch",
     "missing_reference", "ambiguous", "entity_mismatch", "temporal_mismatch",
+    "not_applicable",
 ]
 Method = Literal["deterministic", "llm_fallback"]
 Severity = Literal["INFO", "WARNING", "ERROR", "CRITICAL"]

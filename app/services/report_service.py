@@ -27,8 +27,11 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Any
 
+from pydantic import ValidationError
+
 from app.core.logging import redact_text
-from app.diagnosis import DETERMINISTIC_MISMATCH_TYPES, DiagnosisEngine
+from app.diagnosis import DETERMINISTIC_MISMATCH_TYPES, DiagnosisEngine, FailureClassifier
+from app.domain.schemas import ComparisonBasis, MetricResult
 from app.repositories.evaluation import EvaluationRepository
 
 # comparison outcomes that mean "cannot judge" (never a score, never a failure)
@@ -45,6 +48,40 @@ _RUN_TERMINAL_STATES = {"completed", "completed_with_errors", "failed", "cancell
 # read path below — recomputing one there would present a fraction of the dataset
 # as a headline number.
 _SCORABLE_STATES = {"completed", "completed_with_errors"}
+
+
+def _metric_row_is_failure(row: dict) -> bool:
+    """Classifier result for one persisted metric row.
+
+    The report query stores comparison_type as a scalar. Execution errors
+    (error set, no comparison) are not failures. Threshold failures and
+    deterministic mismatches are, whether or not a diagnosis row was written.
+    """
+    comparison_type = row_comparison_type(row)
+    basis = None
+    if comparison_type:
+        try:
+            basis = ComparisonBasis(comparison_type=comparison_type, method="deterministic")
+        except ValidationError:
+            return False
+    category = row.get("category") or "integrity"
+    if category not in ("retrieval", "generation", "integrity"):
+        category = "integrity"
+    try:
+        result = MetricResult(
+            record_id=str(row.get("record_id") or row.get("result_id") or ""),
+            metric_name=str(row.get("metric_name") or ""),
+            category=category,
+            score=row.get("score"),
+            threshold=row.get("threshold"),
+            passed=row.get("passed"),
+            comparison_basis=basis,
+            metric_version=str(row.get("metric_version") or "unknown"),
+            error=row.get("error"),
+        )
+    except ValidationError:
+        return False
+    return FailureClassifier().classify(result).status == "failure"
 
 
 def row_comparison_type(row: dict) -> str | None:
@@ -87,6 +124,8 @@ def metric_status(row: dict) -> str:
         # has no numeric score. Imported rather than re-listed so it cannot drift
         # from the classifier.
         return "completed"
+    if comparison_type == "not_applicable":
+        return "not_applicable"
     return "not_run"
 
 
@@ -162,7 +201,9 @@ class ReportService:
         if overall_score is None and run.status in _SCORABLE_STATES:
             overall_score, _valid, _total = compute_overall_score(metric_rows, weights)
 
-        aggregated_metrics = self._aggregate_metrics(metric_rows, weights)
+        aggregated_metrics = self._aggregate_metrics(
+            metric_rows, weights, reproducibility_meta=meta,
+        )
         failures = self._failures(diagnoses, results)
         undetermined = self._undetermined(diagnoses, results)
         execution_errors = self._execution_errors(metric_rows, run.error_summary)
@@ -217,7 +258,8 @@ class ReportService:
             "execution_errors": execution_errors,
             "run_level_diagnoses": run_level_diagnoses,
             "quality_dimensions": self._quality_dimensions(
-                aggregated_metrics, diagnoses, failures, undetermined
+                aggregated_metrics, diagnoses, failures, undetermined,
+                metric_rows=metric_rows,
             ),
             "reproducibility": meta,
             "generated_at": datetime.now(UTC),
@@ -227,8 +269,9 @@ class ReportService:
 
     # Quality Dimension Model (Phase 9 Step 6/7): presentation-only aggregation
     # over persisted metrics/diagnoses. No business recomputation — scores come
-    # from _aggregate_metrics, counts from the persisted failure/undetermined
-    # lists. faithfulness deliberately appears in BOTH generation and
+    # from _aggregate_metrics. failure_count comes from the classifier over
+    # persisted metric rows (not only diagnosed rows). faithfulness deliberately
+    # appears in BOTH generation and
     # groundedness (dual-homed by design: it measures generation quality AND
     # groundedness of the answer in retrieved context).
     _DIMENSION_METRICS: dict[str, set[str]] = {
@@ -245,12 +288,20 @@ class ReportService:
         diagnoses,
         failures: list[dict],
         undetermined: list[dict],
+        metric_rows: list[dict] | None = None,
     ) -> list[dict]:
         failures_by_metric: dict[str, int] = {}
-        for f in failures:
-            m = f.get("related_metric")
-            if m:
-                failures_by_metric[m] = failures_by_metric.get(m, 0) + 1
+        if metric_rows is not None:
+            for row in metric_rows:
+                if _metric_row_is_failure(row):
+                    name = row.get("metric_name")
+                    if name:
+                        failures_by_metric[name] = failures_by_metric.get(name, 0) + 1
+        else:
+            for f in failures:
+                m = f.get("related_metric")
+                if m:
+                    failures_by_metric[m] = failures_by_metric.get(m, 0) + 1
         undet_by_metric: dict[str, int] = {}
         for u in undetermined:
             m = u.get("related_metric")
@@ -300,7 +351,11 @@ class ReportService:
         return dims
 
     @staticmethod
-    def _aggregate_metrics(metric_rows: list[dict], weights: dict[str, float]) -> list[dict]:
+    def _aggregate_metrics(
+        metric_rows: list[dict],
+        weights: dict[str, float],
+        reproducibility_meta: dict | None = None,
+    ) -> list[dict]:
         buckets: dict[str, list[dict]] = {}
         for row in metric_rows:
             buckets.setdefault(row["metric_name"], []).append(row)
@@ -308,27 +363,29 @@ class ReportService:
         for name, rows in buckets.items():
             score, valid_count, total_rows = compute_overall_score(rows, weights)
             statuses = [metric_status(r) for r in rows]
-            out.append(
-                {
-                    "name": name,
-                    "category": rows[0].get("category"),
-                    "score": score,  # metric-level weighted mean of VALID rows
-                    "threshold": rows[0].get("threshold"),
-                    "passed": None if score is None else (
-                        all(r.get("passed") is not False for r in rows)
-                        if rows[0].get("threshold") is not None else None
-                    ),
-                    "status": "completed" if valid_count else (
-                        "error" if "error" in statuses else statuses[0]
-                    ),
-                    "valid_count": valid_count,
-                    "invalid_count": total_rows - valid_count,
-                    "error_count": statuses.count("error") + statuses.count("not_configured"),
-                    "unscored_mismatch_count": sum(1 for r in rows if is_unscored_mismatch(r)),
-                    "metric_version": rows[0].get("metric_version"),
-                    "weight": float(weights.get(name, 1.0)),
-                }
-            )
+            item = {
+                "name": name,
+                "category": rows[0].get("category"),
+                "score": score,  # metric-level weighted mean of VALID rows
+                "threshold": rows[0].get("threshold"),
+                "passed": None if score is None else (
+                    all(r.get("passed") is not False for r in rows)
+                    if rows[0].get("threshold") is not None else None
+                ),
+                "status": "completed" if valid_count else (
+                    "error" if "error" in statuses else statuses[0]
+                ),
+                "valid_count": valid_count,
+                "invalid_count": total_rows - valid_count,
+                "error_count": statuses.count("error") + statuses.count("not_configured"),
+                "unscored_mismatch_count": sum(1 for r in rows if is_unscored_mismatch(r)),
+                "metric_version": rows[0].get("metric_version"),
+                "weight": float(weights.get(name, 1.0)),
+            }
+            meta = reproducibility_meta or {}
+            if name == "entity_consistency" and meta.get("alias_table_present") is False:
+                item["inactive_reason"] = "该指标未生效"
+            out.append(item)
         return out
 
     @staticmethod

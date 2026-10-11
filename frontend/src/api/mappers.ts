@@ -371,6 +371,7 @@ const COMPARISON_TYPE_LABEL: Record<string, string> = {
   entity_mismatch: '实体不一致',
   missing_reference: '参考缺失',
   ambiguous: '无法判定',
+  not_applicable: '不适用',
 };
 
 /** 根因标题 → 中文（后端 `_root_cause` 由规则码 Title Case 生成）。 */

@@ -95,6 +95,8 @@ export function presentMetric(
       return { label: '执行错误', tone: 'error', icon: 'cross' };
     case 'not_run':
       return { label: '未执行', tone: 'muted', icon: 'minus' };
+    case 'not_applicable':
+      return { label: '不适用', tone: 'muted', icon: 'minus' };
     default:
       return { label: status, tone: 'muted', icon: 'circle' };
   }

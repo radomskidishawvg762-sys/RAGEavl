@@ -23,7 +23,6 @@ from app.diagnosis.engine import DiagnosisEngine
 from app.diagnosis.evidence import (
     INTEGRITY_CONTRACT_TYPES,
     EvidenceCollector,
-    InsufficientEvidenceError,
 )
 from app.diagnosis.recommendations import build_recommendations
 from app.diagnosis.rules import RuleEngine
@@ -38,6 +37,7 @@ from app.diagnosis.taxonomy import (
     INTEGRITY_RULES,
     DiagnosisRule,
 )
+from app.domain.invariants import InsufficientEvidenceError
 
 __all__ = [
     "DETERMINISTIC_MISMATCH_TYPES",

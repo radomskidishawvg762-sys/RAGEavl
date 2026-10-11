@@ -189,12 +189,12 @@ def test_10_unparsed_is_undetermined() -> None:
     assert out2.status == "undetermined" and out2.diagnosis is None
 
 
-def test_10b_metric_error_is_undetermined() -> None:
+def test_10b_metric_error_is_not_an_undetermined_diagnosis() -> None:
     rec = _record("答案", reference_answer=None)  # missing reference -> engine error result
     result = _run_engine(rec, "numerical_consistency")
     assert result.error is not None
     out = _diagnose(rec, result)
-    assert out.status == "undetermined"
+    assert out.status == "not_failed"
 
 
 # ---------------- evidence contract (points 11-12) ----------------
@@ -233,7 +233,9 @@ def test_12_contract_satisfied_produces_diagnosis_with_bundle() -> None:
     for e in d.evidence:
         assert e.type and e.source and e.locator and e.content  # ADR-07 traceability
     ref = next(e for e in d.evidence if e.type == "reference_evidence")
-    assert ref.locator == "record.reference_contexts[0]"
+    assert ref.source == "reference_answer"
+    assert ref.content == "1亿元"
+    assert ref.locator.startswith("reference_answer[")
     assert ref.metadata["normalized"]["raw"] == "1亿元"  # Layer-2 normalized side attached
 
 

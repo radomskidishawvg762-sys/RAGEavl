@@ -9,10 +9,13 @@ Failure semantics:
      (value_mismatch / unit_mismatch / scale_mismatch / temporal_mismatch /
       entity_mismatch) — a direct Integrity Failure regardless of threshold.
 
-NOT failures (UNDETERMINED / INSUFFICIENT EVIDENCE — never diagnosed):
-  ambiguous, missing_reference (unparsed sides normalize to these), and
-  metric-level errors. ambiguity + anything is never converted into a
-  mismatch, and never guessed into a root cause.
+NOT failures:
+  ambiguous, missing_reference (unparsed sides normalize to these) are
+  UNDETERMINED and never diagnosed. An execution error (error set, no
+  comparison basis) is not a diagnosis either: it is not_failed here so the
+  service does not also persist an undetermined row. The metric row's error
+  is already listed under execution_errors. ambiguity + anything is never
+  converted into a mismatch, and never guessed into a root cause.
 """
 
 from __future__ import annotations
@@ -49,16 +52,17 @@ class FailureClassifier:
 
     def classify(self, result: MetricResult) -> Classification:
         # 0) evaluator-level error WITHOUT a comparison basis (missing input /
-        #    exception) means nothing was judged -> undetermined. Note: judged
-        #    null-score outcomes (ambiguous / unit_mismatch / missing_reference)
-        #    also carry error={"reason"} but ALWAYS carry a comparison_basis —
-        #    those are handled by the comparison_type branches below, never as
-        #    evaluator errors.
+        #    exception) means nothing was judged. It is not_failed, not
+        #    undetermined: the error is already an execution_errors row, and
+        #    persisting undetermined would show the same problem twice.
+        #    Judged null-score outcomes (ambiguous / unit_mismatch /
+        #    missing_reference) also carry error={"reason"} but ALWAYS carry a
+        #    comparison_basis — those are handled below, never as evaluator errors.
         if result.error is not None and result.comparison_basis is None:
             code = result.error.get("code", "unknown")
             return Classification(
-                status="undetermined",
-                reason=f"metric error ({code}): insufficient basis to judge",
+                status="not_failed",
+                reason=f"metric error ({code}): execution error is not a diagnosis",
             )
 
         basis = result.comparison_basis

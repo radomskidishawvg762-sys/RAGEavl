@@ -16,6 +16,8 @@ Metric version pins the normalization+comparison semantics:
   "integrity-normalization-v3" (v3: temporal month granularity, text-order
   candidates, and multi-interval temporal records compare as interval sets —
   ambiguous unless both sides state the same set).
+  "integrity-normalization-v4" (v4: both-empty sides are not_applicable with a
+  null score; English magnitudes are currency only next to a currency word).
 """
 
 from __future__ import annotations
@@ -43,10 +45,32 @@ from app.metrics.integrity.comparison import (
     compare_numerical,
     compare_temporal,
 )
+from app.metrics.integrity.numerical import (
+    DEFAULT_ABSOLUTE_TOLERANCE,
+    DEFAULT_RELATIVE_TOLERANCE,
+)
 from app.metrics.integrity.pairing import pair_or_fallback
 from app.metrics.registry import MetricRegistry
 
-INTEGRITY_METRIC_VERSION = "integrity-normalization-v3"
+INTEGRITY_METRIC_VERSION = "integrity-normalization-v4"
+
+
+def _tolerance_applied(kind: str, outcome: ComparisonOutcome, tolerance: dict) -> dict | None:
+    """Numerical comparisons record the absolute/relative values that were used.
+
+    Profile values win. When the profile omits them, the math defaults that
+    compare_numerical actually applied are recorded. Entity and temporal do not
+    use a tolerance. A not_applicable row never compared anything.
+    """
+    if kind != "numerical" or outcome.comparison_type == "not_applicable":
+        return None
+    absolute = tolerance.get("absolute", DEFAULT_ABSOLUTE_TOLERANCE)
+    relative = tolerance.get("relative", DEFAULT_RELATIVE_TOLERANCE)
+    if absolute is None:
+        absolute = DEFAULT_ABSOLUTE_TOLERANCE
+    if relative is None:
+        relative = DEFAULT_RELATIVE_TOLERANCE
+    return {"absolute": absolute, "relative": relative}
 
 
 class IntegrityMetricDef(BaseModel):
@@ -199,9 +223,9 @@ class IntegrityEngine:
             ref_empty, ans_empty = not ref_items, not ans_items
             if ref_empty and ans_empty:
                 outcome = ComparisonOutcome(
-                    comparison_type="match", score=1.0,
-                    reason=f"no {d.kind} expression on either side (vacuously consistent)",
-                    detail={"vacuous": True},
+                    comparison_type="not_applicable", score=None,
+                    reason=f"no {d.kind} expression on either side",
+                    detail={"not_applicable": True},
                 )
             elif ref_empty:
                 if ans is not None:
@@ -259,7 +283,7 @@ class IntegrityEngine:
             answer={**ans_payload, "side_status": ans_status},
             comparison_type=outcome.comparison_type,
             method="deterministic",
-            tolerance_applied=tolerance or None,
+            tolerance_applied=_tolerance_applied(d.kind, outcome, tolerance),
             diff={k: v for k, v in outcome.detail.items() if k != "tolerance"} or None,
         )
         return MetricResult(
@@ -271,7 +295,11 @@ class IntegrityEngine:
             passed=(outcome.score >= threshold) if (outcome.score is not None and threshold is not None) else None,
             comparison_basis=basis,
             metric_version=INTEGRITY_METRIC_VERSION,
-            error=({"reason": outcome.reason} if outcome.reason and outcome.score is None else None),
+            error=(
+                {"reason": outcome.reason}
+                if outcome.reason and outcome.score is None and outcome.comparison_type != "not_applicable"
+                else None
+            ),
         )
 
     @staticmethod

@@ -28,8 +28,32 @@ def test_quality_dimensions_cover_four_domains_and_dual_home_faithfulness() -> N
         {"related_metric": "faithfulness"},
         {"related_metric": "temporal_consistency"},
     ]
+    metric_rows = [
+        {
+            "metric_name": "numerical_consistency",
+            "category": "integrity",
+            "score": 0.0,
+            "threshold": None,
+            "comparison_type": "value_mismatch",
+            "error": None,
+            "metric_version": "v",
+            "record_id": "r1",
+        },
+        {
+            "metric_name": "numerical_consistency",
+            "category": "integrity",
+            "score": 0.2,
+            "threshold": 0.5,
+            "comparison_type": None,
+            "error": None,
+            "metric_version": "v",
+            "record_id": "r2",
+        },
+    ]
 
-    dimensions = ReportService._quality_dimensions(metrics, diagnoses, failures, undetermined)
+    dimensions = ReportService._quality_dimensions(
+        metrics, diagnoses, failures, undetermined, metric_rows=metric_rows,
+    )
     by_name = {d["dimension"]: d for d in dimensions}
 
     assert set(by_name) == {"retrieval", "generation", "groundedness", "correctness"}
@@ -38,10 +62,10 @@ def test_quality_dimensions_cover_four_domains_and_dual_home_faithfulness() -> N
     assert by_name["generation"]["score"] == 0.7
     assert by_name["groundedness"]["score"] == 0.7
     assert by_name["generation"]["undetermined_count"] == 1
-    assert by_name["correctness"]["failure_count"] == 1
+    assert by_name["correctness"]["failure_count"] == 2
     assert by_name["correctness"]["diagnosed_count"] == 1
     assert by_name["correctness"]["undetermined_count"] == 1
-    assert by_name["correctness"]["diagnosis_coverage"] == 1.0
+    assert by_name["correctness"]["diagnosis_coverage"] == 0.5
     assert by_name["correctness"]["evidence_coverage"] == 1.0
     assert by_name["correctness"]["is_weakest"] is False
     assert by_name["generation"]["is_weakest"] is True

@@ -131,8 +131,8 @@ async def test_scorer_failure_isolated_per_record() -> None:
     assert good[0].score == SCORES["faithfulness"]
 
     # batch level: engine soft-fails per metric (structured error result, no
-    # exception) so the runner sees the record as evaluated; error_records
-    # classification from persisted metric_results.error is T-12's job (Spec 7.1)
+    # exception) so the record still counts as evaluated. The metric error
+    # itself marks the run completed_with_errors.
     runner = LocalAsyncRunner(concurrency=2)
     summary = await runner.run(
         [_record("r1"), _record("r2", question="正常问题"), _record("r3", question="第三个问题")],
@@ -140,7 +140,8 @@ async def test_scorer_failure_isolated_per_record() -> None:
         ["faithfulness"],
         EvalParams(),
     )
-    assert summary.status == "completed"
+    assert summary.status == "completed_with_errors"
+    assert summary.metric_errors == 1
     assert summary.evaluated == 3 and summary.errors == 0
 
 
