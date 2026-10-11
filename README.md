@@ -27,10 +27,10 @@ Evaluation → Failure Detection → Diagnosis → Evidence → Root Cause
 **日常开发跑的是本机 Supabase CLI 自建栈**，数据库监听 `127.0.0.1:54322`。应用本身直接跑在本机（`uvicorn`），不依赖容器。
 
 ```text
-数据库：  本机 Supabase CLI 栈（supabase start），PostgreSQL 17
+数据库：  本机 Supabase CLI 栈（supabase --workdir supabase start），PostgreSQL 17
           → DATABASE_URL 指向 127.0.0.1:54322
-应用：    本机 Python 进程（uvicorn app.main:app --reload）
-前端：    本机 Vite dev server（端口 5173，/api 代理到 :8000）
+应用：    本机 Python 进程（127.0.0.1:8000）
+前端：    本机 Vite dev server（127.0.0.1:5173，/api 代理到 :8000）
 ```
 
 默认端口（来自 [`supabase/supabase/config.toml`](supabase/supabase/config.toml)）：
@@ -56,7 +56,7 @@ Evaluation → Failure Detection → Diagnosis → Evidence → Root Cause
 
 ```text
 [ ] Python ≥ 3.12（本项目实测 3.12.10）
-[ ] Node.js + npm（前端 Vite / vitest）
+[ ] Node.js 24 LTS + npm（前端 Vite / vitest；CI 使用 Node 24）
 [ ] Supabase CLI（本项目实测 v2.116.0）
 [ ] Docker Desktop 处于运行状态 —— 供 Supabase CLI 拉起本地栈
 [ ] 无需 Supabase 账号：本地栈是自建的
@@ -65,19 +65,33 @@ Evaluation → Failure Detection → Diagnosis → Evidence → Root Cause
 ### 1. 启动数据库（本地栈）
 
 ```bash
-supabase start          # 在仓库根目录执行（配置位于 supabase/）
-supabase status         # 打印 API URL / DB URL / Studio URL
+supabase --workdir supabase start
+supabase --workdir supabase status
 ```
 
-首次 `start` 需要拉取镜像，耗时较长；之后是秒级启动。
+以上命令在仓库根目录执行，Windows PowerShell 与 macOS/Linux 通用。配置实际位于 `supabase/supabase/config.toml`，因此需指定 `--workdir supabase`。首次 `start` 需要拉取镜像，耗时较长。
 
-### 2. 写入 DATABASE_URL
+### 2. 安装后端依赖并写入 DATABASE_URL
+
+Windows PowerShell：
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev,eval]"
+Copy-Item .env.example .env.local
+```
+
+macOS/Linux：
 
 ```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ".[dev,eval]"
 cp .env.example .env.local
 ```
 
-编辑 `.env.local`（**不提交 Git**）：
+首次创建 `.env.local` 后编辑（**不提交 Git**；已有文件时直接编辑，勿再次复制覆盖）：
 
 ```env
 # 本地栈（默认）
@@ -95,14 +109,14 @@ RAGEVAL_ENV=dev
 ✓ 连接串含密码，等同 Secret
 ```
 
-> 实测：`.env.local` 中 `DATABASE_URL` 指向 `127.0.0.1:54322`，`ALEMBIC_DATABASE_URL` 与 `TEST_DATABASE_URL` 为空（回退语义见下）。`.env.test` 中 `TEST_DATABASE_URL` 已配置，指向同一本地栈的 `rageval_test` 库。
+需要真实 Judge 时再填写 `JUDGE_*`；仅运行本地测试和 CI 时保持 Judge 未配置。测试库另在 `.env.test` 配置，必须与开发库隔离，见「集成测试」。
 
 ### 3. 执行 Alembic Migration
 
 **这是建表的唯一途径。禁止在 Supabase Dashboard / Studio 手工建表。**
 
 ```bash
-alembic upgrade head
+python -m alembic upgrade head
 ```
 
 预期创建 10 张业务表：
@@ -116,30 +130,53 @@ evaluation_results · metric_results · diagnoses · recommendations · metric_d
 
 ### 4. 启动 FastAPI
 
-```bash
-# 方式 A：本机开发（日常主路径）
-uvicorn app.main:app --reload
+激活虚拟环境后，Windows PowerShell、macOS/Linux 均执行：
 
-# 方式 B：Docker Compose（仅 app 容器，数据库仍需外部可达）
-docker compose -f docker/docker-compose.yml up --build
+```bash
+python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
+
+Docker Compose 为可选的 app 容器打包路径，数据库需从容器可达，见 `docker/docker-compose.yml`。
 
 ### 5. 启动前端
 
-```bash
-# 方式 A：在项目根目录启动（自动转发到 frontend）
-npm run dev
+Windows PowerShell、macOS/Linux 均执行：
 
-# 方式 B：进入前端目录启动
+```bash
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 
-### 6. 健康检查
+依赖安装后也可在仓库根目录运行 `npm run dev`（自动转发到 `frontend`）。默认仅监听 `127.0.0.1:5173`。
+
+### 仅本机访问与局域网访问
+
+后端 Uvicorn 原生默认监听 `127.0.0.1`，上面的启动命令也显式指定该地址；前端由 `frontend/vite.config.ts` 显式指定 `127.0.0.1`。默认从本机访问 `http://127.0.0.1:5173` 和 `http://127.0.0.1:8000`。
+
+需要局域网访问时，临时在两个终端使用以下命令（Windows PowerShell、macOS/Linux 通用）：
 
 ```bash
-curl http://localhost:8000/api/health
+# 仓库根目录，已激活后端虚拟环境
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# 另一个终端，在 frontend 目录
+npm run dev -- --host 0.0.0.0
+```
+
+局域网客户端打开 `http://<本机局域网 IP>:5173`，前端 `/api` 仍通过 Vite 代理到本机后端。重启并恢复默认命令即可恢复仅本机监听。以上监听规则针对本机开发进程，Docker 容器网络单独配置。
+
+### 6. 健康检查
+
+Windows PowerShell：
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/api/health
+```
+
+macOS/Linux：
+
+```bash
+curl http://127.0.0.1:8000/api/health
 ```
 
 响应**区分应用与数据库两个状态**，数据库不健康时返回 **503**：
@@ -195,22 +232,29 @@ Judge 的 `localhost` / 回环 IP 地址直接连接，避免本机代理将本�
 
 ### 后端
 
-```bash
-pytest
+最新完整复验与历史实测见 [2026-10-11 补跑报告](docs/reviews/2026-10-11-faithfulness-followup.md)。CI 不配置真实 Judge，现有 `test_golden_smoke_single_record` 按 `skipif` 跳过；其余测试全部执行，包括真实 PostgreSQL 集成测试。跳过不计为通过。
+
+本机已有真实 `JUDGE_*` 配置时，无费用复验需在**当前终端**清空这些环境变量，覆盖本地 env 文件：
+
+```powershell
+# Windows PowerShell
+$env:JUDGE_PROVIDER=''
+$env:JUDGE_API_KEY=''
+$env:RAGAS_DO_NOT_TRACK='true'
+python -m ruff check .
+python -m pytest -q -ra
 ```
 
-**2026-09-28 实测**（本机，本地栈未启动）：
-
-```text
-534 tests collected
-521 passed, 13 skipped, 30 warnings in 52.73s
-ruff check .: All checks passed
+```bash
+# macOS/Linux
+python -m ruff check .
+JUDGE_PROVIDER='' JUDGE_API_KEY='' RAGAS_DO_NOT_TRACK=true python -m pytest -q -ra
 ```
 
 测试约束：
 
 ```text
-✗ 不硬编码 localhost:5432 / postgres container / db service
+✓ 本地使用 Supabase CLI；CI 使用临时 PostgreSQL 17 service，不连接开发库或 Cloud
 ✓ TEST_DATABASE_URL ≠ DATABASE_URL（pytest 启动即断言，相同直接报错退出）
 ✓ 测试库使用独立的 rageval_test 数据库（同一 PostgreSQL 实例上的独立 database），与开发库分离
 ```
@@ -218,14 +262,11 @@ ruff check .: All checks passed
 ### 前端
 
 ```bash
-cd frontend && npx vitest run
-```
-
-**2026-09-28 实测**：
-
-```text
-Test Files  7 passed (7)
-     Tests  63 passed (63)
+cd frontend
+npm ci
+npm run typecheck
+npm test
+npm run build
 ```
 
 用例位于 `frontend/tests/`（**不是** `frontend/src/`）。
@@ -248,25 +289,26 @@ Integration tests passed:   N      ← 真实 PostgreSQL 上执行并通过
 Integration tests skipped:  N      ← 未配置/不可达，明确跳过（不是通过）
 ```
 
-**关于当前 13 个 skip —— 原因已经变了，不只是数字：**
+`tests/conftest.py` 会分别报告「未配置」和「不可达」的实际原因。先在本地栈创建独立的 `rageval_test` 数据库，再在 `.env.test` 填写其连接串，保留 `.env.local` 的开发库连接不变：
 
-| | 早期状态 | **当前状态（2026-09-28）** |
-|---|---|---|
-| `TEST_DATABASE_URL` | 未配置 | **已在 `.env.test` 中配置** |
-| skip 原因 | 「没配置」 | **「配了，但本地 Supabase 栈没启动（unreachable）」** |
-
-汇总行打印的是 `not configured or unreachable` 这个二选一的措辞，容易误读；**判定当前属于哪一种，看 pytest 汇总行上一行的 `TEST_DATABASE_URL configured` 是否出现**——出现了，就说明是「不可达」而非「未配置」。
-
-所以这 13 个集成测试当前状态是 **NOT VERIFIED**，不是「跳过所以没事」。要真正验证：
+```env
+TEST_DATABASE_URL=postgresql+psycopg://postgres:<password>@127.0.0.1:54322/rageval_test
+```
 
 ```bash
-supabase start      # 先让本地栈起来
-pytest              # 首次运行会自动对 rageval_test 执行 alembic upgrade head
+supabase --workdir supabase start
+python -m pytest -q -ra
 ```
 
 已配置时，conftest 会在首跑自动对测试库执行 `alembic upgrade head`（Alembic 是唯一迁移体系），并在每个测试前后 `TRUNCATE` 全部业务表做隔离。
 
 迁移测试要求（空库 → `upgrade head` → 建表 → CRUD → Run 端到端 → 回滚）见 Spec 5.7.4 与附录 E.5。
+
+### GitHub Actions CI
+
+`.github/workflows/ci.yml` 在 push 到 `main` 或以 `main` 为目标的 pull request 时运行：后端 Python 3.12 安装 `.[dev,eval]`，执行 Ruff、专用测试库 Alembic 迁移及全量 pytest；前端 Node 24 LTS 执行 `npm ci`、类型检查、vitest 和 build。
+
+数据库为 Actions 自带的临时 `postgres:17` service：`DATABASE_URL` 指向 `postgres` 库，`TEST_DATABASE_URL` / `ALEMBIC_DATABASE_URL` 指向独立的 `rageval_test` 库。数据库不可达或迁移失败会直接失败。CI 不读取任何真实 API Key，不调用真实 Judge；唯一允许跳过的是上述真实 Judge smoke 测试，其他跳过会使 CI 失败。
 
 ---
 
@@ -309,7 +351,7 @@ PostgreSQL 17      本机 Supabase CLI 栈（默认）或 Supabase Cloud（可�
 
 | 层 | 选型 |
 |----|------|
-| 前端 | React 18 + TypeScript + Ant Design + ECharts（Vite） |
+| 前端 | React 18 + TypeScript + React Router 6 + ECharts 5（Vite 5；原生 CSS） |
 | 后端 | Python 3.12 + FastAPI + Pydantic v2 + SQLAlchemy 2.0 |
 | 驱动 | psycopg[binary] |
 | 迁移 | Alembic（唯一建表途径） |

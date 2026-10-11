@@ -1,9 +1,11 @@
 # RAGEval Studio — Docker Compose（MVP，仅应用容器）
 #
-# 数据库不在本文件中。
-# 数据库使用预配置的 Supabase Cloud PostgreSQL，通过 DATABASE_URL 连接。
+# 日常开发主路径：本机 Supabase CLI 栈 + 本机 uvicorn / Vite，见 README。
+# Supabase Cloud PostgreSQL 为可选数据库；两者均通过 DATABASE_URL 连接。
+# 本文件仅用于可选的 app 容器打包，不启动或管理数据库。
+# 容器中的 DATABASE_URL 必须使用从容器可达的数据库地址。
 #
-# 已移除（本地 PostgreSQL → Supabase Cloud 迁移）：
+# 本文件不包含：
 #   ✗ db service（postgres:xx 镜像）
 #   ✗ pgdata 数据卷
 #   ✗ 5432:5432 端口映射
