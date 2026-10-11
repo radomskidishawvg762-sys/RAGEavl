@@ -8,4 +8,5 @@
 - 原因：尚未确认是上下文过长还是上游响应慢；现有超时证据不足以归因。
 - 影响：重复测试只有 16/17 条得到有效分数；这 16 条与上次分数完全一致，但不能宣称完整 17/17 条重复一致。无分数不计为命中，也不据此判断 unsupported。
 - 本次处理：保留现有超时配置、原始结果和标签，不再进行 live 调用或超时排查。
+- 2026-10-11 补充：当时传给 RAGAS 的指标整体超时等于 `judge.timeout`（单次请求超时）。faithfulness 至少两次串行调用，context_precision 按上下文条数多次调用，再加上重试，这个预算可能不够，HTTP-CONTEXTS 的连续 `EXT_JUDGE_TIMEOUT`（`scope=metric`）可能与此有关。指标超时现已与单次请求超时分开；未单独配置时按预计调用次数 × 单次超时 × 尝试次数推算。此关联尚未用 live 调用确认，留到下次 live 复验。
 - 证据：见[补跑与全量复验报告](reviews/2026-10-11-faithfulness-followup.md)，以及本地保留的 [整批 trace](../exports/faithfulness-followup-2026-10-11/repeat17/trace.json) 和 [独立补测 trace](../exports/faithfulness-followup-2026-10-11/repeat17-retry/trace.json)。原始产物位于 Git 忽略的 `exports/`，仅在本地保留。

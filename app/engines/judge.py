@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 _JUDGE_DESCRIBE_FIELDS = (
     "provider", "model", "model_version", "base_url",
-    "temperature", "max_tokens", "timeout", "retry",
+    "temperature", "max_tokens", "timeout", "retry", "metric_timeout",
 )
 
 
@@ -46,8 +46,9 @@ class JudgeConfig(BaseModel):
     base_url: str = ""  # OpenAI-compatible gateway endpoint (T-19), e.g. opencode.ai/zen/go
     temperature: float = 0
     max_tokens: int = 1024
-    timeout: int = 30
-    retry: int = 3
+    timeout: int = 30  # single HTTP request
+    retry: int = 3  # attempts, including the first request
+    metric_timeout: int | None = None  # whole RAGAS metric; None = estimated
     api_key: SecretStr | None = None
     # Extra HTTP headers for the gateway (NOT in _JUDGE_DESCRIBE_FIELDS: a routing
     # session id is operational noise in a snapshot, not a reproducibility fact).
@@ -182,6 +183,11 @@ def judge_config_from_merged(merged: dict) -> JudgeConfig:
             "max_tokens": int(judge.get("max_tokens", cfg.max_tokens)),
             "timeout": int(judge.get("timeout", cfg.timeout)),
             "retry": int(judge.get("retry", cfg.retry)),
+            **(
+                {"metric_timeout": int(judge["metric_timeout"])}
+                if judge.get("metric_timeout") not in (None, "")
+                else {}
+            ),
         }
     )
 
@@ -197,6 +203,12 @@ def build_judge(config: JudgeConfig) -> JudgeClient:
             return adapter(config)
         return PlaceholderJudge(config)
     return PlaceholderJudge(config)
+
+
+def embeddings_available() -> bool:
+    """True only when a real embeddings client can be built. This repository
+    implements PlaceholderEmbeddings and nothing else."""
+    return False
 
 
 def build_embeddings(config: JudgeConfig) -> EmbeddingsClient:

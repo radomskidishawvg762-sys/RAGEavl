@@ -69,7 +69,7 @@ THRESHOLDED_PROFILE = """
 metrics:
   context_recall: { enabled: true, threshold: null, weight: 1.0 }
   faithfulness: { enabled: true, threshold: null, weight: 1.0 }
-  answer_relevancy: { enabled: true, threshold: null, weight: 1.0 }
+  answer_relevancy: { enabled: false, threshold: null, weight: 1.0 }
   context_precision: { enabled: true, threshold: null, weight: 1.0 }
   entity_consistency: { enabled: true, threshold: 0.9, weight: 1.0 }
   temporal_consistency: { enabled: true, threshold: 0.9, weight: 1.0 }
@@ -191,7 +191,7 @@ def test_d_selection_change_changes_execution(ctx) -> None:
     run_id = resp.json()["run_id"]
     _wait_terminal(ctx.repo, run_id)
 
-    expected = set(ALL_METRICS) - {"faithfulness", "entity_consistency"}
+    expected = set(ALL_METRICS) - {"faithfulness", "entity_consistency", "answer_relevancy"}
     assert _executed_metrics(ctx.repo, run_id) == expected
     meta = resp.json()["reproducibility_meta"]
     assert set(meta["enabled_metrics"]) == expected

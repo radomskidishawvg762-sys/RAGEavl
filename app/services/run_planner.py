@@ -245,7 +245,10 @@ def resolve_profile(merged: dict) -> RunPlan:
     if not default_judge_settings_service.has_runtime_override() and isinstance(merged_judge, dict):
         judge = judge.model_copy(update={
             key: value for key, value in merged_judge.items()
-            if key in {"provider", "model", "model_version", "base_url", "temperature", "max_tokens", "timeout", "retry"}
+            if key in {
+                "provider", "model", "model_version", "base_url", "temperature",
+                "max_tokens", "timeout", "retry", "metric_timeout",
+            }
             and value not in (None, "")
         })
     if judge.provider or judge.model:
@@ -274,6 +277,19 @@ def resolve_profile(merged: dict) -> RunPlan:
         "diagnosis_enabled": pipeline_cfg["diagnosis"]["enabled"],
     }
     enabled = [name for name in enabled if name not in pipeline_cfg["excluded_metrics"]]
+    if "answer_relevancy" in enabled:
+        # Imported here so a test can replace the function before this runs.
+        # No Judge client is built: embeddings_available() does not call one.
+        from app.engines.judge import embeddings_available
+
+        if not embeddings_available():
+            raise ConfigInvalidError(
+                "answer_relevancy requires an embeddings provider, and none is "
+                "configured; disable answer_relevancy or configure embeddings "
+                "before creating a run",
+                code="BIZ_CONFIG_INVALID",
+                context={"metric": "answer_relevancy", "reason": "embeddings_not_configured"},
+            )
     if not enabled:
         # Nothing left to evaluate. Without this guard the run was CREATED: the
         # factory built no engines, every record produced no metric rows, the
@@ -391,6 +407,8 @@ def build_reproducibility_meta(
     if isinstance(judge, dict):
         for key in ("provider", "temperature", "max_tokens", "timeout", "retry"):
             meta[f"judge_{key}"] = judge.get(key)
+        if judge.get("metric_timeout") not in (None, ""):
+            meta["judge_metric_timeout"] = judge.get("metric_timeout")
     return meta
 
 

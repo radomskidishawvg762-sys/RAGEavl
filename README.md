@@ -356,6 +356,6 @@ PostgreSQL 17      本机 Supabase CLI 栈（默认）或 Supabase Cloud（可�
 | 驱动 | psycopg[binary] |
 | 迁移 | Alembic（唯一建表途径） |
 | 存储 | PostgreSQL 17（本机 Supabase CLI 栈 / 可选 Cloud） |
-| 评估 | RAGAS + 自研 Integrity Metrics（Deterministic-first Hybrid） |
+| 评估 | RAGAS（默认启用 faithfulness、context_recall、context_precision；answer_relevancy 需要 embeddings，默认关闭）+ 自研 Integrity Metrics（Deterministic-first Hybrid） |
 | 测试 | pytest + pytest-asyncio（后端） / vitest + Testing Library（前端） |
 | 部署 | 本机进程为主；`docker/docker-compose.yml` 仅打包 app 容器 |

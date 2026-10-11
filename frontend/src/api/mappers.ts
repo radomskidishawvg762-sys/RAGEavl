@@ -487,8 +487,9 @@ const REPRO_KEY_LABEL: Record<string, string> = {
   judge_model_version: 'Judge 模型版本',
   judge_temperature: 'Judge 采样温度',
   judge_max_tokens: 'Judge 最大生成长度',
-  judge_timeout: 'Judge 超时（秒）',
+  judge_timeout: 'Judge 单次请求超时（秒）',
   judge_retry: 'Judge 重试次数',
+  judge_metric_timeout: '指标整体超时（秒）',
   timestamp: '运行时间',
 };
 

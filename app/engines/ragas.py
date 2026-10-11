@@ -102,6 +102,48 @@ class MetricScorer(Protocol):
     async def score(self, metric_name: str, sample: Any) -> float: ...
 
 
+def expected_llm_calls(metric_name: str, sample: Any, *, strictness: int = 3) -> int:
+    """Serial Judge calls one record needs. faithfulness is statement generation
+    then NLI. context_precision classifies each retrieved context in a loop.
+    context_recall classifies the joined contexts once. answer_relevancy
+    generates `strictness` questions (RAGAS default 3)."""
+    if metric_name == "faithfulness":
+        return 2
+    if metric_name == "context_precision":
+        contexts = getattr(sample, "retrieved_contexts", None) or []
+        return max(1, len(contexts))
+    if metric_name == "answer_relevancy":
+        return max(1, int(strictness))
+    return 1
+
+
+def metric_timeout_seconds(
+    metric_name: str, sample: Any, judge_desc: dict, *, strictness: int = 3,
+) -> float | None:
+    """Whole-metric budget. An explicit metric_timeout wins. Otherwise
+    expected calls × single-request timeout × attempt count. `retry` already
+    includes the first request, so it is (extra retries + 1). The request
+    timeout itself is not changed here."""
+    configured = judge_desc.get("metric_timeout")
+    if isinstance(configured, (int, float)) and not isinstance(configured, bool) and configured > 0:
+        return float(configured)
+    request_timeout = judge_desc.get("timeout")
+    if (
+        not isinstance(request_timeout, (int, float))
+        or isinstance(request_timeout, bool)
+        or request_timeout <= 0
+    ):
+        return None
+    attempts = judge_desc.get("retry", 1)
+    if not isinstance(attempts, (int, float)) or isinstance(attempts, bool):
+        attempts = 1
+    return float(
+        expected_llm_calls(metric_name, sample, strictness=strictness)
+        * float(request_timeout)
+        * max(1, int(attempts))
+    )
+
+
 class RagasScorer:
     """Real RAGAS call path. Metric objects are configured once with the
     JudgeClient bridge; single_turn_ascore is per-record (async)."""
@@ -155,14 +197,17 @@ class RagasScorer:
                     )
                 metric.embeddings = emb_wrapper
             self._metrics[name] = metric
-        self._timeout: float | None = None
-        desc = judge.describe()
-        if desc.get("timeout"):
-            self._timeout = float(desc["timeout"])
+        self._judge_desc = judge.describe()
 
     async def score(self, metric_name: str, sample: Any) -> float:
         metric = self._metrics[metric_name]
-        value = await metric.single_turn_ascore(sample, timeout=self._timeout)
+        value = await metric.single_turn_ascore(
+            sample,
+            timeout=metric_timeout_seconds(
+                metric_name, sample, self._judge_desc,
+                strictness=getattr(metric, "strictness", 3),
+            ),
+        )
         return float(value)
 
 

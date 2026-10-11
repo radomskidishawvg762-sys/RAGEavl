@@ -6,7 +6,9 @@ metrics:
   context_recall: { enabled: true, threshold: null, weight: 1.0 }
   context_precision: { enabled: true, threshold: null, weight: 1.0 }
   faithfulness: { enabled: true, threshold: null, weight: 1.0 }
-  answer_relevancy: { enabled: true, threshold: null, weight: 1.0 }
+  # Needs an embeddings provider. None is implemented, so an explicit enable
+  # is rejected at run creation instead of failing every record.
+  answer_relevancy: { enabled: false, threshold: null, weight: 1.0 }
   entity_consistency: { enabled: true, threshold: null, weight: 1.0 }
   temporal_consistency: { enabled: true, threshold: null, weight: 1.0 }
   numerical_consistency: { enabled: true, threshold: null, weight: 1.0 }

@@ -8,8 +8,10 @@ system:
     model_version: ${JUDGE_MODEL_VERSION:}
     temperature: 0
     max_tokens: 1024
-    timeout: 30
-    retry: 3
+    timeout: 30          # single HTTP request, seconds
+    retry: 3             # attempts, including the first request
+    # metric_timeout: 120  # optional whole-metric budget, seconds. Unset:
+    #                      # expected calls × timeout × retry
   # T-14B formal RAG input: url set -> HttpRagAdapter (POST {"question": ...});
   # empty -> explicit GoldenRunMetadataAdapter (test/golden-run bridge only).
   rag_input:

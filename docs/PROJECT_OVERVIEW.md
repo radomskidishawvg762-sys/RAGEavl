@@ -113,11 +113,11 @@ Run 状态：`pending, running, completed, completed_with_errors, failed, cancel
 
 ### 3.3 指标与失败分类
 
-指标共 **7 个**（2 个引擎）：
+注册表里有 **7 个**指标（2 个引擎）。默认 Profile 启用其中 6 个：
 
 | 引擎 | 指标 |
 |------|------|
-| RagasEngine | `faithfulness`、`answer_relevancy`、`context_recall`、`context_precision` |
+| RagasEngine | 默认启用 `faithfulness`、`context_recall`、`context_precision`。`answer_relevancy` 需要 embeddings；仓库里没有真实 embeddings 实现，默认关闭。配置里显式启用而 embeddings 不可用时，创建 Run 会被拒绝 |
 | IntegrityEngine | `entity_consistency`、`temporal_consistency`、`numerical_consistency` |
 
 Integrity 走 **Deterministic-first Hybrid**（ADR-04）：抽取 → 归一化（别名 / 单位 / 日期解析）→ 确定性比较 → 容差与等价判定 → **仅在不确定时才调 LLM**。每个结果必须带 `comparison_basis`；时间必须解析成区间（不做原始字符串比较）；数值必须抽数 → 单位归一 → 容差（不做字符串相等）。
